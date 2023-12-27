@@ -1,0 +1,9 @@
+{
+    "recommendations": [
+        "ms-python.python",
+        "charliermarsh.ruff",
+        "njpwerner.autodocstring",
+        "EditorConfig.EditorConfig",
+        "tamasfe.even-better-toml"
+    ]
+}

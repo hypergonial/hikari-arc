@@ -1,0 +1,104 @@
+# mkdocs.yml
+site_name: "hikari-arc documentation"
+site_url: https://arc.hypergonial.com
+repo_url: https://github.com/hypergonial/hikari-arc
+copyright: Copyright &copy; 2023 hypergonial
+edit_uri: edit/main/docs/
+theme:
+  name: material
+  icon:
+    logo: fontawesome/solid/book
+    repo: fontawesome/brands/github
+    edit: material/pencil
+    view: material/eye
+    admonition:
+      note: octicons/tag-16
+      abstract: octicons/checklist-16
+      info: octicons/info-16
+      tip: octicons/squirrel-16
+      success: octicons/check-16
+      question: octicons/question-16
+      warning: octicons/alert-16
+      failure: octicons/x-circle-16
+      danger: octicons/zap-16
+      bug: octicons/bug-16
+      example: octicons/beaker-16
+      quote: octicons/quote-16
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: teal
+      toggle:
+        icon: octicons/sun-16
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: teal
+      toggle:
+        icon: octicons/moon-24
+        name: Switch to light mode
+  features:
+    - search.highlight
+    - search.suggest
+    - search.share
+    - content.code.copy
+    - content.code.select
+    - navigation.instant
+    - navigation.instant.progress
+    - navigation.tabs
+    - navigation.expand
+    - navigation.indexes
+    - navigation.footer
+    - content.action.view
+    - content.action.edit
+    - toc.follow
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - toc:
+      permalink: "#"
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+      combine_header_slug: true
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
+  - def_list
+  - pymdownx.tasklist:
+      custom_checkbox: true
+
+plugins:
+  - autorefs
+  - search
+  - social
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          import:
+            - https://docs.python.org/3.11/objects.inv
+            - https://docs.hikari-py.dev/en/latest/objects.inv
+            - https://alluka.cursed.solutions/objects.inv
+          options:
+            annotations_path: source
+            docstring_section_style: spacy
+            docstring_style: numpy
+            inherited_members: false
+            merge_init_into_class: true
+            separate_signature: true
+            show_signature_annotations: true
+            show_source: false
+            show_submodules: false
+
+watch:
+  - docs
+  - README.md
+  - arc
