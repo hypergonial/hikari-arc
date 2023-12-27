@@ -1,10 +1,6 @@
 name: Deploy docs to Pages
 
 on:
-  # Runs on release creation
-  release:
-    types: [published]
-
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
@@ -26,8 +22,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-
 
       - name: Setup Pages
         id: pages
