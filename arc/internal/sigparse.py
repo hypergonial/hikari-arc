@@ -9,6 +9,8 @@ import hikari
 from ..command.option import (
     AttachmentOption,
     AttachmentParams,
+    BoolOption,
+    BoolParams,
     ChannelOption,
     ChannelParams,
     FloatOption,
@@ -35,6 +37,7 @@ if t.TYPE_CHECKING:
 __all__ = ("parse_function_signature",)
 
 TYPE_TO_OPTION_MAPPING: dict[t.Type[t.Any], t.Type[CommandOptionBase[t.Any, t.Any, t.Any]]] = {
+    bool: BoolOption,
     int: IntOption,
     str: StrOption,
     float: FloatOption,
@@ -61,6 +64,7 @@ TYPE_TO_OPTION_MAPPING: dict[t.Type[t.Any], t.Type[CommandOptionBase[t.Any, t.An
 }
 
 OPT_TO_PARAMS_MAPPING: dict[t.Type[CommandOptionBase[t.Any, t.Any, t.Any]], t.Type[t.Any]] = {
+    BoolOption: BoolParams,
     IntOption: IntParams,
     StrOption: StrParams,
     FloatOption: FloatParams,

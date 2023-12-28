@@ -12,8 +12,8 @@ if t.TYPE_CHECKING:
     import typing_extensions as te
 
 
-class RoleParams(OptionParams[hikari.Role]):
-    """The parameters for a user option.
+class BoolParams(OptionParams[bool]):
+    """The parameters for a bool option.
 
     Parameters
     ----------
@@ -29,22 +29,22 @@ class RoleParams(OptionParams[hikari.Role]):
 
 
 @attr.define(slots=True, kw_only=True)
-class RoleOption(CommandOptionBase[hikari.Role, ClientT, RoleParams]):
-    """A slash command option that represents a role.
+class BoolOption(CommandOptionBase[bool, ClientT, BoolParams]):
+    """A slash command option that represents a bool.
 
     ??? hint
         To add an option of this type to your command, add an argument to your command function with the following type hint:
         ```py
-        opt_name: arc.Option[hikari.Role, RoleParams(...)]
+        opt_name: arc.Option[bool, BoolParams(...)]
         ```
     """
 
     @property
     def option_type(self) -> hikari.OptionType:
-        return hikari.OptionType.ROLE
+        return hikari.OptionType.BOOLEAN
 
     @classmethod
-    def _from_params(cls, *, name: str, is_required: bool, params: RoleParams, **kwargs: t.Any) -> te.Self:
+    def _from_params(cls, *, name: str, is_required: bool, params: BoolParams, **kwargs: t.Any) -> te.Self:
         return cls(
             name=name,
             description=params.description,

@@ -16,6 +16,7 @@ async def correct_command(
     e: arc.Option[hikari.GuildChannel | None, arc.ChannelParams(description="quux")],
     f: arc.Option[hikari.Role | hikari.User, arc.MentionableParams(description="quuz")],
     g: arc.Option[hikari.Attachment | None, arc.AttachmentParams(description="among us")],
+    h: arc.Option[bool, arc.BoolParams(description="among us")] = False,
     i: arc.Option[str, arc.StrParams(description="foo")] = "among us",
 ) -> None:
     pass
@@ -23,7 +24,7 @@ async def correct_command(
 
 def test_correct_command() -> None:
     options = parse_function_signature(correct_command)
-    assert len(options) == 8
+    assert len(options) == 9
 
     assert isinstance(options["a"], arc.IntOption)
     assert options["a"].name == "a"
@@ -79,6 +80,11 @@ def test_correct_command() -> None:
     assert options["g"].name == "g"
     assert options["g"].description == "among us"
     assert not options["g"].is_required
+
+    assert isinstance(options["h"], arc.BoolOption)
+    assert options["h"].name == "h"
+    assert options["h"].description == "among us"
+    assert not options["h"].is_required
 
     assert isinstance(options["i"], arc.StrOption)
     assert options["i"].name == "i"

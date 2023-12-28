@@ -8,6 +8,7 @@ from .base import (
     OptionWithChoices,
     OptionWithChoicesParams,
 )
+from .bool import BoolOption, BoolParams
 from .channel import ChannelOption, ChannelParams
 from .float import FloatOption, FloatParams
 from .int import IntOption, IntParams
@@ -22,6 +23,8 @@ __all__ = (
     "OptionBase",
     "OptionWithChoices",
     "AutocompleteCallbackT",
+    "BoolOption",
+    "BoolParams",
     "OptionParams",
     "OptionWithChoicesParams",
     "IntOption",

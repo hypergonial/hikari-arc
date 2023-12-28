@@ -3,6 +3,8 @@ from .message import MessageCommand, message_command
 from .option import (
     AttachmentOption,
     AttachmentParams,
+    BoolOption,
+    BoolParams,
     ChannelOption,
     ChannelParams,
     CommandOptionBase,
@@ -48,6 +50,8 @@ __all__ = (
     "slash_subcommand",
     "CommandOptionBase",
     "Option",
+    "BoolOption",
+    "BoolParams",
     "IntOption",
     "StrOption",
     "OptionParams",
