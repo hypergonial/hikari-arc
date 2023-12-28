@@ -548,6 +548,37 @@ class Context(t.Generic[ClientT]):
             self._issued_response = True
             return await self._create_response()
 
+    async def respond_with_modal(
+        self, title: str, custom_id: str, *, components: t.Sequence[hikari.api.ComponentBuilder]
+    ) -> None:
+        """Respond to the interaction with a modal. Note that this **must be** the first response issued to the interaction.
+        If you're using `miru`, or already have an interaction builder, use [`respond_with_builder`][arc.context.base.Context.respond_with_builder] instead.
+
+        Parameters
+        ----------
+        title : str
+            The title of the modal.
+        custom_id : str
+            The custom ID of the modal.
+        components : t.Sequence[hikari.api.ModalActionRowBuilder]
+            The list of hikari component builders to add to the modal.
+        """
+        async with self._response_lock:
+            if self._issued_response:
+                raise RuntimeError("This interaction was already responded to.")
+
+            if self.client.is_rest:
+                builder = hikari.impl.InteractionModalBuilder(
+                    title=title, custom_id=custom_id, components=list(components)
+                )
+
+                self._resp_builder.set_result(builder)
+                self._issued_response = True
+                return
+
+            await self.interaction.create_modal_response(title=title, custom_id=custom_id, components=list(components))
+            self._issued_response = True
+
     async def edit_response(
         self,
         content: hikari.UndefinedNoneOr[t.Any] = hikari.UNDEFINED,
