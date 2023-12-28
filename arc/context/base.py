@@ -501,18 +501,28 @@ class Context(t.Generic[ClientT]):
                 response.delete_after(delete_after)
             return response
 
-    async def respond_with_builder(self, builder: ResponseBuilderT) -> InteractionResponse:
+    @t.overload
+    async def respond_with_builder(self, builder: hikari.api.InteractionModalBuilder) -> None:
+        ...
+
+    @t.overload
+    async def respond_with_builder(
+        self, builder: hikari.api.InteractionMessageBuilder | hikari.api.InteractionDeferredBuilder
+    ) -> InteractionResponse:
+        ...
+
+    async def respond_with_builder(self, builder: ResponseBuilderT) -> InteractionResponse | None:
         """Respond to the interaction with a builder.
 
         Parameters
         ----------
-        builder : hikari.api.InteractionResponseBuilder
+        builder : ResponseBuilderT
             The builder to respond with.
 
         Returns
         -------
-        InteractionResponse
-            A proxy object representing the response to the interaction.
+        InteractionResponse | None
+            A proxy object representing the response to the interaction. Will be None if the builder is a modal builder.
         """
         async with self._response_lock:
             if self._issued_response:
@@ -521,7 +531,8 @@ class Context(t.Generic[ClientT]):
             if self.client.is_rest:
                 self._resp_builder.set_result(builder)
                 self._issued_response = True
-                return await self._create_response()
+                if not isinstance(builder, hikari.api.InteractionModalBuilder):
+                    return await self._create_response()
 
             if isinstance(builder, hikari.api.InteractionMessageBuilder):
                 await self.interaction.create_initial_response(
@@ -546,7 +557,8 @@ class Context(t.Generic[ClientT]):
                 )
 
             self._issued_response = True
-            return await self._create_response()
+            if not isinstance(builder, hikari.api.InteractionModalBuilder):
+                return await self._create_response()
 
     async def respond_with_modal(
         self, title: str, custom_id: str, *, components: t.Sequence[hikari.api.ComponentBuilder]
@@ -560,7 +572,7 @@ class Context(t.Generic[ClientT]):
             The title of the modal.
         custom_id : str
             The custom ID of the modal.
-        components : t.Sequence[hikari.api.ModalActionRowBuilder]
+        components : t.Sequence[hikari.api.ComponentBuilder]
             The list of hikari component builders to add to the modal.
         """
         async with self._response_lock:
