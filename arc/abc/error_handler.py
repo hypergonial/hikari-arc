@@ -13,10 +13,7 @@ if t.TYPE_CHECKING:
 
 @attr.define(slots=False)
 class HasErrorHandler(abc.ABC, t.Generic[ClientT]):
-    _error_handler: ErrorHandlerCallbackT[ClientT] | None = attr.field(default=None)
-
-    """ def __init__(self, error_handler: ErrorHandlerCallbackT[ClientT]) -> None:
-        self._error_handler = error_handler """
+    _error_handler: ErrorHandlerCallbackT[ClientT] | None = attr.field(default=None, init=False)
 
     @property
     def error_handler(self) -> t.Optional[ErrorHandlerCallbackT[ClientT]]:
