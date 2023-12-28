@@ -53,6 +53,28 @@ theme:
     - content.action.edit
     - toc.follow
 
+nav:
+    - Home: index.md
+    - Getting Started: getting_started.md
+    - Guides:
+        - guides/foo.md
+    - API Reference:
+        - api_reference/index.md
+        - api_reference/client.md
+        - Command:
+          - api_reference/command/index.md
+          - api_reference/command/slash.md
+          - api_reference/command/option.md
+          - api_reference/command/message.md
+          - api_reference/command/user.md
+        - api_reference/context.md
+        - api_reference/errors.md
+        - api_reference/events.md
+        - api_reference/plugin.md
+        - api_reference/abc/index.md
+    - Changelog: changelog.md
+
+
 markdown_extensions:
   - admonition
   - pymdownx.details
