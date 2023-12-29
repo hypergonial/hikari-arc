@@ -9,10 +9,12 @@ hide:
 
 Here you can find all the changelogs for `hikari-arc`.
 
+<!--TODO: Remove arc.Injected[T] because it's confusing -->
 ## v0.1.4
 
 - Add support for passing mappings to `choices=` when specifying option params.
 - Improve handling missing responses via REST by adding `NoResponseIssuedError`.
+- Fix `@plugin.inject_dependencies` failing when located outside of the main module.
 
 ## v0.1.3
 

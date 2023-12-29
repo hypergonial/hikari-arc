@@ -237,23 +237,26 @@ class Plugin(HasErrorHandler[ClientT], t.Generic[ClientT]):
         - [`Client.set_type_dependency`][arc.client.Client.set_type_dependency]
             A method to set dependencies for the client.
         """
-        if self._client is None:
-            raise RuntimeError(
-                f"Cannot inject dependencies into '{func.__name__}' before plugin '{self.name}' is included in a client."
-            )
-
         if inspect.iscoroutinefunction(func):
 
             @functools.wraps(func)
             async def decorator_async(*args: P.args, **kwargs: P.kwargs) -> T:
-                return await self.client.injector.call_with_async_di(func, *args, **kwargs)
+                if self._client is None:
+                    raise RuntimeError(
+                        f"Cannot inject dependencies into '{func.__name__}' before plugin '{self.name}' is included in a client."
+                    )
+                return await self._client.injector.call_with_async_di(func, *args, **kwargs)
 
             return decorator_async  # pyright: ignore reportGeneralTypeIssues
         else:
 
             @functools.wraps(func)
             def decorator(*args: P.args, **kwargs: P.kwargs) -> T:
-                return self.client.injector.call_with_di(func, *args, **kwargs)
+                if self._client is None:
+                    raise RuntimeError(
+                        f"Cannot inject dependencies into '{func.__name__}' before plugin '{self.name}' is included in a client."
+                    )
+                return self._client.injector.call_with_di(func, *args, **kwargs)
 
             return decorator
 
