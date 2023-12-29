@@ -89,7 +89,7 @@ class OptionWithChoicesParams(OptionParams[ChoiceT], t.Generic[ChoiceT, ClientT]
         The name of the option in different locales
     description_localizations : Mapping[hikari.Locale, str]
         The description of the option in different locales
-    choices : t.Sequence[ChoiceT | hikari.CommandChoice] | None
+    choices : t.Sequence[ChoiceT | hikari.CommandChoice] | t.Mapping[str, ChoiceT] | None
         The choices for the option. If provided, these will be the only valid values for the option.
     autocomplete_with : AutocompleteCallbackT[ClientT, ChoiceT] | None
         The callback for autocompleting the option.
@@ -105,7 +105,7 @@ class OptionWithChoicesParams(OptionParams[ChoiceT], t.Generic[ChoiceT, ClientT]
         *,
         name_localizations: t.Mapping[hikari.Locale, str] | None = None,
         description_localizations: t.Mapping[hikari.Locale, str] | None = None,
-        choices: t.Sequence[ChoiceT | hikari.CommandChoice] | None = None,
+        choices: t.Sequence[ChoiceT | hikari.CommandChoice] | t.Mapping[str, ChoiceT] | None = None,
         autocomplete_with: AutocompleteCallbackT[ClientT, ChoiceT] | None = None,
     ) -> None:
         super().__init__(
@@ -118,7 +118,7 @@ class OptionWithChoicesParams(OptionParams[ChoiceT], t.Generic[ChoiceT, ClientT]
         self._autocomplete_with = autocomplete_with
 
     @property
-    def choices(self) -> t.Sequence[ChoiceT | hikari.CommandChoice] | None:
+    def choices(self) -> t.Sequence[ChoiceT | hikari.CommandChoice] | t.Mapping[str, ChoiceT] | None:
         """The choices for the option. If provided, these will be the only valid values for the option."""
         return self._choices
 
@@ -194,7 +194,7 @@ class CommandOptionBase(OptionBase[T], t.Generic[T, ClientT, ParamsT]):
 class OptionWithChoices(CommandOptionBase[ChoiceT, ClientT, ParamsT]):
     """An option that can have choices or be autocompleted."""
 
-    choices: t.Sequence[ChoiceT | hikari.CommandChoice] | None = None
+    choices: t.Sequence[ChoiceT | hikari.CommandChoice] | t.Mapping[str, ChoiceT] | None = None
     """The choices for the option."""
 
     autocomplete_with: AutocompleteCallbackT[ClientT, ChoiceT] | None = None
@@ -203,6 +203,9 @@ class OptionWithChoices(CommandOptionBase[ChoiceT, ClientT, ParamsT]):
     def _choices_to_command_choices(self) -> t.Sequence[hikari.CommandChoice] | None:
         if self.choices is None:
             return None
+
+        if isinstance(self.choices, t.Mapping):
+            return [hikari.CommandChoice(name=str(name), value=value) for name, value in self.choices.items()]
 
         return [
             hikari.CommandChoice(name=str(choice), value=choice)

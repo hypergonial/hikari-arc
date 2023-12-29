@@ -31,7 +31,7 @@ class FloatParams(OptionWithChoicesParams[float, ClientT]):
         The minimum value of the option
     max : float | None
         The maximum value of the option
-    choices : t.Sequence[int | hikari.CommandChoice] | None
+    choices : t.Sequence[float | hikari.CommandChoice] | t.Mapping[str, float] | None
         The choices for the option. If provided, these will be the only valid values for the option.
     autocomplete_with : AutocompleteCallbackT[ClientT, int] | None
         The callback that is invoked when the user autocompletes the option
@@ -49,7 +49,7 @@ class FloatParams(OptionWithChoicesParams[float, ClientT]):
         description_localizations: t.Mapping[hikari.Locale, str] = {},
         min: float | None = None,
         max: float | None = None,
-        choices: t.Sequence[float | hikari.CommandChoice] | None = None,
+        choices: t.Sequence[float | hikari.CommandChoice] | t.Mapping[str, float] | None = None,
         autocomplete_with: AutocompleteCallbackT[ClientT, float] | None = None,
     ) -> None:
         super().__init__(

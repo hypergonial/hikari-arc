@@ -11,6 +11,7 @@ Here you can find all the changelogs for `hikari-arc`.
 
 ## v0.1.4
 
+- Add support for passing mappings to `choices=` when specifying option params.
 - Improve handling missing responses via REST by adding `NoResponseIssuedError`.
 
 ## v0.1.3

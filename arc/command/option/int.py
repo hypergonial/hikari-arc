@@ -31,7 +31,7 @@ class IntParams(OptionWithChoicesParams[int, ClientT]):
         The minimum value of the option
     max : int | None
         The maximum value of the option
-    choices : t.Sequence[int | hikari.CommandChoice] | None
+    choices : t.Sequence[int | hikari.CommandChoice] | t.Mapping[str, int] | None
         The choices for the option. If provided, these will be the only valid values for the option.
     autocomplete_with : AutocompleteCallbackT[ClientT, int] | None
         The callback that is invoked when the user autocompletes the option
@@ -49,7 +49,7 @@ class IntParams(OptionWithChoicesParams[int, ClientT]):
         description_localizations: t.Mapping[hikari.Locale, str] | None = None,
         min: int | None = None,
         max: int | None = None,
-        choices: t.Sequence[int | hikari.CommandChoice] | None = None,
+        choices: t.Sequence[int | hikari.CommandChoice] | t.Mapping[str, int] | None = None,
         autocomplete_with: AutocompleteCallbackT[ClientT, int] | None = None,
     ) -> None:
         super().__init__(
