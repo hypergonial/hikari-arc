@@ -11,14 +11,14 @@ description: A guide on interactions, what they are, and how they work.
 
 ## What is an "interaction" anyway?
 
-Before interactions, there was only really one way to make a bot interact with the user on Discord. You could listen to events through the gateway, and if you so chose, respond to them. However this wasn't ideal, since for example, if you wanted to create a bot that listens for messages that start with `!` (as a common bot-prefix), you would have to scan every single message that is sent, just to find the ones that were meant for your bot. This also created issues with multiple bots potentially sharing the same common prefix, along with privacy concerns, since bots had the right (and practically the requirement) to read every single message.
+Before interactions, there was only one way to make a bot communicate with users on Discord. You could listen to events through the gateway, and if you so chose, respond to them. However this wasn't ideal, since for example, if you wanted to create a bot that listens for messages that start with `!` (as a common bot-prefix), you would have to scan every single message that is sent, just to find the ones that were meant for your bot. This also created issues with multiple bots potentially sharing the same common prefix, along with privacy concerns, since bots had the right (and practically the requirement) to read every single message.
 
 **Interactions** were devised as a sort of "targeted event" by Discord to specifically prompt a bot to respond to user action. Instead of the bot having to listen to every single event through the gateway, it is simply "called to action" by Discord when the bot is requested to perform a specific action. These actions include:
 
-- App Commands (Slash, Context Menu)
-- Slash Command Autocompletion
-- Message Components (Buttons, Selects)
-- Modals
+- **App Commands** (Slash, Context Menu)
+- **Slash Command Autocompletion**
+- **Message Components** (Buttons, Selects)
+- **Modals**
 
 Whenever a user enters a slash command, or presses a button, Discord sends an interaction specifically to *your bot*, asking it to respond to the interaction.
 
@@ -41,7 +41,7 @@ Interactions must be acknowledged in some form by your bot, or they will fail. T
 
 - `DEFERRED_MESSAGE_CREATE` - Signal to Discord that you are not quite ready to send a message yet, but will be in the future. This is what `arc` does when you call [`Context.defer()`][arc.context.base.Context.defer]. The user will see a loading state until you send a [followup](#followups).
 
-- `MODAL` - Send a modal in response. Modals are an interactive form that allow users to enter long-form text and send it to the bot. This corresponds to `arc`'s [`Context.respond_with_modal()`][arc.context.base.Context.respond_with_modal].
+- `MODAL` - Send a modal in response. [Modals](https://discord.com/developers/docs/interactions/message-components#text-inputs) are a type of interactive form that allows users to enter long-form text and send it to the bot. This corresponds to `arc`'s [`Context.respond_with_modal()`][arc.context.base.Context.respond_with_modal].
 
 - `MESSAGE_UPDATE` - Update the message belonging to this interaction. **This is not a valid response for command interactions**.
 
@@ -49,7 +49,9 @@ Interactions must be acknowledged in some form by your bot, or they will fail. T
 
 ### Followups
 
-Once you issued your response, be it a defer or otherwise, Discord will give you an additional **15 minutes** to create followup responses to the interaction. This includes sending new messages or editing/deleting existing responses. In `arc`, a followup is simply created by calling [`Context.respond()`][arc.context.base.Context.respond] again, `arc` automatically determines if you need to issue an initial response or a followup. After 15 minutes, the interaction is permanently invalidated by Discord.
+Once you issued your initial response, be it a defer or an actual message, Discord will give you an additional **15 minutes** to create followup responses to the interaction. This includes sending new messages or editing/deleting existing responses. After 15 minutes, the interaction is permanently invalidated by Discord.
+
+In `arc`, a followup is simply created by calling [`Context.respond()`][arc.context.base.Context.respond] again, `arc` automatically determines if you need to issue an initial response or a followup.
 
 ## Ephemeral messages
 
