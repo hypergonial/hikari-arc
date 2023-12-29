@@ -226,7 +226,6 @@ class InteractionResponse:
         return await self._context._create_response(message)
 
 
-# TODO Add autodefer support from miru to this
 class Context(t.Generic[ClientT]):
     """A context object that is proxying a Discord command interaction."""
 
