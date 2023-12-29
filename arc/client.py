@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import abc
+import asyncio
 import functools
 import importlib
 import inspect
@@ -16,7 +17,7 @@ import hikari
 
 from .command import MessageCommand, SlashCommand, SlashGroup, SlashSubCommand, SlashSubGroup, UserCommand
 from .context import AutodeferMode, Context
-from .errors import ExtensionLoadError, ExtensionUnloadError
+from .errors import ExtensionLoadError, ExtensionUnloadError, NoResponseIssuedError
 from .events import CommandErrorEvent
 from .internal.sync import _sync_commands
 from .internal.types import AppT, BuilderT, EventCallbackT, EventT, ResponseBuilderT
@@ -257,8 +258,16 @@ class Client(t.Generic[AppT], abc.ABC):
 
         fut = await command.invoke(interaction)
 
-        if fut is not None:
-            return await fut
+        if fut is None:
+            return
+
+        try:
+            return await asyncio.wait_for(fut, timeout=3.0)
+        except asyncio.TimeoutError:
+            logger.warning(
+                f"Timed out waiting for response from command: '{interaction.command_name} ({interaction.command_type})'"
+                f" Did you forget to respond?"
+            )
 
     async def on_autocomplete_interaction(
         self, interaction: hikari.AutocompleteInteraction
@@ -869,14 +878,20 @@ class RESTClient(Client[hikari.RESTBotAware]):
 
     async def _on_restbot_interaction_create(self, interaction: hikari.CommandInteraction) -> ResponseBuilderT:
         builder = await self.on_command_interaction(interaction)
-        assert builder is not None
+        if builder is None:
+            raise NoResponseIssuedError(
+                f"No response was issued to interaction for command: {interaction.command_name} ({interaction.command_type})."
+            )
         return builder
 
     async def _on_restbot_autocomplete_interaction_create(
         self, interaction: hikari.AutocompleteInteraction
     ) -> hikari.api.InteractionAutocompleteBuilder:
         builder = await self.on_autocomplete_interaction(interaction)
-        assert builder is not None
+        if builder is None:
+            raise NoResponseIssuedError(
+                f"No response was issued to autocomplete request for command: {interaction.command_name} ({interaction.command_type})."
+            )
         return builder
 
 

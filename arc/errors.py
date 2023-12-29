@@ -1,4 +1,12 @@
-__all__ = ("ArcError", "AutocompleteError", "CommandInvokeError")
+__all__ = (
+    "ArcError",
+    "AutocompleteError",
+    "CommandInvokeError",
+    "ExtensionError",
+    "ExtensionLoadError",
+    "ExtensionUnloadError",
+    "NoResponseIssuedError",
+)
 
 
 class ArcError(Exception):
@@ -23,6 +31,14 @@ class ExtensionLoadError(ExtensionError):
 
 class ExtensionUnloadError(ExtensionError):
     """An error occurred while trying to unload an extension."""
+
+
+class NoResponseIssuedError(ArcError):
+    """Raised when no response was issued by a command.
+    Interactions must be responded to or deferred within 3 seconds to avoid this error.
+
+    `arc` tries to automatically defer responses when possible, so this error should rarely occur, unless autodefer is disabled.
+    """
 
 
 # MIT License

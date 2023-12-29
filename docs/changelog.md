@@ -9,6 +9,10 @@ hide:
 
 Here you can find all the changelogs for `hikari-arc`.
 
+## v0.1.4
+
+- Improve handling missing responses via REST by adding `NoResponseIssuedError`.
+
 ## v0.1.3
 
 - Fix `Context.respond_with_builder` issuing the response twice in REST.
