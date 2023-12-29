@@ -57,8 +57,11 @@ theme:
 nav:
     - Home: index.md
     - Getting Started: getting_started.md
+    - Tutorial:
+        - tutorial/index.md
     - Guides:
-        - guides/foo.md
+        - guides/index.md
+        - guides/interactions.md
     - API Reference:
         - api_reference/index.md
         - api_reference/client.md
@@ -97,6 +100,8 @@ markdown_extensions:
   - def_list
   - pymdownx.tasklist:
       custom_checkbox: true
+  - attr_list
+  - md_in_html
 
 plugins:
   - autorefs
