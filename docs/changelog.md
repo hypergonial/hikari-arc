@@ -11,6 +11,7 @@ Here you can find all the changelogs for `hikari-arc`.
 
 ## v0.1.3
 
+- Fix `Context.respond_with_builder` issuing the response twice in REST.
 - Do not export `abc`s to top-level.
 
 ## v0.1.2
