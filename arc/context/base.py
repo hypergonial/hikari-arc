@@ -17,7 +17,7 @@ if t.TYPE_CHECKING:
 
 __all__ = ("Context", "InteractionResponse", "AutodeferMode")
 
-logger = logging.getLogger("__name__")
+logger = logging.getLogger(__name__)
 
 
 class AutodeferMode(enum.IntEnum):
@@ -349,6 +349,7 @@ class Context(t.Generic[ClientT]):
         async with self._response_lock:
             if self._issued_response:
                 return
+            logger.debug(f"Autodeferring an interaction for command '{self.command.name}'.")
             flags = hikari.MessageFlag.EPHEMERAL if autodefer_mode is AutodeferMode.EPHEMERAL else hikari.UNDEFINED
             # ctx.defer() also acquires _response_lock so we need to use self._interaction directly
             if not self.client.is_rest:
@@ -375,6 +376,7 @@ class Context(t.Generic[ClientT]):
 
         response = InteractionResponse(self, message)
         self._responses.append(response)
+        logger.debug(f"Created a new response for command '{self.command.name}'. Initial: {not bool(message)}")
         return response
 
     def get_guild(self) -> hikari.GatewayGuild | None:
@@ -533,6 +535,8 @@ class Context(t.Generic[ClientT]):
                 self._issued_response = True
                 if not isinstance(builder, hikari.api.InteractionModalBuilder):
                     return await self._create_response()
+                logger.debug(f"Created a new response for command '{self.command.name}'. Initial: True")
+                return
 
             if isinstance(builder, hikari.api.InteractionMessageBuilder):
                 await self.interaction.create_initial_response(
@@ -559,6 +563,7 @@ class Context(t.Generic[ClientT]):
             self._issued_response = True
             if not isinstance(builder, hikari.api.InteractionModalBuilder):
                 return await self._create_response()
+            logger.debug(f"Created a new response for command '{self.command.name}'. Initial: True")
 
     async def respond_with_modal(
         self, title: str, custom_id: str, *, components: t.Sequence[hikari.api.ComponentBuilder]
@@ -583,13 +588,13 @@ class Context(t.Generic[ClientT]):
                 builder = hikari.impl.InteractionModalBuilder(
                     title=title, custom_id=custom_id, components=list(components)
                 )
-
                 self._resp_builder.set_result(builder)
-                self._issued_response = True
-                return
-
-            await self.interaction.create_modal_response(title=title, custom_id=custom_id, components=list(components))
+            else:
+                await self.interaction.create_modal_response(
+                    title=title, custom_id=custom_id, components=list(components)
+                )
             self._issued_response = True
+            logger.debug(f"Created a new response for command '{self.command.name}'. Initial: True")
 
     async def edit_response(
         self,
