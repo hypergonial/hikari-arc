@@ -1,6 +1,6 @@
 import hikari
 
-import arc as arc
+import arc
 
 bot = hikari.GatewayBot("...", banner=None)
 client = arc.GatewayClient(bot)
@@ -66,35 +66,35 @@ def test_my_command() -> None:
     assert isinstance(command, arc.SlashCommand)
     options = command.options
 
-    assert isinstance(options["a"], arc.IntOption)
+    assert isinstance(options["a"], arc.command.IntOption)
     assert options["a"].name == "a"
     assert options["a"].description == "foo"
     assert options["a"].is_required
     assert options["a"].min == 10
     assert options["a"].max is None
 
-    assert isinstance(options["b"], arc.StrOption)
+    assert isinstance(options["b"], arc.command.StrOption)
     assert options["b"].name == "b"
     assert options["b"].description == "bar"
     assert options["b"].is_required
     assert options["b"].min_length == 100
     assert options["b"].max_length is None
 
-    assert isinstance(options["c"], arc.FloatOption)
+    assert isinstance(options["c"], arc.command.FloatOption)
     assert options["c"].name == "c"
     assert options["c"].description == "baz"
     assert not options["c"].is_required
     assert options["c"].min is None
     assert options["c"].max == 50.0
 
-    assert isinstance(options["d"], arc.ChannelOption)
+    assert isinstance(options["d"], arc.command.ChannelOption)
     assert options["d"].name == "d"
     assert options["d"].description == "qux"
     assert not options["d"].is_required
     assert options["d"].channel_types is not None
     assert set(options["d"].channel_types) == {hikari.ChannelType.GUILD_TEXT, hikari.ChannelType.GUILD_NEWS}
 
-    assert isinstance(options["e"], arc.ChannelOption)
+    assert isinstance(options["e"], arc.command.ChannelOption)
     assert options["e"].name == "e"
     assert options["e"].description == "quux"
     assert not options["e"].is_required
@@ -111,12 +111,12 @@ def test_my_command() -> None:
         hikari.ChannelType.GUILD_STAGE,
     }
 
-    assert isinstance(options["f"], arc.MentionableOption)
+    assert isinstance(options["f"], arc.command.MentionableOption)
     assert options["f"].name == "f"
     assert options["f"].description == "quuz"
     assert options["f"].is_required
 
-    assert isinstance(options["g"], arc.AttachmentOption)
+    assert isinstance(options["g"], arc.command.AttachmentOption)
     assert options["g"].name == "g"
     assert options["g"].description == "among us"
     assert not options["g"].is_required
@@ -143,8 +143,8 @@ def test_my_group() -> None:
     assert subcmd.name == "test_subcommand"
     assert subcmd.description == "My subcommand description"
     assert isinstance(subcmd, arc.SlashSubCommand)
-    assert isinstance(subcmd.options["a"], arc.IntOption)
-    assert isinstance(subcmd.options["b"], arc.StrOption)
+    assert isinstance(subcmd.options["a"], arc.command.IntOption)
+    assert isinstance(subcmd.options["b"], arc.command.StrOption)
 
     subgroup = group.children["my_subgroup"]
 

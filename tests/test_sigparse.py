@@ -26,35 +26,35 @@ def test_correct_command() -> None:
     options = parse_function_signature(correct_command)
     assert len(options) == 9
 
-    assert isinstance(options["a"], arc.IntOption)
+    assert isinstance(options["a"], arc.command.IntOption)
     assert options["a"].name == "a"
     assert options["a"].description == "foo"
     assert options["a"].is_required
     assert options["a"].min == 10
     assert options["a"].max is None
 
-    assert isinstance(options["b"], arc.StrOption)
+    assert isinstance(options["b"], arc.command.StrOption)
     assert options["b"].name == "b"
     assert options["b"].description == "bar"
     assert options["b"].is_required
     assert options["b"].min_length == 100
     assert options["b"].max_length is None
 
-    assert isinstance(options["c"], arc.FloatOption)
+    assert isinstance(options["c"], arc.command.FloatOption)
     assert options["c"].name == "c"
     assert options["c"].description == "baz"
     assert not options["c"].is_required
     assert options["c"].min is None
     assert options["c"].max == 50.0
 
-    assert isinstance(options["d"], arc.ChannelOption)
+    assert isinstance(options["d"], arc.command.ChannelOption)
     assert options["d"].name == "d"
     assert options["d"].description == "qux"
     assert not options["d"].is_required
     assert options["d"].channel_types is not None
     assert set(options["d"].channel_types) == {hikari.ChannelType.GUILD_TEXT, hikari.ChannelType.GUILD_NEWS}
 
-    assert isinstance(options["e"], arc.ChannelOption)
+    assert isinstance(options["e"], arc.command.ChannelOption)
     assert options["e"].name == "e"
     assert options["e"].description == "quux"
     assert not options["e"].is_required
@@ -71,22 +71,22 @@ def test_correct_command() -> None:
         hikari.ChannelType.GUILD_STAGE,
     }
 
-    assert isinstance(options["f"], arc.MentionableOption)
+    assert isinstance(options["f"], arc.command.MentionableOption)
     assert options["f"].name == "f"
     assert options["f"].description == "quuz"
     assert options["f"].is_required
 
-    assert isinstance(options["g"], arc.AttachmentOption)
+    assert isinstance(options["g"], arc.command.AttachmentOption)
     assert options["g"].name == "g"
     assert options["g"].description == "among us"
     assert not options["g"].is_required
 
-    assert isinstance(options["h"], arc.BoolOption)
+    assert isinstance(options["h"], arc.command.BoolOption)
     assert options["h"].name == "h"
     assert options["h"].description == "among us"
     assert not options["h"].is_required
 
-    assert isinstance(options["i"], arc.StrOption)
+    assert isinstance(options["i"], arc.command.StrOption)
     assert options["i"].name == "i"
     assert options["i"].description == "foo"
     assert not options["i"].is_required
@@ -136,14 +136,14 @@ def test_di_annotation() -> None:
     options = parse_function_signature(di_annotation)
     assert len(options) == 2
 
-    assert isinstance(options["a"], arc.IntOption)
+    assert isinstance(options["a"], arc.command.IntOption)
     assert options["a"].name == "a"
     assert options["a"].description == "foo"
     assert options["a"].is_required
     assert options["a"].min == 10
     assert options["a"].max is None
 
-    assert isinstance(options["c"], arc.StrOption)
+    assert isinstance(options["c"], arc.command.StrOption)
     assert options["c"].name == "b"
     assert options["c"].description == "bar"
     assert options["c"].is_required

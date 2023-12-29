@@ -9,6 +9,10 @@ hide:
 
 Here you can find all the changelogs for `hikari-arc`.
 
+## v0.1.3
+
+- Do not export `abc`s to top-level.
+
 ## v0.1.2
 
 - Add `Context.respond_with_modal`
