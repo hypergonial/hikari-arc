@@ -33,11 +33,23 @@ class ExtensionUnloadError(ExtensionError):
     """An error occurred while trying to unload an extension."""
 
 
-class NoResponseIssuedError(ArcError):
+class InteractionResponseError(ArcError):
+    """Base exception for all interaction response errors."""
+
+
+class NoResponseIssuedError(InteractionResponseError):
     """Raised when no response was issued by a command.
     Interactions must be responded to or deferred within 3 seconds to avoid this error.
 
     `arc` tries to automatically defer responses when possible, so this error should rarely occur, unless autodefer is disabled.
+    """
+
+
+class ResponseAlreadyIssuedError(InteractionResponseError):
+    """Raised when a response was already issued to an interaction.
+    Interactions can only be issued one initial response, every other response should be a followup.
+
+    Note that certain actions can only be done in an initial response, such as sending modals or builders.
     """
 
 

@@ -9,9 +9,10 @@ hide:
 
 Here you can find all the changelogs for `hikari-arc`.
 
-<!--TODO: Remove arc.Injected[T] because it's confusing -->
-## v0.1.4
+## v0.2.0
 
+- **Breaking:** Rename `Context.edit_response()` to `Context.edit_initial_response()`. This is to make the purpose of the function clearer.
+- **Breaking:** Remove `arc.Injected[T]` typehint alias. Use `arc.inject()` instead. This is to avoid confusion between the two.
 - Add support for passing mappings to `choices=` when specifying option params.
 - Improve handling missing responses via REST by adding `NoResponseIssuedError`.
 - Fix `@plugin.inject_dependencies` failing when located outside of the main module.

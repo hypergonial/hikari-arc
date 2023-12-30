@@ -10,6 +10,7 @@ from contextlib import suppress
 import attr
 import hikari
 
+from ..errors import NoResponseIssuedError, ResponseAlreadyIssuedError
 from ..internal.types import ClientT, ResponseBuilderT
 
 if t.TYPE_CHECKING:
@@ -88,8 +89,9 @@ class _ResponseGlue:
 
 
 class InteractionResponse:
-    """Represents a response to an interaction, allows for standardized handling of responses.
-    This class is not meant to be directly instantiated, and is instead returned by :obj:`arc.context.Context`.
+    """Represents a message response to an interaction, allows for standardized handling of such responses.
+    This class is not meant to be directly instantiated, and is instead returned by [Context][arc.context.base.Context]
+    when a message response is issued.
     """
 
     __slots__ = ("_context", "_message", "_delete_after_task")
@@ -421,6 +423,7 @@ class Context(t.Generic[ClientT]):
         delete_after: hikari.UndefinedOr[float | int | datetime.timedelta] = hikari.UNDEFINED,
     ) -> InteractionResponse:
         """Short-hand method to create a new message response via the interaction this context represents.
+        This function automatically determines if the response should be an initial response or a followup.
 
         Parameters
         ----------
@@ -454,7 +457,7 @@ class Context(t.Generic[ClientT]):
         Returns
         -------
         InteractionResponse
-            A proxy object representing the response to the interaction.
+            A proxy object representing the message response to the interaction.
         """
         async with self._response_lock:
             if self._issued_response:
@@ -524,10 +527,15 @@ class Context(t.Generic[ClientT]):
         -------
         InteractionResponse | None
             A proxy object representing the response to the interaction. Will be None if the builder is a modal builder.
+
+        Raises
+        ------
+        RuntimeError
+            The interaction was already issued an initial response.
         """
         async with self._response_lock:
             if self._issued_response:
-                raise RuntimeError("This interaction was already responded to.")
+                raise RuntimeError("This interaction was already issued an initial response.")
 
             if self.client.is_rest:
                 self._resp_builder.set_result(builder)
@@ -578,10 +586,15 @@ class Context(t.Generic[ClientT]):
             The custom ID of the modal.
         components : t.Sequence[hikari.api.ComponentBuilder]
             The list of hikari component builders to add to the modal.
+
+        Raises
+        ------
+        ResponseAlreadyIssuedError
+            The interaction was already issued an initial response.
         """
         async with self._response_lock:
             if self._issued_response:
-                raise RuntimeError("This interaction was already responded to.")
+                raise ResponseAlreadyIssuedError("This interaction was already issued an initial response.")
 
             if self.client.is_rest:
                 builder = hikari.impl.InteractionModalBuilder(
@@ -595,7 +608,7 @@ class Context(t.Generic[ClientT]):
             self._issued_response = True
             logger.debug(f"Created a new response for command '{self.command.name}'. Initial: True")
 
-    async def edit_response(
+    async def edit_initial_response(
         self,
         content: hikari.UndefinedNoneOr[t.Any] = hikari.UNDEFINED,
         *,
@@ -609,7 +622,9 @@ class Context(t.Generic[ClientT]):
         user_mentions: hikari.UndefinedOr[hikari.SnowflakeishSequence[hikari.PartialUser] | bool] = hikari.UNDEFINED,
         role_mentions: hikari.UndefinedOr[hikari.SnowflakeishSequence[hikari.PartialRole] | bool] = hikari.UNDEFINED,
     ) -> InteractionResponse:
-        """A short-hand method to edit the initial response belonging to this interaction.
+        """A short-hand method to edit the initial response belonging to this interaction. If you want to edit a followup,
+        you should use the `edit()`[arc.context.base.InteractionResponse.edit] method of the returned
+        [`InteractionResponse`][arc.context.base.InteractionResponse] response object instead.
 
         Parameters
         ----------
@@ -641,8 +656,8 @@ class Context(t.Generic[ClientT]):
 
         Raises
         ------
-        RuntimeError
-            The interaction was not yet responded to.
+        NoResponseIssuedError
+            The interaction was not yet issued an initial response.
         """
         async with self._response_lock:
             if self._issued_response:
@@ -661,10 +676,11 @@ class Context(t.Generic[ClientT]):
                 return await self._create_response(message)
 
             else:
-                raise RuntimeError("This interaction was not yet issued a response.")
+                raise NoResponseIssuedError("This interaction was not yet issued an initial response.")
 
     async def defer(self, flags: hikari.UndefinedOr[int | hikari.MessageFlag] = hikari.UNDEFINED) -> None:
-        """Short-hand method to defer an interaction response. Raises RuntimeError if the interaction was already responded to.
+        """Short-hand method to defer an interaction response. Raises ResponseAlreadyIssuedError
+        if the interaction was already responded to.
 
         Parameters
         ----------
@@ -673,13 +689,11 @@ class Context(t.Generic[ClientT]):
 
         Raises
         ------
-        RuntimeError
-            REST clients cannot defer responses.
-        ValueError
-            response_type was not a deferred response type.
+        ResponseAlreadyIssuedError
+            The interaction was already issued an initial response.
         """
         if self._issued_response:
-            raise RuntimeError("Interaction was already responded to.")
+            raise ResponseAlreadyIssuedError("Interaction was already issued an initial response.")
 
         async with self._response_lock:
             if not self.client.is_rest:
