@@ -110,7 +110,7 @@ await context.respond("I'm secret!", flags=hikari.MessageFlag.EPHEMERAL)
 You'd expect the interaction in the above command to time out after 3 seconds, and the call to [`Context.respond()`][arc.context.base.Context.respond] to fail, however `arc`, by default, after 2 seconds of not providing an initial response, defers the interaction for you to keep the interaction alive, thus the command succeeds. This default behaviour may however be undesirable if you want to, for example, make the initial response be ephemeral, or have tighter control over how the initial response is created. For this reason, `arc` provides 3 seperate configurations for autodeferring through the [`AutodeferMode`][arc.context.base.AutodeferMode] enum.
 
 - `AutodeferMode.OFF` - Autodeferring is completely turned off. If you fail to respond within 3 seconds, the interaction fails.
-- `AutodeferMode.ON` - The interaction will be deferred after 2 seconds if you did not create an initial response by then. **The defer will not be ephemeral**.
+- `AutodeferMode.ON` (Default) - The interaction will be deferred after 2 seconds if you did not create an initial response by then. **The defer will not be ephemeral**.
 - `AutodeferMode.EPHEMERAL` - The interaction will be deferred after 2 seconds if you did not create an initial response by then. **The defer will be ephemeral**.
 
 This can be passed to the command decorator's `autodefer=` keyword argument:
