@@ -52,6 +52,7 @@ theme:
     - navigation.top
     - content.action.view
     - content.action.edit
+    - content.tooltips
     - toc.follow
 
 nav:
@@ -62,6 +63,7 @@ nav:
     - Guides:
         - guides/index.md
         - guides/interactions.md
+        - guides/dependency_injection.md
     - API Reference:
         - api_reference/index.md
         - api_reference/client.md
