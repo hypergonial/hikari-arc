@@ -9,7 +9,7 @@ https://arc.hypergonial.com
 """
 
 from alluka import Client as Injector
-from alluka import Injected, inject
+from alluka import inject
 
 from .client import Client, GatewayClient, RESTClient
 from .command import (
@@ -51,7 +51,6 @@ __all__ = (
     "__url__",
     "__maintainer__",
     "AutodeferMode",
-    "Injected",
     "inject",
     "Injector",
     "AutocompleteData",

@@ -588,7 +588,7 @@ class Client(t.Generic[AppT], abc.ABC):
 
         @client.include
         @arc.slash_command("cmd", "A command.")
-        async def cmd(ctx: arc.Context[arc.GatewayClient], dep: arc.Injected[MyDependency]) -> None:
+        async def cmd(ctx: arc.Context[arc.GatewayClient], dep: MyDependency = arc.inject()) -> None:
             await ctx.respond(dep.value)
         ```
 
