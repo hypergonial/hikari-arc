@@ -695,7 +695,7 @@ def slash_subcommand(
     Usage
     -----
     ```py
-    group = client.include_group("group", "A group of slash commands.")
+    group = client.include_slash_group("group", "A group of slash commands.")
 
     @group.include
     @arc.slash_subcommand(name="hi", description="Say hi!")
