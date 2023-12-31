@@ -623,7 +623,7 @@ class Context(t.Generic[ClientT]):
         role_mentions: hikari.UndefinedOr[hikari.SnowflakeishSequence[hikari.PartialRole] | bool] = hikari.UNDEFINED,
     ) -> InteractionResponse:
         """A short-hand method to edit the initial response belonging to this interaction. If you want to edit a followup,
-        you should use the `edit()`[arc.context.base.InteractionResponse.edit] method of the returned
+        you should use the [`edit()`][arc.context.base.InteractionResponse.edit] method of the returned
         [`InteractionResponse`][arc.context.base.InteractionResponse] response object instead.
 
         Parameters
