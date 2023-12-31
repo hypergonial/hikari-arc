@@ -29,11 +29,11 @@ class HasErrorHandler(abc.ABC, t.Generic[ClientT]):
         ```py
         @client.include
         @arc.slash_command("foo", "Foo command description")
-        async def foo(ctx: arc.Context[ClientT]) -> None:
+        async def foo(ctx: arc.GatewayContext) -> None:
             raise Exception("foo")
 
         @foo.set_error_handler
-        async def foo_error_handler(ctx: arc.Context[ClientT], exc: Exception) -> None:
+        async def foo_error_handler(ctx: arc.GatewayContext, exc: Exception) -> None:
             await ctx.respond("foo failed")
         ```
         """

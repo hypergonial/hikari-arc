@@ -635,7 +635,7 @@ def slash_command(
     @client.include
     @arc.slash_command(name="hi", description="Say hi!")
     async def hi_slash(
-        ctx: arc.Context[arc.GatewayClient],
+        ctx: arc.GatewayContext,
         user: arc.Option[hikari.User, arc.UserParams(description="The user to say hi to.")]
     ) -> None:
         await ctx.respond(f"Hey {user.mention}!")
@@ -700,7 +700,7 @@ def slash_subcommand(
     @group.include
     @arc.slash_subcommand(name="hi", description="Say hi!")
     async def hi_slashsub(
-        ctx: arc.Context[arc.GatewayClient],
+        ctx: arc.GatewayContext,
         user: arc.Option[hikari.User, arc.UserParams(description="The user to say hi to.")]
     ) -> None:
         await ctx.respond(f"Hey {user.mention}!")

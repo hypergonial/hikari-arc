@@ -98,7 +98,7 @@ def user_command(
     ```py
     @client.include
     @arc.user_command(name="Say Hi", description="Say hi!")
-    async def hi_user(ctx: arc.Context[arc.GatewayClient], user: hikari.User) -> None:
+    async def hi_user(ctx: arc.GatewayContext, user: hikari.User) -> None:
         await ctx.respond(f"Hey {user.mention}!")
     ```
     """

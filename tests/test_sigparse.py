@@ -122,7 +122,7 @@ class MyType:
 
 
 async def di_annotation(
-    ctx: arc.Context[arc.GatewayClient],
+    ctx: arc.GatewayContext,
     a: arc.Option[int, arc.IntParams(description="foo", min=10)],
     c: arc.Option[str, arc.StrParams(name="b", description="bar", min_length=100)],
     b: MyType = arc.inject(),

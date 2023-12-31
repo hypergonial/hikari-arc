@@ -360,7 +360,7 @@ class Client(t.Generic[AppT], abc.ABC):
 
         @group.include
         @arc.slash_subcommand(name="Command", description="A command.")
-        async def cmd(ctx: arc.Context[arc.GatewayClient]) -> None:
+        async def cmd(ctx: arc.GatewayContext) -> None:
             await ctx.respond("Hello!")
         ```
         """
@@ -443,7 +443,7 @@ class Client(t.Generic[AppT], abc.ABC):
 
         # In extension.py
 
-        plugin = arc.GatewayPlugin[arc.GatewayClient]("test_plugin")
+        plugin = arc.GatewayPlugin("test_plugin")
 
         @arc.loader
         def loader(client: arc.GatewayClient) -> None:
@@ -590,7 +590,7 @@ class Client(t.Generic[AppT], abc.ABC):
 
         @client.include
         @arc.slash_command("cmd", "A command.")
-        async def cmd(ctx: arc.Context[arc.GatewayClient], dep: MyDependency = arc.inject()) -> None:
+        async def cmd(ctx: arc.GatewayContext, dep: MyDependency = arc.inject()) -> None:
             await ctx.respond(dep.value)
         ```
 

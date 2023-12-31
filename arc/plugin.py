@@ -178,7 +178,7 @@ class PluginBase(HasErrorHandler[ClientT], t.Generic[ClientT]):
 
         @group.include
         @arc.slash_subcommand(name="Command", description="A command.")
-        async def cmd(ctx: arc.Context[arc.GatewayClient]) -> None:
+        async def cmd(ctx: arc.GatewayContext) -> None:
             await ctx.respond("Hello!")
         ```
         """

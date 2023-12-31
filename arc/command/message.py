@@ -96,7 +96,7 @@ def message_command(
     @client.include
     @arc.message_command(name="Say Hi", description="Say hi!")
     async def hi_msg(
-        ctx: arc.Context[arc.GatewayClient], message: hikari.Message
+        ctx: arc.GatewayContext, message: hikari.Message
     ) -> None:
         await ctx.respond(f"Hey {message.author}!")
     ```
