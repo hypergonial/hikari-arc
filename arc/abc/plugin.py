@@ -28,7 +28,7 @@ class PluginBase(HasErrorHandler[ClientT], t.Generic[ClientT]):
 
     Parameters
     ----------
-    name : builtins.str
+    name : str
         The name of this plugin. This must be unique across all plugins.
     """
 

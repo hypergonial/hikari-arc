@@ -20,7 +20,7 @@ class RESTPluginBase(PluginBase[RESTClientT]):
 
     Parameters
     ----------
-    name : builtins.str
+    name : str
         The name of this plugin. This must be unique across all plugins.
     """
 
@@ -35,7 +35,7 @@ class GatewayPluginBase(PluginBase[GatewayClientT]):
 
     Parameters
     ----------
-    name : builtins.str
+    name : str
         The name of this plugin. This must be unique across all plugins.
     """
 
