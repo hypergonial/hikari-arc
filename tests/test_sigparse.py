@@ -1,5 +1,3 @@
-import typing as t
-
 import hikari
 import pytest
 
@@ -8,7 +6,7 @@ from arc.internal.sigparse import parse_function_signature
 
 
 async def correct_command(
-    ctx: arc.Context[t.Any],
+    ctx: arc.GatewayContext,
     a: arc.Option[int, arc.IntParams(description="foo", min=10)],
     b: arc.Option[str, arc.StrParams(description="bar", min_length=100)],
     c: arc.Option[float | None, arc.FloatParams(description="baz", max=50.0)],
@@ -93,7 +91,7 @@ def test_correct_command() -> None:
 
 
 async def wrong_params_type(
-    ctx: arc.Context[t.Any],
+    ctx: arc.GatewayContext,
     a: arc.Option[int, arc.IntParams(description="foo", min=10)],
     b: arc.Option[str, arc.IntParams(description="bar", max=50)],
 ) -> None:
@@ -109,7 +107,7 @@ class WrongType:
     pass
 
 
-async def wrong_opt_type(ctx: arc.Context[t.Any], a: arc.Option[WrongType, arc.IntParams(description="foo")]) -> None:
+async def wrong_opt_type(ctx: arc.GatewayContext, a: arc.Option[WrongType, arc.IntParams(description="foo")]) -> None:
     pass
 
 

@@ -7,15 +7,13 @@ import typing as t
 import attr
 import hikari
 
-from ..abc import HasErrorHandler
-from ..context import AutodeferMode
-from ..internal.types import BuilderT, ClientT, CommandCallbackT, ResponseBuilderT
+from arc.abc.error_handler import HasErrorHandler
+from arc.context import AutodeferMode
+from arc.internal.types import BuilderT, ClientT, CommandCallbackT, ResponseBuilderT
 
 if t.TYPE_CHECKING:
     from ..context import Context
-    from ..plugin import Plugin
-
-__all__ = ("CommandProto", "CallableCommandProto", "CommandBase", "CallableCommandBase")
+    from ..plugin import PluginBase
 
 
 class CommandProto(t.Protocol):
@@ -111,7 +109,7 @@ class CommandBase(HasErrorHandler[ClientT], t.Generic[ClientT, BuilderT]):
     _client: ClientT | None = attr.field(init=False, default=None)
     """The client that is handling this command."""
 
-    _plugin: Plugin[ClientT] | None = attr.field(init=False, default=None)
+    _plugin: PluginBase[ClientT] | None = attr.field(init=False, default=None)
     """The plugin that this command belongs to, if any."""
 
     guilds: hikari.UndefinedOr[t.Sequence[hikari.Snowflake]] = hikari.UNDEFINED
@@ -156,7 +154,7 @@ class CommandBase(HasErrorHandler[ClientT], t.Generic[ClientT, BuilderT]):
         return self._client
 
     @property
-    def plugin(self) -> Plugin[ClientT] | None:
+    def plugin(self) -> PluginBase[ClientT] | None:
         """The plugin that this command belongs to, if any."""
         return self._plugin
 
@@ -267,7 +265,7 @@ class CommandBase(HasErrorHandler[ClientT], t.Generic[ClientT, BuilderT]):
         self._client = client
         self.client._add_command(self)
 
-    def _plugin_include_hook(self, plugin: Plugin[ClientT]) -> None:
+    def _plugin_include_hook(self, plugin: PluginBase[ClientT]) -> None:
         """Called when the plugin requests the command be added to it."""
         self._plugin = plugin
         self._plugin._add_command(self)
@@ -304,26 +302,3 @@ class CallableCommandBase(CommandBase[ClientT, BuilderT]):
         self._invoke_task = asyncio.create_task(self._handle_callback(self, ctx, *args, **kwargs))
         if self.client.is_rest:
             return ctx._resp_builder
-
-
-# MIT License
-#
-# Copyright (c) 2023-present hypergonial
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.

@@ -3,7 +3,7 @@ from __future__ import annotations
 import typing as t
 from functools import total_ordering
 
-from .about import __version__
+from arc.internal.about import __version__
 
 if t.TYPE_CHECKING:
     import typing_extensions as te

@@ -5,16 +5,16 @@ import typing as t
 import attr
 import hikari
 
-from ..context import Context
-from ..errors import CommandInvokeError
-from ..internal.types import ClientT, ResponseBuilderT
-from .base import AutodeferMode, CallableCommandBase
+from arc.abc.command import CallableCommandBase
+from arc.context import AutodeferMode, Context
+from arc.errors import CommandInvokeError
+from arc.internal.types import ClientT, ResponseBuilderT
 
 if t.TYPE_CHECKING:
     import asyncio
 
-    from ..internal.types import UserContextCallbackT
-    from .base import CallableCommandProto
+    from arc.abc.command import CallableCommandProto
+    from arc.internal.types import UserContextCallbackT
 
 __all__ = ("UserCommand", "user_command")
 

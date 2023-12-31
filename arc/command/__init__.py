@@ -1,4 +1,3 @@
-from .base import CallableCommandBase, CallableCommandProto, CommandBase, CommandProto
 from .message import MessageCommand, message_command
 from .option import (
     AttachmentOption,
@@ -7,17 +6,12 @@ from .option import (
     BoolParams,
     ChannelOption,
     ChannelParams,
-    CommandOptionBase,
     FloatOption,
     FloatParams,
     IntOption,
     IntParams,
     MentionableOption,
     MentionableParams,
-    Option,
-    OptionParams,
-    OptionWithChoices,
-    OptionWithChoicesParams,
     RoleOption,
     RoleParams,
     StrOption,
@@ -37,10 +31,6 @@ from .slash import (
 from .user import UserCommand, user_command
 
 __all__ = (
-    "CommandBase",
-    "CommandProto",
-    "CallableCommandBase",
-    "CallableCommandProto",
     "SlashCommand",
     "SlashCommandLike",
     "SlashGroup",
@@ -48,15 +38,10 @@ __all__ = (
     "SlashSubGroup",
     "slash_command",
     "slash_subcommand",
-    "CommandOptionBase",
-    "Option",
     "BoolOption",
     "BoolParams",
     "IntOption",
     "StrOption",
-    "OptionParams",
-    "OptionWithChoices",
-    "OptionWithChoicesParams",
     "IntParams",
     "StrParams",
     "FloatOption",

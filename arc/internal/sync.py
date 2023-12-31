@@ -9,9 +9,9 @@ from contextlib import suppress
 import hikari
 
 if t.TYPE_CHECKING:
-    from ..client import Client
-    from ..command import CommandBase
-    from .types import AppT
+    from arc.abc.client import Client
+    from arc.abc.command import CommandBase
+    from arc.internal.types import AppT
 
 __all__ = ("_sync_commands",)
 

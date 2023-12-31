@@ -9,7 +9,7 @@ client = arc.GatewayClient(bot)
 @client.include
 @arc.slash_command("test", default_permissions=hikari.Permissions.ADMINISTRATOR)
 async def my_command(
-    ctx: arc.Context[arc.GatewayClient],
+    ctx: arc.GatewayContext,
     a: arc.Option[int, arc.IntParams(description="foo", min=10)],
     b: arc.Option[str, arc.StrParams(description="bar", min_length=100)],
     c: arc.Option[float | None, arc.FloatParams(description="baz", max=50.0)],
@@ -31,7 +31,7 @@ subgroup = group.include_subgroup("my_subgroup", "My subgroup description")
 @group.include
 @arc.slash_subcommand("test_subcommand", "My subcommand description")
 async def my_subcommand(
-    ctx: arc.Context[arc.GatewayClient],
+    ctx: arc.GatewayContext,
     a: arc.Option[int, arc.IntParams(description="foo", min=10)],
     b: arc.Option[str, arc.StrParams(description="bar", min_length=100)],
 ) -> None:
@@ -41,7 +41,7 @@ async def my_subcommand(
 @subgroup.include
 @arc.slash_subcommand("test_subsubcommand", "My subsubcommand description")
 async def my_subsubcommand(
-    ctx: arc.Context[arc.GatewayClient],
+    ctx: arc.GatewayContext,
     a: arc.Option[int, arc.IntParams(description="foo", min=10)],
     b: arc.Option[str, arc.StrParams(description="bar", min_length=100)],
 ) -> None:

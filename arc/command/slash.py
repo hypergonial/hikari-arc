@@ -6,20 +6,20 @@ import typing as t
 import attr
 import hikari
 
-from ..abc import HasErrorHandler
-from ..context import AutocompleteData, Context
-from ..errors import AutocompleteError, CommandInvokeError
-from ..internal.sigparse import parse_function_signature
-from ..internal.types import ClientT, CommandCallbackT, ResponseBuilderT, SlashCommandLike
-from .base import AutodeferMode, CallableCommandBase, CommandBase
-from .option import OptionBase, OptionWithChoices
+from arc.abc.command import CallableCommandBase, CommandBase
+from arc.abc.error_handler import HasErrorHandler
+from arc.abc.option import OptionBase, OptionWithChoices
+from arc.context import AutocompleteData, AutodeferMode, Context
+from arc.errors import AutocompleteError, CommandInvokeError
+from arc.internal.sigparse import parse_function_signature
+from arc.internal.types import ClientT, CommandCallbackT, ResponseBuilderT, SlashCommandLike
 
 if t.TYPE_CHECKING:
     from asyncio.futures import Future
 
-    from ..plugin import Plugin
-    from .base import CallableCommandProto
-    from .option import CommandOptionBase
+    from arc.abc.command import CallableCommandProto
+    from arc.abc.option import CommandOptionBase
+    from arc.plugin import PluginBase
 
 __all__ = (
     "SlashCommandLike",
@@ -418,7 +418,7 @@ class SlashSubGroup(OptionBase[ClientT], HasErrorHandler[ClientT]):
     If undefined, then it will be inherited from the parent.
     """
 
-    _plugin: Plugin[ClientT] | None = attr.field(default=None, init=False)
+    _plugin: PluginBase[ClientT] | None = attr.field(default=None, init=False)
 
     @property
     def option_type(self) -> hikari.OptionType:
@@ -444,7 +444,7 @@ class SlashSubGroup(OptionBase[ClientT], HasErrorHandler[ClientT]):
         return self.parent.client
 
     @property
-    def plugin(self) -> Plugin[ClientT] | None:
+    def plugin(self) -> PluginBase[ClientT] | None:
         """The plugin that includes this subgroup."""
         return self._plugin
 
@@ -542,7 +542,7 @@ class SlashSubCommand(OptionBase[ClientT], HasErrorHandler[ClientT]):
         return self.root.client
 
     @property
-    def plugin(self) -> Plugin[ClientT] | None:
+    def plugin(self) -> PluginBase[ClientT] | None:
         """The plugin that includes this subcommand."""
         return self.root.plugin
 

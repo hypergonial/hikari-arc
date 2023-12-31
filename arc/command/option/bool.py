@@ -5,11 +5,13 @@ import typing as t
 import attr
 import hikari
 
-from ...internal.types import ClientT
-from .base import CommandOptionBase, OptionParams
+from arc.abc.option import CommandOptionBase, OptionParams
+from arc.internal.types import ClientT
 
 if t.TYPE_CHECKING:
     import typing_extensions as te
+
+__all__ = ("BoolOption", "BoolParams")
 
 
 class BoolParams(OptionParams[bool]):

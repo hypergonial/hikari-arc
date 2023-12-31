@@ -5,7 +5,7 @@ import typing as t
 
 import attr
 
-from ..internal.types import ClientT, ErrorHandlerCallbackT
+from arc.internal.types import ClientT, ErrorHandlerCallbackT
 
 if t.TYPE_CHECKING:
     from ..context import Context

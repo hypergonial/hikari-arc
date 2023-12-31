@@ -5,12 +5,12 @@ from functools import cached_property
 
 import attr
 
-from ..internal.types import ChoiceT, ClientT
+from arc.internal.types import ChoiceT, ClientT
 
 if t.TYPE_CHECKING:
     import hikari
 
-    from ..command import CommandProto
+    from arc.abc.command import CommandProto
 
 __all__ = ("AutocompleteData",)
 

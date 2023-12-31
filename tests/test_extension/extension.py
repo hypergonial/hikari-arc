@@ -2,13 +2,13 @@ import hikari
 
 import arc
 
-plugin = arc.GatewayPlugin[arc.GatewayClient]("test_plugin")
+plugin = arc.GatewayPlugin("test_plugin")
 
 
 @plugin.include
 @arc.slash_command("foo", "Test description")
 async def foo_command(
-    ctx: arc.Context[arc.GatewayClient],
+    ctx: arc.GatewayContext,
     a: arc.Option[float | None, arc.FloatParams(description="foo", max=50.0)],
     b: arc.Option[hikari.GuildChannel | None, arc.ChannelParams(description="bar")],
 ) -> None:
@@ -18,7 +18,7 @@ async def foo_command(
 @plugin.include
 @arc.slash_command("bar", "Test description")
 async def bar_command(
-    ctx: arc.Context[arc.GatewayClient],
+    ctx: arc.GatewayContext,
     a: arc.Option[hikari.Role | hikari.User, arc.MentionableParams(description="foo")],
     b: arc.Option[hikari.Attachment | None, arc.AttachmentParams(description="bar")],
 ) -> None:
@@ -28,7 +28,7 @@ async def bar_command(
 @plugin.include
 @arc.slash_command("baz", "Test description")
 async def baz_command(
-    ctx: arc.Context[arc.GatewayClient],
+    ctx: arc.GatewayContext,
     a: arc.Option[int, arc.IntParams(description="foo", min=10)],
     b: arc.Option[str, arc.StrParams(description="bar", min_length=100)],
 ) -> None:
@@ -43,7 +43,7 @@ group = plugin.include_slash_group(
 @group.include
 @arc.slash_subcommand("test_subcommand", "My subcommand description")
 async def my_subcommand(
-    ctx: arc.Context[arc.GatewayClient],
+    ctx: arc.GatewayContext,
     a: arc.Option[int, arc.IntParams(description="foo", min=10)],
     b: arc.Option[str, arc.StrParams(description="bar", min_length=100)],
 ) -> None:

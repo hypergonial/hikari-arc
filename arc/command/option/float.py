@@ -5,13 +5,15 @@ import typing as t
 import attr
 import hikari
 
-from ...internal.types import ClientT
-from .base import OptionWithChoices, OptionWithChoicesParams
+from arc.abc.option import OptionWithChoices, OptionWithChoicesParams
+from arc.internal.types import ClientT
 
 if t.TYPE_CHECKING:
     import typing_extensions as te
 
     from ...internal.types import AutocompleteCallbackT
+
+__all__ = ("FloatOption", "FloatParams")
 
 
 class FloatParams(OptionWithChoicesParams[float, ClientT]):

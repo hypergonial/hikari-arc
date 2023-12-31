@@ -4,10 +4,10 @@ import typing as t
 
 import hikari
 
-from .internal.types import GatewayClientT
+from arc.internal.types import GatewayClientT
 
 if t.TYPE_CHECKING:
-    from .context import Context
+    from arc.context import Context
 
 __all__ = ("ArcEvent", "CommandErrorEvent")
 

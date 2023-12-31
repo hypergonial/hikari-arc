@@ -10,11 +10,11 @@ from contextlib import suppress
 import attr
 import hikari
 
-from ..errors import NoResponseIssuedError, ResponseAlreadyIssuedError
-from ..internal.types import ClientT, ResponseBuilderT
+from arc.errors import NoResponseIssuedError, ResponseAlreadyIssuedError
+from arc.internal.types import ClientT, ResponseBuilderT
 
 if t.TYPE_CHECKING:
-    from ..command import CallableCommandProto
+    from arc.abc.command import CallableCommandProto
 
 __all__ = ("Context", "InteractionResponse", "AutodeferMode")
 

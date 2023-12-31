@@ -5,9 +5,10 @@ import typing as t
 if t.TYPE_CHECKING:
     import hikari
 
-    from ..client import Client, GatewayClient, RESTClient
-    from ..command import OptionParams, SlashCommand, SlashGroup
-    from ..context import AutocompleteData, Context
+    from arc.abc import Client, OptionParams
+    from arc.client import GatewayClient, RESTClient
+    from arc.command import SlashCommand, SlashGroup
+    from arc.context import AutocompleteData, Context
 
 
 # Generics

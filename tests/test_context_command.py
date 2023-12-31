@@ -8,13 +8,13 @@ client = arc.GatewayClient(bot)
 
 @client.include
 @arc.user_command(name="Say Hi")
-async def ping_user(ctx: arc.Context[arc.GatewayClient], user: hikari.User) -> None:
+async def ping_user(ctx: arc.GatewayContext, user: hikari.User) -> None:
     await ctx.respond(f"Hi {user}!")
 
 
 @client.include
 @arc.message_command(name="Say Hi")
-async def ping_message(ctx: arc.Context[arc.GatewayClient], message: hikari.Message) -> None:
+async def ping_message(ctx: arc.GatewayContext, message: hikari.Message) -> None:
     await ctx.respond(f"Hi {message.author}!")
 
 

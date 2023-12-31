@@ -5,4 +5,4 @@ description: Command API reference
 
 # Command
 
-::: arc.command.base
+Here you can find all the concrete implementations of commands inside arc. For the abstract base classes see [here](../abc/index.md).

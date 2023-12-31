@@ -11,18 +11,18 @@ https://arc.hypergonial.com
 from alluka import Client as Injector
 from alluka import inject
 
-from .client import Client, GatewayClient, RESTClient
+from arc import abc, command
+
+from .abc import Option
+from .client import Client, GatewayClient, GatewayContext, GatewayPlugin, RESTClient, RESTContext, RESTPlugin
 from .command import (
     AttachmentParams,
     BoolParams,
-    CallableCommandBase,
-    CallableCommandProto,
     ChannelParams,
     FloatParams,
     IntParams,
     MentionableParams,
     MessageCommand,
-    Option,
     RoleParams,
     SlashCommand,
     SlashGroup,
@@ -36,12 +36,12 @@ from .command import (
     slash_subcommand,
     user_command,
 )
-from .context import AutocompleteData, AutodeferMode, Context
+from .context import AutocompleteData, AutodeferMode, Context, InteractionResponse
 from .errors import ArcError, AutocompleteError, CommandInvokeError
 from .events import ArcEvent, CommandErrorEvent
 from .extension import loader, unloader
 from .internal.about import __author__, __author_email__, __license__, __maintainer__, __url__, __version__
-from .plugin import GatewayPlugin, Plugin, RESTPlugin
+from .plugin import GatewayPluginBase, PluginBase, RESTPluginBase
 
 __all__ = (
     "__version__",
@@ -54,8 +54,6 @@ __all__ = (
     "inject",
     "Injector",
     "AutocompleteData",
-    "CallableCommandProto",
-    "CallableCommandBase",
     "Option",
     "Context",
     "Context",
@@ -84,13 +82,20 @@ __all__ = (
     "ArcError",
     "AutocompleteError",
     "CommandInvokeError",
-    "Plugin",
-    "RESTPlugin",
-    "GatewayPlugin",
+    "PluginBase",
+    "RESTPluginBase",
+    "GatewayPluginBase",
     "loader",
     "unloader",
     "ArcEvent",
     "CommandErrorEvent",
+    "InteractionResponse",
+    "GatewayContext",
+    "RESTContext",
+    "RESTPlugin",
+    "GatewayPlugin",
+    "abc",
+    "command",
 )
 
 # MIT License

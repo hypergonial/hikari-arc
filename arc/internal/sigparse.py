@@ -6,7 +6,8 @@ import typing as t
 
 import hikari
 
-from ..command.option import (
+from arc.abc.option import OptionParams
+from arc.command.option import (
     AttachmentOption,
     AttachmentParams,
     BoolOption,
@@ -19,7 +20,6 @@ from ..command.option import (
     IntParams,
     MentionableOption,
     MentionableParams,
-    OptionParams,
     RoleOption,
     RoleParams,
     StrOption,
@@ -29,9 +29,9 @@ from ..command.option import (
 )
 
 if t.TYPE_CHECKING:
-    from ..command.option import CommandOptionBase
-    from ..context import Context
-    from .types import ClientT
+    from arc.abc.option import CommandOptionBase
+    from arc.context import Context
+    from arc.internal.types import ClientT
 
 
 __all__ = ("parse_function_signature",)

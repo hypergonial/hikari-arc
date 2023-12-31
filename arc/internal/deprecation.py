@@ -3,7 +3,7 @@ from __future__ import annotations
 import typing as t
 from warnings import warn
 
-from .version import CURRENT_VERSION, Version
+from arc.internal.version import CURRENT_VERSION, Version
 
 __all__ = ("warn_deprecate",)
 

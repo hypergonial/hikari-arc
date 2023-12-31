@@ -87,7 +87,7 @@ await context.respond("I'm secret!", flags=hikari.MessageFlag.EPHEMERAL)
 
     @client.include
     @arc.slash_command("name", "description")
-    async def takes_time(context: arc.Context[arc.GatewayClient]) -> None:
+    async def takes_time(context: arc.GatewayContext) -> None:
         await asyncio.sleep(10) # Simulate something taking a long time
         await context.respond("Finished!")
     ```
@@ -102,7 +102,7 @@ await context.respond("I'm secret!", flags=hikari.MessageFlag.EPHEMERAL)
 
     @client.include
     @arc.slash_command("name", "description")
-    async def takes_time(context: arc.Context[arc.RESTClient]) -> None:
+    async def takes_time(context: arc.RESTContext) -> None:
         await asyncio.sleep(10) # Simulate something taking a long time
         await context.respond("Finished!")
     ```
@@ -125,7 +125,7 @@ This can be passed to the command decorator's `autodefer=` keyword argument:
 
     @client.include
     @arc.slash_command("name", "description", autodefer=AutodeferMode.EPHEMERAL)
-    async def takes_time(context: arc.Context[arc.GatewayClient]) -> None:
+    async def takes_time(context: arc.GatewayContext) -> None:
         await asyncio.sleep(10)
         await context.respond("Finished!") # This will now be an ephemeral response!
     ```
@@ -140,7 +140,7 @@ This can be passed to the command decorator's `autodefer=` keyword argument:
 
     @client.include
     @arc.slash_command("name", "description", autodefer=AutodeferMode.EPHEMERAL)
-    async def takes_time(context: arc.Context[arc.RESTClient]) -> None:
+    async def takes_time(context: arc.RESTContext) -> None:
         await asyncio.sleep(10)
         await context.respond("Finished!") # This will now be an ephemeral response!
     ```

@@ -5,13 +5,16 @@ import typing as t
 import attr
 import hikari
 
-from ...internal.types import ClientT
-from .base import OptionWithChoices, OptionWithChoicesParams
+from arc.abc.option import OptionWithChoices, OptionWithChoicesParams
+from arc.internal.types import ClientT
 
 if t.TYPE_CHECKING:
     import typing_extensions as te
 
-    from ...internal.types import AutocompleteCallbackT
+    from arc.internal.types import AutocompleteCallbackT
+
+
+__all__ = ("StrOption", "StrParams")
 
 
 class StrParams(OptionWithChoicesParams[str, ClientT]):

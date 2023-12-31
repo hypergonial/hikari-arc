@@ -7,7 +7,7 @@ from typing import Any
 import attr
 import hikari
 
-from ...internal.types import AutocompleteCallbackT, ChoiceT, ClientT, ParamsT
+from arc.internal.types import AutocompleteCallbackT, ChoiceT, ClientT, ParamsT
 
 if t.TYPE_CHECKING:
     import typing_extensions as te
@@ -23,6 +23,12 @@ Usage
 -----
 ```py
 arc.Option[type, arc.TypeParams(...)]
+```
+
+So for example, to create an `int` option, you would do:
+
+```py
+arc.Option[int, arc.IntParams(...)]
 ```
 """
 

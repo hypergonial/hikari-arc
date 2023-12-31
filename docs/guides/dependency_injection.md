@@ -68,8 +68,7 @@ In the above example, we asked `arc` that every time we ask for a dependency of 
     @arc.slash_command("increment", "Increment a counter!")
     # We inject a dependency of type 'MyDatabase' here.
     async def increment(
-        ctx: arc.Context[arc.GatewayClient],
-        db: MyDatabase = arc.inject()
+        ctx: arc.GatewayContext, db: MyDatabase = arc.inject()
     ) -> None:
         db.value += 1
         await ctx.respond(f"Counter is at: `{db.value}`")
@@ -83,8 +82,7 @@ In the above example, we asked `arc` that every time we ask for a dependency of 
     @arc.slash_command("increment", "Increment a counter!")
     # We inject a dependency of type 'MyDatabase' here.
     async def increment(
-        ctx: arc.Context[arc.RESTClient],
-        db: MyDatabase = arc.inject()
+        ctx: arc.RESTContext, db: MyDatabase = arc.inject()
     ) -> None:
         db.value += 1
         await ctx.respond(f"Counter is at: `{db.value}`")
@@ -160,8 +158,7 @@ Let's say our app has two configurations, a "testing mode" where we want our "da
     # We inject 'Database' here, the caller doesn't know which
     # implementation it will get!
     async def fetch_data(
-        ctx: arc.Context[arc.GatewayClient],
-        db: Database = arc.inject()
+        ctx: arc.GatewayContext, db: Database = arc.inject()
     ) -> None:
         data = await db.fetch_data()
         await ctx.respond(f"Data is: `{data}`")
@@ -184,8 +181,7 @@ Let's say our app has two configurations, a "testing mode" where we want our "da
     # We inject 'Database' here, the caller doesn't know which
     # implementation it will get!
     async def fetch_data(
-        ctx: arc.Context[arc.RESTClient],
-        db: Database = arc.inject()
+        ctx: arc.RESTContext, db: Database = arc.inject()
     ) -> None:
         data = await db.fetch_data()
         await ctx.respond(f"Data is: `{data}`")

@@ -4,7 +4,7 @@ import sys
 import typing as t
 
 if t.TYPE_CHECKING:
-    from .internal.types import ClientT
+    from arc.internal.types import ClientT
 
 
 def loader(callback: t.Callable[[ClientT], None]) -> t.Callable[[ClientT], None]:

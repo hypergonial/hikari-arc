@@ -13,7 +13,13 @@ Here you can find all the changelogs for `hikari-arc`.
 
 - **Breaking:** Rename `Context.edit_response()` to `Context.edit_initial_response()`. This is to make the purpose of the function clearer.
 - **Breaking:** Remove `arc.Injected[T]` typehint alias. Use `arc.inject()` instead. This is to avoid confusion between the two.
+- **Breaking:** Rename `GatewayPlugin` to `GatewayPluginBase` and `RESTPlugin` to `RESTPluginBase`.
+- Add `GatewayContext` aliasing `Context[GatewayClient]`
+- Add `RESTContext` aliasing `Context[RESTClient]`
+- Add `GatewayPlugin` aliasing `GatewayPluginBase[GatewayClient]`
+- Add `RESTPlugin` aliasing `RESTPlugin[RESTClient]`
 - Add support for passing mappings to `choices=` when specifying option params.
+- Move `ABC`s used internally under `arc.abc`.
 - Improve handling missing responses via REST by adding `NoResponseIssuedError`.
 - Fix `@plugin.inject_dependencies` failing when located outside of the main module.
 

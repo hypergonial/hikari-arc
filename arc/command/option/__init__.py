@@ -1,13 +1,4 @@
 from .attachment import AttachmentOption, AttachmentParams
-from .base import (
-    AutocompleteCallbackT,
-    CommandOptionBase,
-    Option,
-    OptionBase,
-    OptionParams,
-    OptionWithChoices,
-    OptionWithChoicesParams,
-)
 from .bool import BoolOption, BoolParams
 from .channel import ChannelOption, ChannelParams
 from .float import FloatOption, FloatParams
@@ -18,15 +9,8 @@ from .str import StrOption, StrParams
 from .user import UserOption, UserParams
 
 __all__ = (
-    "Option",
-    "CommandOptionBase",
-    "OptionBase",
-    "OptionWithChoices",
-    "AutocompleteCallbackT",
     "BoolOption",
     "BoolParams",
-    "OptionParams",
-    "OptionWithChoicesParams",
     "IntOption",
     "IntParams",
     "StrOption",

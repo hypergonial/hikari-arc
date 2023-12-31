@@ -77,7 +77,12 @@ nav:
         - api_reference/errors.md
         - api_reference/events.md
         - api_reference/plugin.md
-        - api_reference/abc/index.md
+        - ABC:
+            - api_reference/abc/index.md
+            - api_reference/abc/client.md
+            - api_reference/abc/command.md
+            - api_reference/abc/option.md
+            - api_reference/abc/error_handler.md
     - Changelog: changelog.md
 
 
@@ -121,7 +126,7 @@ plugins:
             annotations_path: source
             docstring_section_style: spacy
             docstring_style: numpy
-            inherited_members: false
+            inherited_members: true
             merge_init_into_class: true
             separate_signature: true
             show_signature_annotations: true

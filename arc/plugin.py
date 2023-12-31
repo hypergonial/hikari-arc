@@ -8,22 +8,23 @@ import typing as t
 
 import hikari
 
-from .abc import HasErrorHandler
-from .command import MessageCommand, SlashCommand, SlashGroup, UserCommand
-from .context import AutodeferMode, Context
-from .internal.types import BuilderT, ClientT, EventCallbackT, GatewayClientT, RESTClientT, SlashCommandLike
+from arc.abc.error_handler import HasErrorHandler
+from arc.command import MessageCommand, SlashCommand, SlashGroup, UserCommand
+from arc.context import AutodeferMode, Context
+from arc.internal.types import BuilderT, ClientT, EventCallbackT, GatewayClientT, RESTClientT, SlashCommandLike
 
 if t.TYPE_CHECKING:
-    from .command import CommandBase, SlashSubCommand, SlashSubGroup
+    from arc.abc.command import CommandBase
+    from arc.command import SlashSubCommand, SlashSubGroup
 
-__all__ = ("Plugin", "RESTPlugin", "GatewayPlugin")
+__all__ = ("PluginBase", "RESTPluginBase", "GatewayPluginBase")
 
 P = t.ParamSpec("P")
 T = t.TypeVar("T")
 
 
-class Plugin(HasErrorHandler[ClientT], t.Generic[ClientT]):
-    """A base class for plugins.
+class PluginBase(HasErrorHandler[ClientT], t.Generic[ClientT]):
+    """An abstract base class for plugins.
 
     Parameters
     ----------
@@ -261,7 +262,7 @@ class Plugin(HasErrorHandler[ClientT], t.Generic[ClientT]):
             return decorator
 
 
-class RESTPlugin(Plugin[RESTClientT]):
+class RESTPluginBase(PluginBase[RESTClientT]):
     """The default implementation of a REST plugin.
 
     Parameters
@@ -275,7 +276,7 @@ class RESTPlugin(Plugin[RESTClientT]):
         return True
 
 
-class GatewayPlugin(Plugin[GatewayClientT]):
+class GatewayPluginBase(PluginBase[GatewayClientT]):
     """The default implementation of a gateway plugin.
 
     Parameters
