@@ -57,7 +57,7 @@ description: A guide on dependency injection & arc
     client.set_type_dependency(MyDatabase, database)
     ```
 
-In the above example, we asked `arc` that every time we ask for a dependency of type `MyDatabase`, it should return the specific instance we gave it as the second parameter to [`Client.set_type_dependency`][arc.client.Client.set_type_dependency]
+In the above example, we asked `arc` that every time we ask for a dependency of type `MyDatabase`, it should return the specific instance we gave it as the second parameter to [`Client.set_type_dependency`][arc.abc.client.Client.set_type_dependency]
 
 ## Injecting dependencies
 
@@ -93,7 +93,7 @@ And here we request that `arc` injects the dependency we declared earlier into o
 
 ### Injecting other functions
 
-By default, only command callbacks are injected with dependencies, but you might want to inject other functions too. This can be done via the [`@Client.inject_dependencies`][arc.client.Client.inject_dependencies] decorator (or [`@Plugin.inject_dependencies`][arc.plugin.Plugin.inject_dependencies] if working in a plugin).
+By default, only command callbacks are injected with dependencies, but you might want to inject other functions too. This can be done via the [`@Client.inject_dependencies`][arc.abc.client.Client.inject_dependencies] decorator (or [`@Plugin.inject_dependencies`][arc.abc.plugin.PluginBase.inject_dependencies] if working in a plugin).
 
 ```py
 @client.inject_dependencies
@@ -105,7 +105,7 @@ def compare_counter(value: int, db: MyDatabase = arc.inject()) -> None:
 ```
 
 !!! warning
-    Trying to use [`arc.inject()`][alluka.inject] outside a command or a function decorated with [`@Client.inject_dependencies`][arc.client.Client.inject_dependencies] will lead to unexpected results.
+    Trying to use [`arc.inject()`][alluka.inject] outside a command or a function decorated with [`@Client.inject_dependencies`][arc.abc.client.Client.inject_dependencies] will lead to unexpected results.
 
 ## The benefits of dependency injection
 

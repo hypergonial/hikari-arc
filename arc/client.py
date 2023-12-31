@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 
 class GatewayClient(Client[hikari.GatewayBotAware]):
     """The default implementation for an arc client with `hikari.GatewayBotAware` support.
-    If you want to use a `hikari.RESTBotAware`, use `RESTClient` instead.
+    If you want to use a `hikari.RESTBotAware`, use [`RESTClient`][arc.client.RESTClient] instead.
 
     Parameters
     ----------
@@ -119,7 +119,7 @@ class GatewayClient(Client[hikari.GatewayBotAware]):
 
 class RESTClient(Client[hikari.RESTBotAware]):
     """The default implementation for an arc client with `hikari.RESTBotAware` support.
-    If you want to use `hikari.GatewayBotAware`, use `GatewayClient` instead.
+    If you want to use `hikari.GatewayBotAware`, use [`GatewayClient`][arc.client.GatewayClient] instead.
 
     Parameters
     ----------

@@ -82,6 +82,7 @@ nav:
             - api_reference/abc/client.md
             - api_reference/abc/command.md
             - api_reference/abc/option.md
+            - api_reference/abc/plugin.md
             - api_reference/abc/error_handler.md
     - Changelog: changelog.md
 

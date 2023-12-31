@@ -12,8 +12,8 @@ from arc.context import AutodeferMode
 from arc.internal.types import BuilderT, ClientT, CommandCallbackT, ResponseBuilderT
 
 if t.TYPE_CHECKING:
-    from ..context import Context
-    from ..plugin import PluginBase
+    from arc.abc.plugin import PluginBase
+    from arc.context import Context
 
 
 class CommandProto(t.Protocol):

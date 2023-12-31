@@ -19,7 +19,7 @@ if t.TYPE_CHECKING:
 
     from arc.abc.command import CallableCommandProto
     from arc.abc.option import CommandOptionBase
-    from arc.plugin import PluginBase
+    from arc.abc.plugin import PluginBase
 
 __all__ = (
     "SlashCommandLike",

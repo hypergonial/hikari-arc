@@ -15,6 +15,7 @@ from contextlib import suppress
 import alluka
 import hikari
 
+from arc.abc.plugin import PluginBase
 from arc.command.message import MessageCommand
 from arc.command.slash import SlashCommand, SlashGroup, SlashSubCommand, SlashSubGroup
 from arc.command.user import UserCommand
@@ -22,7 +23,6 @@ from arc.context import AutodeferMode, Context
 from arc.errors import ExtensionLoadError, ExtensionUnloadError
 from arc.internal.sync import _sync_commands
 from arc.internal.types import AppT, BuilderT, ResponseBuilderT
-from arc.plugin import PluginBase
 
 if t.TYPE_CHECKING:
     import typing_extensions as te
