@@ -63,6 +63,7 @@ nav:
     - Guides:
         - guides/index.md
         - guides/interactions.md
+        - guides/hooks.md
         - guides/dependency_injection.md
     - API Reference:
         - api_reference/index.md
