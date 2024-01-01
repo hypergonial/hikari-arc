@@ -135,7 +135,10 @@ class PluginBase(HasErrorHandler[ClientT], Hookable[ClientT]):
             raise TypeError(f"Unknown command type '{type(command).__name__}'.")
 
     def include(self, command: CommandBase[ClientT, BuilderT]) -> CommandBase[ClientT, BuilderT]:
-        """Include a command in this plugin.
+        """Add a command to this plugin.
+
+        !!! note
+            This should be the **last** (topmost) decorator on a command.
 
         Parameters
         ----------

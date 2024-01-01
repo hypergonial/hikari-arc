@@ -15,8 +15,6 @@ __all__ = ("ArcEvent", "CommandErrorEvent")
 class ArcEvent(hikari.Event):
     """Base class for all Arc events."""
 
-    pass
-
 
 class CommandErrorEvent(ArcEvent, t.Generic[GatewayClientT]):
     """Event dispatched when a command raises an exception that is not handled by any error handlers."""

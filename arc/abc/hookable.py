@@ -48,6 +48,10 @@ class Hookable(abc.ABC, t.Generic[ClientT]):
     def add_hook(self, hook: HookT[ClientT]) -> te.Self:
         """Add a new pre-execution hook to this object.
 
+        Any function that takes a [Context][`arc.context.base.Context`] as its sole parameter
+        and returns either a [`HookResult`][arc.abc.hookable.HookResult] or
+        `None` can be used as a hook.
+
         Parameters
         ----------
         hook : HookT[ClientT]
@@ -63,6 +67,10 @@ class Hookable(abc.ABC, t.Generic[ClientT]):
 
     def add_post_hook(self, hook: PostHookT[ClientT]) -> te.Self:
         """Add a new post-execution hook to this object.
+
+        Any function that takes a [Context][`arc.context.base.Context`] as its sole parameter
+        and returns either a [`HookResult`][arc.abc.hookable.HookResult] or
+        `None` can be used as a hook.
 
         Parameters
         ----------

@@ -22,6 +22,21 @@ class RESTPluginBase(PluginBase[RESTClientT]):
     ----------
     name : str
         The name of this plugin. This must be unique across all plugins.
+
+    Usage
+    -----
+    ```py
+    plugin = arc.RESTPlugin("MyPlugin")
+
+    @plugin.include
+    @arc.slash_command("ping", "Ping the bot.")
+    async def ping(ctx: arc.RESTContext) -> None:
+        ...
+
+    # Snip
+
+    client.add_plugin(plugin)
+    ```
     """
 
     @property
@@ -37,6 +52,21 @@ class GatewayPluginBase(PluginBase[GatewayClientT]):
     ----------
     name : str
         The name of this plugin. This must be unique across all plugins.
+
+    Usage
+    -----
+    ```py
+    plugin = arc.GatewayPlugin("MyPlugin")
+
+    @plugin.include
+    @arc.slash_command("ping", "Ping the bot.")
+    async def ping(ctx: arc.GatewayContext) -> None:
+        ...
+
+    # Snip
+
+    client.add_plugin(plugin)
+    ```
     """
 
     def __init__(self, name: str) -> None:

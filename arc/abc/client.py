@@ -328,16 +328,39 @@ class Client(t.Generic[AppT], abc.ABC):
     def include(self, command: CommandBase[te.Self, BuilderT]) -> CommandBase[te.Self, BuilderT]:
         """First-order decorator to add a command to this client.
 
+        !!! note
+            This should be the **last** (topmost) decorator on a command.
+
         Parameters
         ----------
         command : CommandBase[te.Self, BuilderT]
             The command to add.
-        """
-        if command.plugin is not None:
-            raise ValueError(f"Command '{command.name}' is already registered with plugin '{command.plugin.name}'.")
 
-        if command.name in self.commands[command.command_type]:
-            raise ValueError(f"Command '{command.name}' is already registered with this client.")
+        Raises
+        ------
+        RuntimeError
+            If the command is already added to a plugin or another client.
+
+        Usage
+        -----
+        ```py
+        @client.include # Add the command to the client.
+        @arc.slash_command("cmd", "A command.")
+        async def cmd(ctx: arc.GatewayContext) -> None:
+            ...
+        ```
+        """
+        if command.client is not self:
+            raise RuntimeError(f"Command '{command.name}' is already registered with another client.")
+
+        if command.plugin is not None:
+            raise RuntimeError(
+                f"Command '{command.name}' is already registered with plugin '{command.plugin.name}'."
+                f"\nYou should use '{type(self).__name__}.add_plugin()' to add the entire plugin to the client."
+            )
+
+        if existing := self.commands[command.command_type].get(command.name):
+            existing._client_remove_hook(self)
 
         command._client_include_hook(self)
         return command
@@ -462,7 +485,7 @@ class Client(t.Generic[AppT], abc.ABC):
 
     def add_hook(self, hook: HookT[te.Self]) -> te.Self:
         """Add a pre-execution hook to this client.
-        This hook will be executed before every command callback added to this client.
+        This hook will be executed before **every command** added to this client.
 
         Parameters
         ----------
@@ -473,13 +496,17 @@ class Client(t.Generic[AppT], abc.ABC):
         -------
         te.Self
             The client for chaining calls.
+
+        See Also
+        --------
+        - [`Client.add_post_hook`][arc.client.Client.add_post_hook]
         """
         self._hooks.append(hook)
         return self
 
     def add_post_hook(self, hook: PostHookT[te.Self]) -> te.Self:
         """Add a post-execution hook to this client.
-        This hook will be executed after every command callback added to this client.
+        This hook will be executed after **every command** added to this client.
 
         !!! warning
             Post-execution hooks will be called even if the command callback raises an exception.
@@ -493,6 +520,10 @@ class Client(t.Generic[AppT], abc.ABC):
         -------
         te.Self
             The client for chaining calls.
+
+        See Also
+        --------
+        - [`Client.add_hook`][arc.client.Client.add_hook]
         """
         self._post_hooks.append(hook)
         return self
@@ -580,6 +611,19 @@ class Client(t.Generic[AppT], abc.ABC):
             If `dir_path` does not exist or is not a directory.
         ExtensionLoadError
             If a module does not have a loader defined.
+
+        Usage
+        -----
+        ```py
+        client = arc.GatewayClient(...)
+        client.load_extensions_from("extensions/foo")
+        ```
+
+        See Also
+        --------
+        - [`@arc.loader`][arc.extension.loader]
+        - [`Client.load_extension`][arc.client.Client.load_extension]
+        - [`Client.unload_extension`][arc.client.Client.unload_extension]
         """
         if isinstance(dir_path, str):
             dir_path = pathlib.Path(dir_path)
@@ -622,6 +666,11 @@ class Client(t.Generic[AppT], abc.ABC):
         ------
         ExtensionUnloadError
             If the module does not have an unloader or is not loaded.
+
+        See Also
+        --------
+        - [`Client.load_extension`][arc.client.Client.load_extension]
+        - [`Client.load_extensions_from`][arc.client.Client.load_extensions_from]
         """
         parents = path.split(".")
         name = parents.pop()

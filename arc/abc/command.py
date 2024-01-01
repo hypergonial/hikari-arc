@@ -273,7 +273,7 @@ class CommandBase(HasErrorHandler[ClientT], Hookable[ClientT], t.Generic[ClientT
     async def invoke(
         self, interaction: hikari.CommandInteraction, *args: t.Any, **kwargs: t.Any
     ) -> None | asyncio.Future[ResponseBuilderT]:
-        """Invoke this command with the given context.
+        """Invoke this command with the given interaction.
 
         Parameters
         ----------
@@ -312,6 +312,11 @@ class CommandBase(HasErrorHandler[ClientT], Hookable[ClientT], t.Generic[ClientT
         """Called when the client requests the command be added to it."""
         self._client = client
         self.client._add_command(self)
+
+    def _client_remove_hook(self, client: ClientT) -> None:
+        """Called when the client requests the command be removed from it."""
+        self._client = None
+        self.client._remove_command(self)
 
     def _plugin_include_hook(self, plugin: PluginBase[ClientT]) -> None:
         """Called when the plugin requests the command be added to it."""
