@@ -5,7 +5,7 @@ import typing as t
 if t.TYPE_CHECKING:
     import hikari
 
-    from arc.abc import Client, OptionParams
+    from arc.abc import Client, Hookable, HookResult, OptionParams
     from arc.client import GatewayClient, RESTClient
     from arc.command import SlashCommand, SlashGroup
     from arc.context import AutocompleteData, Context
@@ -20,6 +20,7 @@ RESTClientT = t.TypeVar("RESTClientT", bound="RESTClient")
 EventT = t.TypeVar("EventT", bound="hikari.Event")
 BuilderT = t.TypeVar("BuilderT", bound="hikari.api.SlashCommandBuilder | hikari.api.ContextMenuCommandBuilder")
 ParamsT = t.TypeVar("ParamsT", bound="OptionParams[t.Any]")
+HookableT = t.TypeVar("HookableT", bound="Hookable[t.Any]")
 
 # Type aliases
 EventCallbackT: t.TypeAlias = "t.Callable[[EventT], t.Coroutine[t.Any, t.Any, None]]"
@@ -34,3 +35,5 @@ AutocompleteCallbackT: t.TypeAlias = "t.Callable[[AutocompleteData[ClientT, Choi
 ResponseBuilderT: t.TypeAlias = (
     "hikari.api.InteractionMessageBuilder | hikari.api.InteractionDeferredBuilder | hikari.api.InteractionModalBuilder"
 )
+HookT: t.TypeAlias = "t.Callable[[Context[ClientT]], t.Awaitable[HookResult]] | t.Callable[[Context[ClientT]], HookResult] | t.Callable[[Context[ClientT]], None] | t.Callable[[Context[ClientT]], t.Awaitable[None]]"
+PostHookT: t.TypeAlias = "t.Callable[[Context[ClientT]], None] | t.Callable[[Context[ClientT]], t.Awaitable[None]]"

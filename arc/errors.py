@@ -1,3 +1,7 @@
+import typing as t
+
+import hikari
+
 __all__ = (
     "ArcError",
     "AutocompleteError",
@@ -35,6 +39,58 @@ class ExtensionUnloadError(ExtensionError):
 
 class InteractionResponseError(ArcError):
     """Base exception for all interaction response errors."""
+
+
+class HookAbortError(ArcError):
+    """Raised when a built-in hook aborts the execution of a command."""
+
+
+class GuildOnlyError(HookAbortError):
+    """Raised when a command is invoked outside of a guild and a
+    [`guild_only`][arc.utils.hooks.guild_only] hook is present.
+    """
+
+
+class NotOwnerError(HookAbortError):
+    """Raised when a command is invoked by a non-owner and a
+    [`owner_only`][arc.utils.hooks.owner_only] hook is present.
+    """
+
+
+class DMOnlyError(HookAbortError):
+    """Raised when a command is invoked outside of a DM and a
+    [`dm_only`][arc.utils.hooks.dm_only] hook is present.
+    """
+
+
+class InvokerMissingPermissionsError(HookAbortError):
+    """Raised when a command is invoked by a user without the
+    required permissions set by a [`has_permissions`][arc.utils.hooks.has_permissions] hook.
+
+    Attributes
+    ----------
+    missing_permissions : hikari.Permissions
+        The permissions that the invoker is missing.
+    """
+
+    def __init__(self, missing_permissions: hikari.Permissions, *args: t.Any) -> None:
+        self.missing_permissions = missing_permissions
+        super().__init__(*args)
+
+
+class BotMissingPermissionsError(HookAbortError):
+    """Raised when a command is invoked and the bot is missing the
+    required permissions set by a [`bot_has_permissions`][arc.utils.hooks.bot_has_permissions] hook.
+
+    Attributes
+    ----------
+    missing_permissions : hikari.Permissions
+        The permissions that the bot is missing.
+    """
+
+    def __init__(self, missing_permissions: hikari.Permissions, *args: t.Any) -> None:
+        self.missing_permissions = missing_permissions
+        super().__init__(*args)
 
 
 class NoResponseIssuedError(InteractionResponseError):

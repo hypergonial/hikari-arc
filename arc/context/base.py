@@ -242,6 +242,7 @@ class Context(t.Generic[ClientT]):
         "_autodefer_task",
         "_created_at",
         "_autodefer_task",
+        "_has_command_failed",
     )
 
     def __init__(
@@ -256,6 +257,7 @@ class Context(t.Generic[ClientT]):
         self._response_lock: asyncio.Lock = asyncio.Lock()
         self._created_at = datetime.datetime.now()
         self._autodefer_task: asyncio.Task[None] | None = None
+        self._has_command_failed: bool = False
 
     @property
     def interaction(self) -> hikari.CommandInteraction:
@@ -335,6 +337,11 @@ class Context(t.Generic[ClientT]):
             return datetime.datetime.now() - self._created_at <= datetime.timedelta(minutes=15)
         else:
             return datetime.datetime.now() - self._created_at <= datetime.timedelta(seconds=3)
+
+    @property
+    def has_command_failed(self) -> bool:
+        """Returns if the command callback failed to execute or not."""
+        return self._has_command_failed
 
     def _start_autodefer(self, autodefer_mode: AutodeferMode) -> None:
         """Start the autodefer task."""

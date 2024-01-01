@@ -13,7 +13,7 @@ from alluka import inject
 
 from arc import abc, command
 
-from .abc import Option
+from .abc import HookResult, Option, with_hook, with_post_hook
 from .client import Client, GatewayClient, GatewayContext, GatewayPlugin, RESTClient, RESTContext, RESTPlugin
 from .command import (
     AttachmentParams,
@@ -42,6 +42,7 @@ from .events import ArcEvent, CommandErrorEvent
 from .extension import loader, unloader
 from .internal.about import __author__, __author_email__, __license__, __maintainer__, __url__, __version__
 from .plugin import GatewayPluginBase, PluginBase, RESTPluginBase
+from .utils import bot_has_permissions, dm_only, guild_only, has_permissions, owner_only
 
 __all__ = (
     "__version__",
@@ -94,8 +95,16 @@ __all__ = (
     "RESTContext",
     "RESTPlugin",
     "GatewayPlugin",
+    "HookResult",
     "abc",
     "command",
+    "with_hook",
+    "with_post_hook",
+    "bot_has_permissions",
+    "dm_only",
+    "guild_only",
+    "has_permissions",
+    "owner_only",
 )
 
 # MIT License

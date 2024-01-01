@@ -3,21 +3,19 @@ from __future__ import annotations
 import abc
 import typing as t
 
-import attr
-
 from arc.internal.types import ClientT, ErrorHandlerCallbackT
 
 if t.TYPE_CHECKING:
     from ..context import Context
 
 
-@attr.define(slots=False)
 class HasErrorHandler(abc.ABC, t.Generic[ClientT]):
-    _error_handler: ErrorHandlerCallbackT[ClientT] | None = attr.field(default=None, init=False)
+    """An interface for objects that can have an error handler set on them."""
 
     @property
-    def error_handler(self) -> t.Optional[ErrorHandlerCallbackT[ClientT]]:
-        return self._error_handler
+    @abc.abstractmethod
+    def error_handler(self) -> ErrorHandlerCallbackT[ClientT] | None:
+        """The error handler for this object."""
 
     def set_error_handler(self, callback: ErrorHandlerCallbackT[ClientT]) -> ErrorHandlerCallbackT[ClientT]:
         """Decorator to set an error handler for this object. This can be added to commands, groups, or plugins.
@@ -42,4 +40,4 @@ class HasErrorHandler(abc.ABC, t.Generic[ClientT]):
 
     @abc.abstractmethod
     async def _handle_exception(self, ctx: Context[ClientT], exc: Exception) -> None:
-        ...
+        """Handle an exception or propagate it to the next error handler if it cannot be handled."""

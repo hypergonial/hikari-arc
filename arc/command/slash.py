@@ -6,13 +6,12 @@ import typing as t
 import attr
 import hikari
 
-from arc.abc.command import CallableCommandBase, CommandBase
-from arc.abc.error_handler import HasErrorHandler
-from arc.abc.option import OptionBase, OptionWithChoices
+from arc.abc.command import CallableCommandBase, CommandBase, SubCommandBase
+from arc.abc.option import OptionWithChoices
 from arc.context import AutocompleteData, AutodeferMode, Context
 from arc.errors import AutocompleteError, CommandInvokeError
 from arc.internal.sigparse import parse_function_signature
-from arc.internal.types import ClientT, CommandCallbackT, ResponseBuilderT, SlashCommandLike
+from arc.internal.types import ClientT, CommandCallbackT, HookT, PostHookT, ResponseBuilderT, SlashCommandLike
 
 if t.TYPE_CHECKING:
     from asyncio.futures import Future
@@ -397,18 +396,15 @@ class SlashGroup(CommandBase[ClientT, hikari.api.SlashCommandBuilder]):
             autodefer=AutodeferMode(autodefer) if autodefer else hikari.UNDEFINED,
             name_localizations=name_localizations or {},
             description_localizations=description_localizations or {},
-            parent=self,
         )
+        group.parent = self
         self.children[name] = group
         return group
 
 
 @attr.define(slots=True, kw_only=True)
-class SlashSubGroup(OptionBase[ClientT], HasErrorHandler[ClientT]):
+class SlashSubGroup(SubCommandBase[ClientT, SlashGroup[ClientT]]):
     """A subgroup of a slash command group."""
-
-    parent: SlashGroup[ClientT] | None = None
-    """The parent group of this subgroup."""
 
     children: dict[str, SlashSubCommand[ClientT]] = attr.field(factory=dict)
     """Subcommands that belong to this subgroup."""
@@ -454,6 +450,14 @@ class SlashSubGroup(OptionBase[ClientT], HasErrorHandler[ClientT]):
             "options": [subcommand.to_command_option() for subcommand in self.children.values()],
         }
 
+    def _resolve_hooks(self) -> list[HookT[ClientT]]:
+        assert self.parent is not None
+        return self.parent._resolve_hooks() + self._hooks
+
+    def _resolve_post_hooks(self) -> list[PostHookT[ClientT]]:
+        assert self.parent is not None
+        return self.parent._resolve_post_hooks() + self._post_hooks
+
     async def _handle_exception(self, ctx: Context[ClientT], exc: Exception) -> None:
         try:
             if self.error_handler:
@@ -472,11 +476,8 @@ class SlashSubGroup(OptionBase[ClientT], HasErrorHandler[ClientT]):
 
 
 @attr.define(slots=True, kw_only=True)
-class SlashSubCommand(OptionBase[ClientT], HasErrorHandler[ClientT]):
+class SlashSubCommand(SubCommandBase[ClientT, SlashGroup[ClientT] | SlashSubGroup[ClientT]]):
     """A subcommand of a slash command group."""
-
-    parent: SlashGroup[ClientT] | SlashSubGroup[ClientT] | None = None
-    """The parent group of this subcommand."""
 
     callback: CommandCallbackT[ClientT]
     """The callback that will be invoked when this subcommand is invoked."""
@@ -490,6 +491,14 @@ class SlashSubCommand(OptionBase[ClientT], HasErrorHandler[ClientT]):
     """
 
     _invoke_task: asyncio.Task[t.Any] | None = attr.field(default=None, init=False)
+
+    def _resolve_hooks(self) -> list[HookT[ClientT]]:
+        assert self.parent is not None
+        return self.parent._resolve_hooks() + self._hooks
+
+    def _resolve_post_hooks(self) -> list[PostHookT[ClientT]]:
+        assert self.parent is not None
+        return self.parent._resolve_post_hooks() + self._post_hooks
 
     async def _handle_exception(self, ctx: Context[ClientT], exc: Exception) -> None:
         try:

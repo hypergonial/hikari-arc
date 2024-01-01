@@ -2,14 +2,25 @@ from __future__ import annotations
 
 import abc
 import asyncio
+import inspect
 import typing as t
 
 import attr
 import hikari
 
 from arc.abc.error_handler import HasErrorHandler
+from arc.abc.hookable import Hookable, HookResult
+from arc.abc.option import OptionBase
 from arc.context import AutodeferMode
-from arc.internal.types import BuilderT, ClientT, CommandCallbackT, ResponseBuilderT
+from arc.internal.types import (
+    BuilderT,
+    ClientT,
+    CommandCallbackT,
+    ErrorHandlerCallbackT,
+    HookT,
+    PostHookT,
+    ResponseBuilderT,
+)
 
 if t.TYPE_CHECKING:
     from arc.abc.plugin import PluginBase
@@ -35,7 +46,7 @@ class CommandProto(t.Protocol):
         """The fully qualified name of this command."""
 
 
-class CallableCommandProto(t.Protocol, t.Generic[ClientT]):
+class CallableCommandProto(t.Protocol[ClientT]):
     """A protocol for any command-like object that can be called directly. This includes commands and subcommands."""
 
     name: str
@@ -56,7 +67,7 @@ class CallableCommandProto(t.Protocol, t.Generic[ClientT]):
 
     @abc.abstractmethod
     async def __call__(self, ctx: Context[ClientT], *args: t.Any, **kwargs: t.Any) -> None:
-        """Invoke this command with the given context.
+        """Call the callback of the command with the given context and arguments.
 
         Parameters
         ----------
@@ -98,9 +109,17 @@ class CallableCommandProto(t.Protocol, t.Generic[ClientT]):
     async def _handle_exception(self, ctx: Context[ClientT], exc: Exception) -> None:
         ...
 
+    def _resolve_hooks(self) -> t.Sequence[HookT[ClientT]]:
+        """Resolve all pre-execution hooks that apply to this object."""
+        ...
+
+    def _resolve_post_hooks(self) -> t.Sequence[PostHookT[ClientT]]:
+        """Resolve all post-execution hooks that apply to this object."""
+        ...
+
 
 @attr.define(slots=True, kw_only=True)
-class CommandBase(HasErrorHandler[ClientT], t.Generic[ClientT, BuilderT]):
+class CommandBase(HasErrorHandler[ClientT], Hookable[ClientT], t.Generic[ClientT, BuilderT]):
     """An abstract base class for all application commands."""
 
     name: str
@@ -133,6 +152,27 @@ class CommandBase(HasErrorHandler[ClientT], t.Generic[ClientT, BuilderT]):
 
     _instances: dict[hikari.Snowflake | None, hikari.PartialCommand] = attr.field(factory=dict)
     """A mapping of guild IDs to command instances. None corresponds to the global instance, if any."""
+
+    _error_handler: ErrorHandlerCallbackT[ClientT] | None = attr.field(init=False, default=None)
+
+    _hooks: list[HookT[ClientT]] = attr.field(init=False, factory=list)
+
+    _post_hooks: list[PostHookT[ClientT]] = attr.field(init=False, factory=list)
+
+    @property
+    def error_handler(self) -> ErrorHandlerCallbackT[ClientT] | None:
+        """The error handler for this command."""
+        return self._error_handler
+
+    @property
+    def hooks(self) -> t.MutableSequence[HookT[ClientT]]:
+        """The pre-execution hooks for this command."""
+        return self._hooks
+
+    @property
+    def post_hooks(self) -> t.MutableSequence[PostHookT[ClientT]]:
+        """The post-execution hooks for this command."""
+        return self._post_hooks
 
     @property
     @abc.abstractmethod
@@ -174,6 +214,14 @@ class CommandBase(HasErrorHandler[ClientT], t.Generic[ClientT, BuilderT]):
                 await self.plugin._handle_exception(ctx, exc)
             else:
                 await self.client._on_error(ctx, exc)
+
+    def _resolve_hooks(self) -> list[HookT[ClientT]]:
+        plugin_hooks = self.plugin._resolve_hooks() if self.plugin else []
+        return self.client._hooks + plugin_hooks + self._hooks
+
+    def _resolve_post_hooks(self) -> list[PostHookT[ClientT]]:
+        plugin_hooks = self.plugin._resolve_post_hooks() if self.plugin else []
+        return self.client._post_hooks + plugin_hooks + self._post_hooks
 
     async def publish(self, guild: hikari.SnowflakeishOr[hikari.PartialGuild] | None = None) -> hikari.PartialCommand:
         """Publish this command to the given guild, or globally if no guild is provided.
@@ -270,15 +318,60 @@ class CommandBase(HasErrorHandler[ClientT], t.Generic[ClientT, BuilderT]):
         self._plugin = plugin
         self._plugin._add_command(self)
 
-    async def _handle_callback(
-        self, command: CallableCommandProto[ClientT], ctx: Context[ClientT], *args: t.Any, **kwargs: t.Any
-    ) -> None:
+    async def _handle_pre_hooks(self, command: CallableCommandProto[ClientT], ctx: Context[ClientT]) -> bool:
+        """Handle all pre-execution hooks for a command.
+
+        Returns
+        -------
+        bool
+            Whether the command should be aborted.
+        """
+        aborted = False
         try:
-            await self.client.injector.call_with_async_di(command.callback, ctx, *args, **kwargs)
+            hooks = command._resolve_hooks()
+            for hook in hooks:
+                if inspect.iscoroutinefunction(hook):
+                    res = await hook(ctx)
+                else:
+                    res = hook(ctx)
+
+                res = t.cast(HookResult | None, res)
+
+                if res and res._abort:
+                    aborted = True
+        except Exception as e:
+            aborted = True
+            await command._handle_exception(ctx, e)
+
+        return aborted
+
+    async def _handle_post_hooks(self, command: CallableCommandProto[ClientT], ctx: Context[ClientT]) -> None:
+        """Handle all post-execution hooks for a command."""
+        try:
+            post_hooks = command._resolve_post_hooks()
+            for hook in post_hooks:
+                if inspect.iscoroutinefunction(hook):
+                    await hook(ctx)
+                else:
+                    hook(ctx)
         except Exception as e:
             await command._handle_exception(ctx, e)
 
-    # TODO - hooks, max_concurrency, cooldowns
+    async def _handle_callback(
+        self, command: CallableCommandProto[ClientT], ctx: Context[ClientT], *args: t.Any, **kwargs: t.Any
+    ) -> None:
+        """Handle the callback of a command. Invoke all hooks and the callback, and handle any exceptions."""
+        # If hook aborted, stop invocation
+        if await self._handle_pre_hooks(command, ctx):
+            return
+
+        try:
+            await self.client.injector.call_with_async_di(command.callback, ctx, *args, **kwargs)
+        except Exception as e:
+            ctx._has_command_failed = True
+            await command._handle_exception(ctx, e)
+        finally:
+            await self._handle_post_hooks(command, ctx)
 
 
 @attr.define(slots=True, kw_only=True)
@@ -302,3 +395,34 @@ class CallableCommandBase(CommandBase[ClientT, BuilderT]):
         self._invoke_task = asyncio.create_task(self._handle_callback(self, ctx, *args, **kwargs))
         if self.client.is_rest:
             return ctx._resp_builder
+
+
+ParentT = t.TypeVar("ParentT")
+
+
+class SubCommandBase(OptionBase[ClientT], HasErrorHandler[ClientT], Hookable[ClientT], t.Generic[ClientT, ParentT]):
+    """An abstract base class for all slash subcommands and subgroups."""
+
+    _error_handler: ErrorHandlerCallbackT[ClientT] | None = attr.field(default=None, init=False)
+
+    _hooks: list[HookT[ClientT]] = attr.field(factory=list, init=False)
+
+    _post_hooks: list[PostHookT[ClientT]] = attr.field(factory=list, init=False)
+
+    parent: ParentT | None = attr.field(default=None, init=False)
+    """The parent of this subcommand or subgroup."""
+
+    @property
+    def error_handler(self) -> ErrorHandlerCallbackT[ClientT] | None:
+        """The error handler for this object."""
+        return self._error_handler
+
+    @property
+    def hooks(self) -> t.MutableSequence[HookT[ClientT]]:
+        """The pre-execution hooks for this object."""
+        return self._hooks
+
+    @property
+    def post_hooks(self) -> t.MutableSequence[PostHookT[ClientT]]:
+        """The post-execution hooks for this object."""
+        return self._post_hooks

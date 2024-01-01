@@ -22,7 +22,7 @@ from arc.command.user import UserCommand
 from arc.context import AutodeferMode, Context
 from arc.errors import ExtensionLoadError, ExtensionUnloadError
 from arc.internal.sync import _sync_commands
-from arc.internal.types import AppT, BuilderT, ResponseBuilderT
+from arc.internal.types import AppT, BuilderT, HookT, PostHookT, ResponseBuilderT
 
 if t.TYPE_CHECKING:
     import typing_extensions as te
@@ -64,6 +64,9 @@ class Client(t.Generic[AppT], abc.ABC):
         "_autosync",
         "_plugins",
         "_loaded_extensions",
+        "_hooks",
+        "_post_hooks",
+        "_owner_ids",
     )
 
     def __init__(
@@ -79,6 +82,9 @@ class Client(t.Generic[AppT], abc.ABC):
         self._plugins: dict[str, PluginBase[te.Self]] = {}
         self._loaded_extensions: list[str] = []
         self._autosync = autosync
+        self._hooks: list[HookT[te.Self]] = []
+        self._post_hooks: list[PostHookT[te.Self]] = []
+        self._owner_ids: list[hikari.Snowflake] = []
 
     @property
     @abc.abstractmethod
@@ -143,6 +149,21 @@ class Client(t.Generic[AppT], abc.ABC):
         """The plugins added to this client."""
         return self._plugins
 
+    @property
+    def hooks(self) -> t.MutableSequence[HookT[te.Self]]:
+        """The pre-execution hooks for this client."""
+        return self._hooks
+
+    @property
+    def post_hooks(self) -> t.MutableSequence[PostHookT[te.Self]]:
+        """The post-execution hooks for this client."""
+        return self._post_hooks
+
+    @property
+    def owner_ids(self) -> t.Sequence[hikari.Snowflake]:
+        """The IDs of the owners of this application."""
+        return self._owner_ids
+
     def _add_command(self, command: CommandBase[te.Self, t.Any]) -> None:
         """Add a command to this client. Called by include hooks."""
         if isinstance(command, (SlashCommand, SlashGroup)):
@@ -193,6 +214,14 @@ class Client(t.Generic[AppT], abc.ABC):
         Fetches application, syncs commands, calls user-defined startup.
         """
         self._application = await self.app.rest.fetch_application()
+
+        owner_ids = [self._application.owner.id]
+
+        if self._application.team is not None:
+            owner_ids.extend(member for member in self._application.team.members)
+
+        self._owner_ids = owner_ids
+
         logger.debug(f"Fetched application: '{self.application}'")
         if self._autosync:
             await _sync_commands(self)
@@ -230,7 +259,9 @@ class Client(t.Generic[AppT], abc.ABC):
         print(f"Unhandled error in command '{context.command.name}' callback: {exception}", file=sys.stderr)
         traceback.print_exception(type(exception), exception, exception.__traceback__, file=sys.stderr)
         with suppress(Exception):
-            await context.respond("❌ Something went wrong. Please contact the bot developer.")
+            # Try to respond to make autodefer less jarring when a command fails.
+            if not context._issued_response and context.is_valid:
+                await context.respond("❌ Something went wrong. Please contact the bot developer.")
 
     async def on_command_interaction(self, interaction: hikari.CommandInteraction) -> ResponseBuilderT | None:
         """Should be called when a command interaction is sent by Discord.
@@ -381,17 +412,23 @@ class Client(t.Generic[AppT], abc.ABC):
         group._client_include_hook(self)
         return group
 
-    def add_plugin(self, plugin: PluginBase[te.Self]) -> None:
+    def add_plugin(self, plugin: PluginBase[te.Self]) -> te.Self:
         """Add a plugin to this client.
 
         Parameters
         ----------
         plugin : Plugin[te.Self]
             The plugin to add.
+
+        Returns
+        -------
+        te.Self
+            The client for chaining calls.
         """
         plugin._client_include_hook(self)
+        return self
 
-    def remove_plugin(self, plugin: str | PluginBase[te.Self]) -> None:
+    def remove_plugin(self, plugin: str | PluginBase[te.Self]) -> te.Self:
         """Remove a plugin from this client.
 
         Parameters
@@ -403,11 +440,17 @@ class Client(t.Generic[AppT], abc.ABC):
         ------
         ValueError
             If there is no plugin with the given name.
+
+        Returns
+        -------
+        te.Self
+            The client for chaining calls.
         """
         if isinstance(plugin, PluginBase):
             if plugin not in self.plugins.values():
                 raise ValueError(f"Plugin '{plugin.name}' is not registered with this client.")
-            return plugin._client_remove_hook()
+            plugin._client_remove_hook()
+            return self
 
         pg = self.plugins.get(plugin)
 
@@ -415,6 +458,44 @@ class Client(t.Generic[AppT], abc.ABC):
             raise ValueError(f"Plugin '{plugin}' is not registered with this client.")
 
         pg._client_remove_hook()
+        return self
+
+    def add_hook(self, hook: HookT[te.Self]) -> te.Self:
+        """Add a pre-execution hook to this client.
+        This hook will be executed before every command callback added to this client.
+
+        Parameters
+        ----------
+        hook : HookT[te.Self]
+            The hook to add.
+
+        Returns
+        -------
+        te.Self
+            The client for chaining calls.
+        """
+        self._hooks.append(hook)
+        return self
+
+    def add_post_hook(self, hook: PostHookT[te.Self]) -> te.Self:
+        """Add a post-execution hook to this client.
+        This hook will be executed after every command callback added to this client.
+
+        !!! warning
+            Post-execution hooks will be called even if the command callback raises an exception.
+
+        Parameters
+        ----------
+        hook : PostHookT[te.Self]
+            The hook to add.
+
+        Returns
+        -------
+        te.Self
+            The client for chaining calls.
+        """
+        self._post_hooks.append(hook)
+        return self
 
     def load_extension(self, path: str) -> te.Self:
         """Load a python module with path `path` as an extension.
@@ -568,7 +649,7 @@ class Client(t.Generic[AppT], abc.ABC):
 
         return self
 
-    def set_type_dependency(self, type_: t.Type[T], instance: T) -> None:
+    def set_type_dependency(self, type_: t.Type[T], instance: T) -> te.Self:
         """Set a type dependency for this client. This can then be injected into all arc callbacks.
 
         Parameters
@@ -577,6 +658,11 @@ class Client(t.Generic[AppT], abc.ABC):
             The type of the dependency.
         instance : T
             The instance of the dependency.
+
+        Returns
+        -------
+        te.Self
+            The client for chaining calls.
 
         Usage
         -----
@@ -603,6 +689,7 @@ class Client(t.Generic[AppT], abc.ABC):
             A decorator to inject dependencies into arbitrary functions.
         """
         self._injector.set_type_dependency(type_, instance)
+        return self
 
     def get_type_dependency(self, type_: t.Type[T]) -> hikari.UndefinedOr[T]:
         """Get a type dependency for this client.

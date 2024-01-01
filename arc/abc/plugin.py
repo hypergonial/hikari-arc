@@ -9,9 +9,10 @@ import typing as t
 import hikari
 
 from arc.abc.error_handler import HasErrorHandler
+from arc.abc.hookable import Hookable
 from arc.command import MessageCommand, SlashCommand, SlashGroup, UserCommand
 from arc.context import AutodeferMode, Context
-from arc.internal.types import BuilderT, ClientT, SlashCommandLike
+from arc.internal.types import BuilderT, ClientT, ErrorHandlerCallbackT, HookT, PostHookT, SlashCommandLike
 
 if t.TYPE_CHECKING:
     from arc.abc.command import CommandBase
@@ -23,7 +24,7 @@ P = t.ParamSpec("P")
 T = t.TypeVar("T")
 
 
-class PluginBase(HasErrorHandler[ClientT], t.Generic[ClientT]):
+class PluginBase(HasErrorHandler[ClientT], Hookable[ClientT]):
     """An abstract base class for plugins.
 
     Parameters
@@ -35,13 +36,30 @@ class PluginBase(HasErrorHandler[ClientT], t.Generic[ClientT]):
     def __init__(
         self, name: str, *, default_enabled_guilds: hikari.UndefinedOr[t.Sequence[hikari.Snowflake]] = hikari.UNDEFINED
     ) -> None:
-        super().__init__()
         self._client: ClientT | None = None
         self._name = name
         self._slash_commands: dict[str, SlashCommandLike[ClientT]] = {}
         self._user_commands: dict[str, UserCommand[ClientT]] = {}
         self._message_commands: dict[str, MessageCommand[ClientT]] = {}
         self._default_enabled_guilds = default_enabled_guilds
+        self._error_handler: ErrorHandlerCallbackT[ClientT] | None = None
+        self._hooks: list[HookT[ClientT]] = []
+        self._post_hooks: list[PostHookT[ClientT]] = []
+
+    @property
+    def error_handler(self) -> ErrorHandlerCallbackT[ClientT] | None:
+        """The error handler for this plugin."""
+        return self._error_handler
+
+    @property
+    def hooks(self) -> t.MutableSequence[HookT[ClientT]]:
+        """The pre-execution hooks for this plugin."""
+        return self._hooks
+
+    @property
+    def post_hooks(self) -> t.MutableSequence[PostHookT[ClientT]]:
+        """The post-execution hooks for this plugin."""
+        return self._post_hooks
 
     @property
     @abc.abstractmethod
@@ -66,6 +84,21 @@ class PluginBase(HasErrorHandler[ClientT], t.Generic[ClientT]):
     def default_enabled_guilds(self) -> hikari.UndefinedOr[t.Sequence[hikari.Snowflake]]:
         """The default guilds to enable commands in."""
         return self._default_enabled_guilds
+
+    async def _handle_exception(self, ctx: Context[ClientT], exc: Exception) -> None:
+        try:
+            if self.error_handler is not None:
+                await self.error_handler(ctx, exc)
+            else:
+                raise exc
+        except Exception as exc:
+            await self.client._on_error(ctx, exc)
+
+    def _resolve_hooks(self) -> list[HookT[ClientT]]:
+        return self._hooks
+
+    def _resolve_post_hooks(self) -> list[PostHookT[ClientT]]:
+        return self._post_hooks
 
     def _client_include_hook(self, client: ClientT) -> None:
         if client._plugins.get(self.name) is not None:
@@ -119,15 +152,6 @@ class PluginBase(HasErrorHandler[ClientT], t.Generic[ClientT]):
 
         command._plugin_include_hook(self)
         return command
-
-    async def _handle_exception(self, ctx: Context[ClientT], exc: Exception) -> None:
-        try:
-            if self.error_handler is not None:
-                await self.error_handler(ctx, exc)
-            else:
-                raise exc
-        except Exception as exc:
-            await self.client._on_error(ctx, exc)
 
     def include_slash_group(
         self,
