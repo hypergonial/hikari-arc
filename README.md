@@ -53,6 +53,7 @@ See [Contributing](./CONTRIBUTING.md)
 
 - [`hikari-lightbulb`](https://github.com/tandemdude/hikari-lightbulb) - The library initially started as a reimagination of lightbulb, it inherits a similar project structure and terminology.
 - [`Tanjun`](https://github.com/FasterSpeeding/Tanjun) - For the idea of using `typing.Annotated` and dependency injection in a command handler. `arc` also uses the same dependency injection library, [`Alluka`](https://github.com/FasterSpeeding/Alluka), under the hood.
+- [`hikari-crescent`](https://github.com/hikari-crescent/hikari-crescent) The design of hooks is largely inspired by `crescent`.
 - [`FastAPI`](https://github.com/tiangolo/fastapi) - Some design ideas and most of the documentation configuration derives from `FastAPI`.
 
 ## Links
