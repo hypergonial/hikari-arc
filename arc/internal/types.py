@@ -37,3 +37,4 @@ ResponseBuilderT: t.TypeAlias = (
 )
 HookT: t.TypeAlias = "t.Callable[[Context[ClientT]], t.Awaitable[HookResult]] | t.Callable[[Context[ClientT]], HookResult] | t.Callable[[Context[ClientT]], None] | t.Callable[[Context[ClientT]], t.Awaitable[None]]"
 PostHookT: t.TypeAlias = "t.Callable[[Context[ClientT]], None] | t.Callable[[Context[ClientT]], t.Awaitable[None]]"
+LifeCycleHookT: t.TypeAlias = "t.Callable[[ClientT], t.Awaitable[None]]"

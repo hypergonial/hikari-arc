@@ -12,6 +12,7 @@ Here you can find all the changelogs for `hikari-arc`.
 ## v0.3.0
 
 - Add [hooks](./guides/hooks.md).
+- Add lifecycle hooks to `Client` along with an error handler.
 - Declare `attrs` explicitly as a dependency.
 
 ## v0.2.0

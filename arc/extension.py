@@ -18,7 +18,7 @@ def loader(callback: t.Callable[[ClientT], None]) -> t.Callable[[ClientT], None]
     # In my_extension.py:
 
     @arc.loader
-    def load(client: arc.Client) -> None:
+    def load(client: arc.GatewayClient) -> None:
         client.add_plugin(...)
     ```
 
@@ -42,7 +42,7 @@ def unloader(callback: t.Callable[[ClientT], None]) -> t.Callable[[ClientT], Non
     # In my_extension.py:
 
     @arc.unloader
-    def unload(client: arc.Client) -> None:
+    def unload(client: arc.GatewayClient) -> None:
         client.remove_plugin(...)
     ```
 

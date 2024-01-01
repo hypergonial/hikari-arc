@@ -64,6 +64,8 @@ nav:
         - guides/index.md
         - guides/interactions.md
         - guides/hooks.md
+        - guides/error_handling.md
+        - guides/plugins_extensions.md
         - guides/dependency_injection.md
     - API Reference:
         - api_reference/index.md

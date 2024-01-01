@@ -22,7 +22,7 @@ from arc.command.user import UserCommand
 from arc.context import AutodeferMode, Context
 from arc.errors import ExtensionLoadError, ExtensionUnloadError
 from arc.internal.sync import _sync_commands
-from arc.internal.types import AppT, BuilderT, HookT, PostHookT, ResponseBuilderT
+from arc.internal.types import AppT, BuilderT, ErrorHandlerCallbackT, HookT, LifeCycleHookT, PostHookT, ResponseBuilderT
 
 if t.TYPE_CHECKING:
     import typing_extensions as te
@@ -67,6 +67,9 @@ class Client(t.Generic[AppT], abc.ABC):
         "_hooks",
         "_post_hooks",
         "_owner_ids",
+        "_error_handler",
+        "_startup_hook",
+        "_shutdown_hook",
     )
 
     def __init__(
@@ -85,6 +88,9 @@ class Client(t.Generic[AppT], abc.ABC):
         self._hooks: list[HookT[te.Self]] = []
         self._post_hooks: list[PostHookT[te.Self]] = []
         self._owner_ids: list[hikari.Snowflake] = []
+        self._error_handler: ErrorHandlerCallbackT[te.Self] | None = None
+        self._startup_hook: LifeCycleHookT[te.Self] | None = None
+        self._shutdown_hook: LifeCycleHookT[te.Self] | None = None
 
     @property
     @abc.abstractmethod
@@ -164,6 +170,11 @@ class Client(t.Generic[AppT], abc.ABC):
         """The IDs of the owners of this application."""
         return self._owner_ids
 
+    @property
+    def error_handler(self) -> ErrorHandlerCallbackT[te.Self] | None:
+        """The error handler for this client."""
+        return self._error_handler
+
     def _add_command(self, command: CommandBase[te.Self, t.Any]) -> None:
         """Add a command to this client. Called by include hooks."""
         if isinstance(command, (SlashCommand, SlashGroup)):
@@ -225,43 +236,30 @@ class Client(t.Generic[AppT], abc.ABC):
         logger.debug(f"Fetched application: '{self.application}'")
         if self._autosync:
             await _sync_commands(self)
-        await self.on_startup()
 
-    async def on_startup(self) -> None:
-        """Called when the client is starting up.
-        Override for custom startup logic.
-        """
+        if self._startup_hook:
+            await self._startup_hook(self)
 
     async def _on_shutdown(self) -> None:
         """Called when the client is shutting down.
         Reserved for internal shutdown logic.
         """
-        await self.on_shutdown()
-
-    async def on_shutdown(self) -> None:
-        """Called when the client is shutting down.
-        Override for custom shutdown logic.
-        """
+        if self._shutdown_hook:
+            await self._shutdown_hook(self)
 
     async def _on_error(self, ctx: Context[te.Self], exception: Exception) -> None:
-        await self.on_error(ctx, exception)
+        if self._error_handler is not None:
+            try:
+                return await self._error_handler(ctx, exception)
+            except Exception as e:
+                exception = e
 
-    async def on_error(self, context: Context[te.Self], exception: Exception) -> None:
-        """Called when an error occurs in a command callback and all other error handlers have failed.
-
-        Parameters
-        ----------
-        context : Context[te.Self]
-            The context of the command.
-        exception : Exception
-            The exception that was raised.
-        """
-        print(f"Unhandled error in command '{context.command.name}' callback: {exception}", file=sys.stderr)
+        print(f"Unhandled error in command '{ctx.command.name}' callback: {exception}", file=sys.stderr)
         traceback.print_exception(type(exception), exception, exception.__traceback__, file=sys.stderr)
         with suppress(Exception):
             # Try to respond to make autodefer less jarring when a command fails.
-            if not context._issued_response and context.is_valid:
-                await context.respond("❌ Something went wrong. Please contact the bot developer.")
+            if not ctx._issued_response and ctx.is_valid:
+                await ctx.respond("❌ Something went wrong. Please contact the bot developer.")
 
     async def on_command_interaction(self, interaction: hikari.CommandInteraction) -> ResponseBuilderT | None:
         """Should be called when a command interaction is sent by Discord.
@@ -278,12 +276,15 @@ class Client(t.Generic[AppT], abc.ABC):
         """
         command = None
 
-        if interaction.command_type is hikari.CommandType.SLASH:
-            command = self.slash_commands.get(interaction.command_name)
-        elif interaction.command_type is hikari.CommandType.MESSAGE:
-            command = self.message_commands.get(interaction.command_name)
-        elif interaction.command_type is hikari.CommandType.USER:
-            command = self.user_commands.get(interaction.command_name)
+        match interaction.command_type:
+            case hikari.CommandType.SLASH:
+                command = self.slash_commands.get(interaction.command_name)
+            case hikari.CommandType.MESSAGE:
+                command = self.message_commands.get(interaction.command_name)
+            case hikari.CommandType.USER:
+                command = self.user_commands.get(interaction.command_name)
+            case _:
+                pass
 
         if command is None:
             logger.warning(f"Received interaction for unknown command '{interaction.command_name}'.")
@@ -339,7 +340,7 @@ class Client(t.Generic[AppT], abc.ABC):
         Raises
         ------
         RuntimeError
-            If the command is already added to a plugin or another client.
+            If the command is already added to a plugin.
 
         Usage
         -----
@@ -350,9 +351,6 @@ class Client(t.Generic[AppT], abc.ABC):
             ...
         ```
         """
-        if command.client is not self:
-            raise RuntimeError(f"Command '{command.name}' is already registered with another client.")
-
         if command.plugin is not None:
             raise RuntimeError(
                 f"Command '{command.name}' is already registered with plugin '{command.plugin.name}'."
@@ -527,6 +525,85 @@ class Client(t.Generic[AppT], abc.ABC):
         """
         self._post_hooks.append(hook)
         return self
+
+    def set_error_handler(self, handler: ErrorHandlerCallbackT[te.Self]) -> None:
+        """Decorator to set the error handler for this client.
+
+        This will be called when a command callback raises an exception
+        that is not handled by any other error handlers.
+
+        Parameters
+        ----------
+        handler : ErrorHandlerCallbackT[te.Self]
+            The error handler to set.
+
+        Usage
+        -----
+        ```py
+        @client.set_error_handler
+        async def error_handler_func(ctx: arc.GatewayContext, exception: Exception) -> None:
+            await ctx.respond(f"❌ Something went wrong: {exception}")
+        ```
+
+        Or, as a function:
+
+        ```py
+        client.set_error_handler(error_handler_func)
+        ```
+        """
+        self._error_handler = handler
+
+    def set_startup_hook(self, handler: LifeCycleHookT[te.Self]) -> None:
+        """Decorator to set the startup hook for this client.
+
+        This will be called when the client starts up.
+
+        Parameters
+        ----------
+        handler : LifeCycleHookT[te.Self]
+            The startup hook to set.
+
+        Usage
+        -----
+        ```py
+        @client.set_startup_hook
+        async def startup_hook(client: arc.GatewayClient) -> None:
+            print("Client started up!")
+        ```
+
+        Or, as a function:
+
+        ```py
+        client.set_startup_hook(startup_hook)
+        ```
+        """
+        self._startup_hook = handler
+
+    def set_shutdown_hook(self, handler: LifeCycleHookT[te.Self]) -> None:
+        """Decorator to set the shutdown hook for this client.
+
+        This will be called when the client shuts down.
+
+        Parameters
+        ----------
+        handler : LifeCycleHookT[te.Self]
+            The shutdown hook to set.
+
+        Usage
+        -----
+        ```py
+        @client.set_shutdown_hook
+        async def shutdown_hook(client: arc.GatewayClient) -> None:
+            print("Client shut down!")
+        ```
+
+        Or, as a function:
+
+        ```py
+        client.set_shutdown_hook(shutdown_hook)
+        ```
+        """
+        self._shutdown_hook = handler
 
     def load_extension(self, path: str) -> te.Self:
         """Load a python module with path `path` as an extension.
