@@ -9,6 +9,11 @@ hide:
 
 Here you can find all the changelogs for `hikari-arc`.
 
+## v0.3.0
+
+- Add [hooks](./guides/hooks.md).
+- Declare `attrs` explicitly as a dependency.
+
 ## v0.2.0
 
 - **Breaking:** Rename `Context.edit_response()` to `Context.edit_initial_response()`. This is to make the purpose of the function clearer.
