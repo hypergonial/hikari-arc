@@ -38,6 +38,7 @@ theme:
         icon: octicons/moon-24
         name: Switch to light mode
   features:
+    - content.tabs.link
     - search.highlight
     - search.suggest
     - search.share
@@ -140,7 +141,6 @@ plugins:
             show_signature_annotations: true
             show_source: false
             show_submodules: false
-
 watch:
   - docs
   - README.md
