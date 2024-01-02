@@ -9,22 +9,41 @@ description: A guide on plugins & extensions in arc
 
 Plugins are a way to group commands and related functionality together. This can then be combined with [extensions](#extensions) to allow for easy code modularization.
 
-```py
+=== "Gateway"
 
-plugin = GatewayPlugin("plugin name")
+    ```py
+    plugin = GatewayPlugin("plugin name")
 
-@plugin.include
-@arc.slash_command("name", "description")
-async def plugin_cmd(ctx: arc.GatewayContext) -> None:
-    ...
+    @plugin.include
+    @arc.slash_command("name", "description")
+    async def plugin_cmd(ctx: arc.GatewayContext) -> None:
+        ...
 
-@plugin.include
-@arc.slash_command("other-name", "description")
-async def other_plugin_cmd(ctx: arc.GatewayContext) -> None:
-    ...
+    @plugin.include
+    @arc.slash_command("other-name", "description")
+    async def other_plugin_cmd(ctx: arc.GatewayContext) -> None:
+        ...
 
-client.add_plugin(plugin)
-```
+    client.add_plugin(plugin)
+    ```
+
+=== "REST"
+
+    ```py
+    plugin = RESTPlugin("plugin name")
+
+    @plugin.include
+    @arc.slash_command("name", "description")
+    async def plugin_cmd(ctx: arc.RESTContext) -> None:
+        ...
+
+    @plugin.include
+    @arc.slash_command("other-name", "description")
+    async def other_plugin_cmd(ctx: arc.RESTContext) -> None:
+        ...
+
+    client.add_plugin(plugin)
+    ```
 
 In the snippet above, we define a new plugin, add two commands to it, then add the plugin to the client. This in turn adds all commands added to the plugin to the client as well. Plugins can also have [hooks](./hooks.md) added to them, which will be used for every command added to the plugin. Additionally, it is possible to set an [error handler](./error_handling.md) on a plugin.
 
