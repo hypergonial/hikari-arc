@@ -82,11 +82,14 @@ extensions
     ) -> None:
         await ctx.respond(f"Foo!")
 
+    # This will run when the extension is loaded
+    # If there is no loader, the extension cannot be loaded!
     @arc.loader
     def loader(client: arc.GatewayClient) -> None:
         client.add_plugin(plugin)
 
-
+    # If you add an unloader, the extension can also be unloaded at runtime!
+    # Adding an unloader is optional.
     @arc.unloader
     def unloader(client: arc.GatewayClient) -> None:
         client.remove_plugin(plugin)
@@ -132,11 +135,14 @@ extensions
     ) -> None:
         await ctx.respond(f"Foo!")
 
+    # This will run when the extension is loaded
+    # If there is no loader, the extension cannot be loaded!
     @arc.loader
     def loader(client: arc.RESTClient) -> None:
         client.add_plugin(plugin)
 
-
+    # If you add an unloader, the extension can also be unloaded at runtime!
+    # Adding an unloader is optional.
     @arc.unloader
     def unloader(client: arc.RESTClient) -> None:
         client.remove_plugin(plugin)
@@ -177,6 +183,7 @@ To load `foo.py` into the client before execution, you can use [`Client.load_ext
     bot = hikari.GatewayBot("TOKEN")
     client = arc.GatewayClient(bot)
 
+    # Will run foo.loader()
     client.load_extension("extensions.foo")
 
 
@@ -192,6 +199,7 @@ To load `foo.py` into the client before execution, you can use [`Client.load_ext
     bot = hikari.RESTBot("TOKEN")
     client = arc.RESTClient(bot)
 
+    # Will run foo.loader()
     client.load_extension("extensions.foo")
 
 
@@ -209,7 +217,7 @@ Or to load all extensions from the `extensions` folder, you can use [`Client.loa
     bot = hikari.GatewayBot("TOKEN")
     client = arc.GatewayClient(bot)
 
-    # Will run foo.loader()
+    # Will run foo.loader() and bar.loader()
     client.load_extensions_from("extensions")
 
 
