@@ -69,8 +69,7 @@ class Hookable(abc.ABC, t.Generic[ClientT]):
         """Add a new post-execution hook to this object.
 
         Any function that takes a [`Context`][arc.context.base.Context] as its sole parameter
-        and returns either a [`HookResult`][arc.abc.hookable.HookResult] or
-        `None` can be used as a hook.
+        and returns `None` can be used as a post-hook.
 
         Parameters
         ----------
@@ -115,8 +114,7 @@ def with_post_hook(hook: PostHookT[ClientT]) -> t.Callable[[HookableT], Hookable
     """Add a new post-execution hook to a hookable object. It will run after the command callback.
 
     Any function that takes a [`Context`][arc.context.base.Context] as its sole parameter
-    and returns either a [`HookResult`][arc.abc.hookable.HookResult] or
-    `None` can be used as a hook.
+    and returns `None` can be used as a post-hook.
 
     Post-execution hooks are not executed if a pre-execution hook aborts the execution of the command.
 
