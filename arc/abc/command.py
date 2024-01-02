@@ -21,6 +21,7 @@ from arc.internal.types import (
     PostHookT,
     ResponseBuilderT,
 )
+from arc.locale import CommandLocaleRequest
 
 if t.TYPE_CHECKING:
     from arc.abc.plugin import PluginBase
@@ -322,6 +323,25 @@ class CommandBase(HasErrorHandler[ClientT], Hookable[ClientT], t.Generic[ClientT
         """Called when the plugin requests the command be added to it."""
         self._plugin = plugin
         self._plugin._add_command(self)
+
+    def _request_command_locale(self) -> None:
+        """Request the locale for this command."""
+        if self.name_localizations or self._client is None:
+            return
+
+        if not self._client._provided_locales or not self._client._command_locale_provider:
+            return
+
+        name_locales: dict[hikari.Locale, str] = {}
+
+        for locale in self._client._provided_locales:
+            request = CommandLocaleRequest(self, locale, self.name)
+            resp = self._client._command_locale_provider(request)
+
+            if resp.name is not None:
+                name_locales[locale] = resp.name
+
+        self._name_localizations = name_locales
 
     async def _handle_pre_hooks(self, command: CallableCommandProto[ClientT], ctx: Context[ClientT]) -> bool:
         """Handle all pre-execution hooks for a command.

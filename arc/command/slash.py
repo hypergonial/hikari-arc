@@ -12,11 +12,13 @@ from arc.context import AutocompleteData, AutodeferMode, Context
 from arc.errors import AutocompleteError, CommandInvokeError
 from arc.internal.sigparse import parse_function_signature
 from arc.internal.types import ClientT, CommandCallbackT, HookT, PostHookT, ResponseBuilderT, SlashCommandLike
+from arc.locale import CommandLocaleRequest, LocaleResponse
 
 if t.TYPE_CHECKING:
     from asyncio.futures import Future
 
-    from arc.abc.command import CallableCommandProto
+    from arc.abc.client import Client
+    from arc.abc.command import CallableCommandProto, CommandProto
     from arc.abc.option import CommandOptionBase
     from arc.abc.plugin import PluginBase
 
@@ -110,7 +112,7 @@ class SlashCommand(CallableCommandBase[ClientT, hikari.api.SlashCommandBuilder])
     description: str = "No description provided."
     """The description of this slash command."""
 
-    description_localizations: dict[hikari.Locale, str] = attr.field(factory=dict)
+    description_localizations: t.Mapping[hikari.Locale, str] = attr.field(factory=dict)
     """The localizations for this command's description."""
 
     options: dict[str, CommandOptionBase[t.Any, ClientT, t.Any]] = attr.field(factory=dict)
@@ -196,6 +198,33 @@ class SlashCommand(CallableCommandBase[ClientT, hikari.api.SlashCommandBuilder])
 
         await interaction.create_response(choices)
 
+    def _request_command_locale(self) -> None:
+        """Request the locale for this command."""
+        if self.name_localizations or self.description_localizations or self._client is None:
+            return
+
+        if not self._client._provided_locales or not self._client._command_locale_provider:
+            return
+
+        name_locales: dict[hikari.Locale, str] = {}
+        desc_locales: dict[hikari.Locale, str] = {}
+
+        for locale in self._client._provided_locales:
+            request = CommandLocaleRequest(self, locale, self.name)
+            resp = self._client._command_locale_provider(request)
+
+            assert isinstance(resp, LocaleResponse)
+
+            if resp.name is not None and resp.description is not None:
+                name_locales[locale] = resp.name
+                desc_locales[locale] = resp.description
+
+        self.name_localizations: t.Mapping[hikari.Locale, str] = name_locales
+        self.description_localizations: t.Mapping[hikari.Locale, str] = desc_locales
+
+        for option in self.options.values():
+            option._request_option_locale(self._client, self)
+
 
 @attr.define(slots=True, kw_only=True)
 class SlashGroup(CommandBase[ClientT, hikari.api.SlashCommandBuilder]):
@@ -207,7 +236,7 @@ class SlashGroup(CommandBase[ClientT, hikari.api.SlashCommandBuilder]):
     description: str = "No description provided."
     """The description of this slash group."""
 
-    description_localizations: dict[hikari.Locale, str] = attr.field(factory=dict)
+    description_localizations: t.Mapping[hikari.Locale, str] = attr.field(factory=dict)
     """The localizations for this group's description."""
 
     _invoke_task: asyncio.Task[t.Any] | None = attr.field(init=False, default=None)
@@ -359,6 +388,31 @@ class SlashGroup(CommandBase[ClientT, hikari.api.SlashCommandBuilder]):
 
         await interaction.create_response(choices)
 
+    def _request_command_locale(self) -> None:
+        """Request the locale for this command."""
+        if self.name_localizations or self.description_localizations or self._client is None:
+            return
+
+        if not self._client._provided_locales or not self._client._command_locale_provider:
+            return
+
+        name_locales: dict[hikari.Locale, str] = {}
+        desc_locales: dict[hikari.Locale, str] = {}
+
+        for locale in self._client._provided_locales:
+            request = CommandLocaleRequest(self, locale, self.name)
+            resp = self._client._command_locale_provider(request)
+
+            if resp.name is not None and resp.description is not None:
+                name_locales[locale] = resp.name
+                desc_locales[locale] = resp.description
+
+        self.name_localizations: t.Mapping[hikari.Locale, str] = name_locales
+        self.description_localizations: t.Mapping[hikari.Locale, str] = desc_locales
+
+        for sub in self.children.values():
+            sub._request_option_locale(self._client, self)
+
     def include(self, command: SlashSubCommand[ClientT]) -> SlashSubCommand[ClientT]:
         """First-order decorator to add a subcommand to this group."""
         command.parent = self
@@ -468,6 +522,12 @@ class SlashSubGroup(SubCommandBase[ClientT, SlashGroup[ClientT]]):
             assert self.parent is not None
             await self.parent._handle_exception(ctx, e)
 
+    def _request_option_locale(self, client: Client[t.Any], command: CommandProto) -> None:
+        super()._request_option_locale(client, command)
+
+        for subcommand in self.children.values():
+            subcommand._request_option_locale(client, command)
+
     def include(self, command: SlashSubCommand[ClientT]) -> SlashSubCommand[ClientT]:
         """First-order decorator to add a subcommand to this group."""
         command.parent = self
@@ -554,6 +614,12 @@ class SlashSubCommand(SubCommandBase[ClientT, SlashGroup[ClientT] | SlashSubGrou
     def plugin(self) -> PluginBase[ClientT] | None:
         """The plugin that includes this subcommand."""
         return self.root.plugin
+
+    def _request_option_locale(self, client: Client[t.Any], command: CommandProto) -> None:
+        super()._request_option_locale(client, command)
+
+        for option in self.options.values():
+            option._request_option_locale(client, command)
 
     def _resolve_autodefer(self) -> AutodeferMode:
         """Resolve autodefer for this subcommand."""

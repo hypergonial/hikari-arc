@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import itertools
 import logging
+import pprint
 import typing as t
 from collections import defaultdict
 from contextlib import suppress
@@ -170,6 +171,23 @@ def _get_all_commands(
     return mapping
 
 
+def _process_localizations(
+    client: Client[AppT],
+    commands: dict[hikari.Snowflake | None, dict[hikari.CommandType, dict[str, CommandBase[t.Any, t.Any]]]],
+) -> None:
+    """Call localization providers for all commands."""
+    if not client._provided_locales:
+        return
+
+    logger.info("Processing localizations...")
+
+    # trol
+    for a in commands.values():
+        for b in a.values():
+            for command in b.values():
+                command._request_command_locale()
+
+
 async def _sync_global_commands(client: Client[AppT], commands: CommandMapping) -> None:
     """Add, edit, and delete global commands to match the client's slash commands.
 
@@ -306,6 +324,9 @@ async def _sync_commands(client: Client[AppT]) -> None:
         raise RuntimeError("Application is not set, cannot sync commands")
 
     commands = _get_all_commands(client)
+    _process_localizations(client, commands)
+    pprint.PrettyPrinter(indent=4).pprint(commands)
+
     global_commands = commands.pop(None, None)
 
     if commands:

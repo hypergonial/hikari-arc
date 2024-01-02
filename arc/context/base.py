@@ -12,6 +12,7 @@ import hikari
 
 from arc.errors import NoResponseIssuedError, ResponseAlreadyIssuedError
 from arc.internal.types import ClientT, ResponseBuilderT
+from arc.locale import CustomLocaleRequest
 
 if t.TYPE_CHECKING:
     from arc.abc.command import CallableCommandProto
@@ -394,6 +395,48 @@ class Context(t.Generic[ClientT]):
     def get_channel(self) -> hikari.TextableGuildChannel | None:
         """Gets the channel this context represents, None if in a DM. Requires application cache."""
         return self._interaction.get_channel()
+
+    def loc(self, key: str, use_guild: bool = True, force_locale: hikari.Locale | None = None, **kwargs: t.Any) -> str:
+        """Get a localized string using the interaction's locale.
+
+        Parameters
+        ----------
+        key : str
+            The key of the string to localize.
+        use_guild : bool, optional
+            Whether to use the guild or not, if in a guild.
+        force_locale : hikari.Locale | None, optional
+            Force a locale to use, instead of the context's locale.
+        kwargs : t.Any
+            The keyword arguments to pass to the string formatter.
+
+        Returns
+        -------
+        str
+            The localized string.
+        """
+        if not self._client._provided_locales:
+            raise RuntimeError("The client does not have any provided locales set.")
+
+        if force_locale is None:
+            if not isinstance(self.locale, hikari.Locale):
+                raise RuntimeError("This context does not have a valid locale object.")
+
+            if self.guild_locale and not isinstance(self.guild_locale, hikari.Locale):
+                raise RuntimeError("This context does not have a valid guild locale object.")
+
+            locale = (self.guild_locale or self.locale) if use_guild else self.locale
+        else:
+            locale = force_locale
+
+        if not self._client._custom_locale_provider:
+            raise RuntimeError("The client does not have a custom locale provider.")
+
+        if locale not in self._client._provided_locales:
+            locale = hikari.Locale.EN_US
+
+        request = CustomLocaleRequest(self.command, locale, self, key)
+        return self._client._custom_locale_provider(request).format(**kwargs)
 
     async def get_last_response(self) -> InteractionResponse:
         """Get the last response issued to the interaction this context is proxying.

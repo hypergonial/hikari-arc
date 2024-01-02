@@ -41,6 +41,14 @@ from .errors import ArcError, AutocompleteError, CommandInvokeError
 from .events import ArcEvent, CommandErrorEvent
 from .extension import loader, unloader
 from .internal.about import __author__, __author_email__, __license__, __maintainer__, __url__, __version__
+from .locale import (
+    CommandLocaleRequest,
+    CustomLocaleRequest,
+    LocaleRequest,
+    LocaleRequestType,
+    LocaleResponse,
+    OptionLocaleRequest,
+)
 from .plugin import GatewayPluginBase, PluginBase, RESTPluginBase
 from .utils import bot_has_permissions, dm_only, guild_only, has_permissions, owner_only
 
@@ -96,6 +104,12 @@ __all__ = (
     "RESTPlugin",
     "GatewayPlugin",
     "HookResult",
+    "LocaleRequest",
+    "LocaleRequestType",
+    "LocaleResponse",
+    "CustomLocaleRequest",
+    "CommandLocaleRequest",
+    "OptionLocaleRequest",
     "abc",
     "command",
     "with_hook",

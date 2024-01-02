@@ -9,6 +9,10 @@ hide:
 
 Here you can find all the changelogs for `hikari-arc`.
 
+## Unreleased
+
+- Add localization support through locale providers.
+
 ## v0.3.0
 
 - Add [hooks](./guides/hooks.md).

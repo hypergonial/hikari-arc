@@ -22,7 +22,19 @@ from arc.command.user import UserCommand
 from arc.context import AutodeferMode, Context
 from arc.errors import ExtensionLoadError, ExtensionUnloadError
 from arc.internal.sync import _sync_commands
-from arc.internal.types import AppT, BuilderT, ErrorHandlerCallbackT, HookT, LifeCycleHookT, PostHookT, ResponseBuilderT
+from arc.internal.types import (
+    AppT,
+    BuilderT,
+    CommandLocaleRequestT,
+    CustomLocaleRequestT,
+    ErrorHandlerCallbackT,
+    HookT,
+    LifeCycleHookT,
+    OptionLocaleRequestT,
+    PostHookT,
+    ResponseBuilderT,
+)
+from arc.locale import CommandLocaleRequest, LocaleResponse, OptionLocaleRequest
 
 if t.TYPE_CHECKING:
     import typing_extensions as te
@@ -70,13 +82,25 @@ class Client(t.Generic[AppT], abc.ABC):
         "_error_handler",
         "_startup_hook",
         "_shutdown_hook",
+        "_provided_locales",
+        "_command_locale_provider",
+        "_option_locale_provider",
+        "_custom_locale_provider",
     )
 
     def __init__(
-        self, app: AppT, *, default_enabled_guilds: t.Sequence[hikari.Snowflake] | None = None, autosync: bool = True
+        self,
+        app: AppT,
+        *,
+        default_enabled_guilds: t.Sequence[hikari.Snowflake] | None = None,
+        autosync: bool = True,
+        provided_locales: t.Sequence[hikari.Locale] | None = None,
     ) -> None:
         self._app = app
         self._default_enabled_guilds = default_enabled_guilds
+        self._autosync = autosync
+        self._provided_locales: t.Sequence[hikari.Locale] | None = provided_locales
+
         self._application: hikari.Application | None = None
         self._slash_commands: dict[str, SlashCommandLike[te.Self]] = {}
         self._message_commands: dict[str, MessageCommand[te.Self]] = {}
@@ -84,13 +108,15 @@ class Client(t.Generic[AppT], abc.ABC):
         self._injector: alluka.Client = alluka.Client()
         self._plugins: dict[str, PluginBase[te.Self]] = {}
         self._loaded_extensions: list[str] = []
-        self._autosync = autosync
         self._hooks: list[HookT[te.Self]] = []
         self._post_hooks: list[PostHookT[te.Self]] = []
         self._owner_ids: list[hikari.Snowflake] = []
         self._error_handler: ErrorHandlerCallbackT[te.Self] | None = None
         self._startup_hook: LifeCycleHookT[te.Self] | None = None
         self._shutdown_hook: LifeCycleHookT[te.Self] | None = None
+        self._command_locale_provider: CommandLocaleRequestT | None = None
+        self._option_locale_provider: OptionLocaleRequestT | None = None
+        self._custom_locale_provider: CustomLocaleRequestT | None = None
 
     @property
     @abc.abstractmethod
@@ -302,6 +328,20 @@ class Client(t.Generic[AppT], abc.ABC):
                 f"Timed out waiting for response from command: '{interaction.command_name} ({interaction.command_type})'"
                 f" Did you forget to respond?"
             )
+
+    def _provide_command_locale(self, request: CommandLocaleRequest) -> LocaleResponse:
+        """Provide a locale for a command."""
+        if self._command_locale_provider is None:
+            return LocaleResponse(name=request.command.name, description=getattr(request.command, "description", None))
+
+        return self._command_locale_provider(request)
+
+    def _provide_option_locale(self, request: OptionLocaleRequest) -> LocaleResponse:
+        """Provide a locale for an option."""
+        if self._option_locale_provider is None:
+            return LocaleResponse(name=request.option.name, description=request.option.description)
+
+        return self._option_locale_provider(request)
 
     async def on_autocomplete_interaction(
         self, interaction: hikari.AutocompleteInteraction
@@ -604,6 +644,84 @@ class Client(t.Generic[AppT], abc.ABC):
         ```
         """
         self._shutdown_hook = handler
+
+    def set_command_locale_provider(self, provider: CommandLocaleRequestT) -> None:
+        """Decorator to set the command locale provider for this client.
+
+        This will be called for each command for each locale.
+
+        Parameters
+        ----------
+        provider : CommandLocaleRequestT
+            The command locale provider to set.
+
+        Usage
+        -----
+        ```py
+        @client.set_command_locale_provider
+        def command_locale_provider(request: arc.CommandLocaleRequest) -> arc.LocaleResponse:
+            ...
+        ```
+
+        Or, as a function:
+
+        ```py
+        client.set_command_locale_provider(command_locale_provider)
+        ```
+        """
+        self._command_locale_provider = provider
+
+    def set_option_locale_provider(self, provider: OptionLocaleRequestT) -> None:
+        """Decorator to set the option locale provider for this client.
+
+        This will be called for each option of each command for each locale.
+
+        Parameters
+        ----------
+        provider : OptionLocaleRequestT
+            The option locale provider to set.
+
+        Usage
+        -----
+        ```py
+        @client.set_option_locale_provider
+        def option_locale_provider(request: arc.OptionLocaleRequest) -> arc.LocaleResponse:
+            ...
+        ```
+
+        Or, as a function:
+
+        ```py
+        client.set_option_locale_provider(option_locale_provider)
+        ```
+        """
+        self._option_locale_provider = provider
+
+    def set_custom_locale_provider(self, provider: CustomLocaleRequestT) -> None:
+        """Decorator to set the custom locale provider for this client.
+
+        This will be called for each custom locale request performed via [`Context.loc()`][arc.context.base.Context.loc].
+
+        Parameters
+        ----------
+        provider : CustomLocaleRequestT
+            The custom locale provider to set.
+
+        Usage
+        -----
+        ```py
+        @client.set_custom_locale_provider
+        def custom_locale_provider(request: arc.CustomLocaleRequest) -> str:
+            ...
+        ```
+
+        Or, as a function:
+
+        ```py
+        client.set_custom_locale_provider(custom_locale_provider)
+        ```
+        """
+        self._custom_locale_provider = provider
 
     def load_extension(self, path: str) -> te.Self:
         """Load a python module with path `path` as an extension.

@@ -8,9 +8,13 @@ import attr
 import hikari
 
 from arc.internal.types import AutocompleteCallbackT, ChoiceT, ClientT, ParamsT
+from arc.locale import OptionLocaleRequest
 
 if t.TYPE_CHECKING:
     import typing_extensions as te
+
+    from arc.abc.client import Client
+    from arc.abc.command import CommandProto
 
 __all__ = ("Option", "OptionParams", "OptionWithChoices", "OptionWithChoicesParams", "OptionBase", "CommandOptionBase")
 
@@ -166,6 +170,28 @@ class OptionBase(abc.ABC, t.Generic[T]):
     def to_command_option(self) -> hikari.CommandOption:
         """Convert this option to a hikari.CommandOption."""
         return hikari.CommandOption(**self._to_dict())
+
+    def _request_option_locale(self, client: Client[t.Any], command: CommandProto) -> None:
+        """Request the option's name and description in different locales."""
+        if self.name_localizations or self.description_localizations:
+            return
+
+        if not client._provided_locales or not client._option_locale_provider:
+            return
+
+        name_locales: dict[hikari.Locale, str] = {}
+        desc_locales: dict[hikari.Locale, str] = {}
+
+        for locale in client._provided_locales:
+            request = OptionLocaleRequest(command, locale, self.name, self.description, self)
+            resp = client._option_locale_provider(request)
+
+            if resp.name is not None and resp.description is not None:
+                name_locales[locale] = resp.name
+                desc_locales[locale] = resp.description
+
+        self.name_localizations = name_locales
+        self.description_localizations = desc_locales
 
 
 @attr.define(slots=True, kw_only=True)

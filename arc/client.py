@@ -37,6 +37,8 @@ class GatewayClient(Client[hikari.GatewayBotAware]):
         The guilds that slash commands will be registered in by default, by default None
     autosync : bool, optional
         Whether to automatically sync commands on startup, by default True
+    provided_locales : t.Sequence[hikari.Locale] | None, optional
+        The locales that will be provided to the client by locale provider callbacks, by default None
 
     Usage
     -----
@@ -59,8 +61,11 @@ class GatewayClient(Client[hikari.GatewayBotAware]):
         *,
         default_enabled_guilds: t.Sequence[hikari.Snowflake] | None = None,
         autosync: bool = True,
+        provided_locales: t.Sequence[hikari.Locale] | None = None,
     ) -> None:
-        super().__init__(app, default_enabled_guilds=default_enabled_guilds, autosync=autosync)
+        super().__init__(
+            app, default_enabled_guilds=default_enabled_guilds, autosync=autosync, provided_locales=provided_locales
+        )
         self.app.event_manager.subscribe(hikari.StartedEvent, self._on_gatewaybot_startup)
         self.app.event_manager.subscribe(hikari.StoppingEvent, self._on_gatewaybot_shutdown)
         self.app.event_manager.subscribe(hikari.InteractionCreateEvent, self._on_gatewaybot_interaction_create)
@@ -129,6 +134,8 @@ class RESTClient(Client[hikari.RESTBotAware]):
         The guilds that slash commands will be registered in by default, by default None
     autosync : bool, optional
         Whether to automatically sync commands on startup, by default True
+    provided_locales : t.Sequence[hikari.Locale] | None, optional
+        The locales that will be provided to the client by locale provider callbacks, by default None
 
 
     Usage
@@ -155,8 +162,11 @@ class RESTClient(Client[hikari.RESTBotAware]):
         *,
         default_enabled_guilds: t.Sequence[hikari.Snowflake] | None = None,
         autosync: bool = True,
+        provided_locales: t.Sequence[hikari.Locale] | None = None,
     ) -> None:
-        super().__init__(app, default_enabled_guilds=default_enabled_guilds, autosync=autosync)
+        super().__init__(
+            app, default_enabled_guilds=default_enabled_guilds, autosync=autosync, provided_locales=provided_locales
+        )
         self.app.add_startup_callback(self._on_restbot_startup)
         self.app.add_shutdown_callback(self._on_restbot_shutdown)
         self.app.interaction_server.set_listener(
