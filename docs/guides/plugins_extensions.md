@@ -132,8 +132,6 @@ extensions
     ) -> None:
         await ctx.respond(f"Foo!")
 
-    # ...
-
     @arc.loader
     def loader(client: arc.RESTClient) -> None:
         client.add_plugin(plugin)
@@ -157,8 +155,6 @@ extensions
         ctx: arc.RESTContext,
     ) -> None:
         await ctx.respond(f"Bar!")
-
-    # ...
 
     @arc.loader
     def loader(client: arc.RESTClient) -> None:
