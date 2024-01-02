@@ -483,7 +483,7 @@ class Client(t.Generic[AppT], abc.ABC):
 
     def add_hook(self, hook: HookT[te.Self]) -> te.Self:
         """Add a pre-execution hook to this client.
-        This hook will be executed before **every command** added to this client.
+        This hook will be executed before **every command** that is added to this client.
 
         Parameters
         ----------
@@ -504,7 +504,7 @@ class Client(t.Generic[AppT], abc.ABC):
 
     def add_post_hook(self, hook: PostHookT[te.Self]) -> te.Self:
         """Add a post-execution hook to this client.
-        This hook will be executed after **every command** added to this client.
+        This hook will be executed after **every command** that is added to this client.
 
         !!! warning
             Post-execution hooks will be called even if the command callback raises an exception.

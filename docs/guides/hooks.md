@@ -21,6 +21,8 @@ def my_hook(ctx: arc.Context[Any]) -> None:
 !!! question "Can hooks be async?"
     Hooks can either be async or sync, both variants are supported.
 
+For a list of built-in hooks, see [here](../api_reference/utils/hooks.md).
+
 ## Pre-execution VS Post-execution hooks
 
 There are two types of hooks you can add to a command, ones that run before the command is run (pre-execution) and ones that run after (post-execution).
@@ -69,8 +71,8 @@ A pre-execution hook can abort the execution of a command in one of two ways:
     ```py
     def my_check(ctx: arc.Context[Any]) -> arc.HookResult:
         if ctx.author.id != 1234567890:
-            return HookResult(abort=True)
-        return HookResult()
+            return arc.HookResult(abort=True)
+        return arc.HookResult()
     ```
 
 The difference between these two approaches is that returning a [`HookResult`][arc.abc.hookable.HookResult] with `abort=True` will silently cancel the command from being executed, while the former will raise an exception that can then be handled (and should be handled) by an error handler.

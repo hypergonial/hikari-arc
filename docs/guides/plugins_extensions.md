@@ -56,6 +56,12 @@ extensions
 
     plugin = arc.GatewayPlugin("foo")
 
+    @plugin.include
+    @arc.slash_command("foo", "Foo command")
+    async def foo_cmd(
+        ctx: arc.GatewayContext,
+    ) -> None:
+        await ctx.respond(f"Foo!")
 
     @arc.loader
     def loader(client: arc.GatewayClient) -> None:
@@ -74,6 +80,12 @@ extensions
 
     plugin = arc.GatewayPlugin("bar")
 
+    @plugin.include
+    @arc.slash_command("bar", "Bar command")
+    async def bar_cmd(
+        ctx: arc.GatewayContext,
+    ) -> None:
+        await ctx.respond(f"Bar!")
 
     @arc.loader
     def loader(client: arc.GatewayClient) -> None:
@@ -94,6 +106,13 @@ extensions
 
     plugin = arc.RESTPlugin("foo")
 
+    @plugin.include
+    @arc.slash_command("foo", "Foo command")
+    async def foo_cmd(
+        ctx: arc.RESTContext,
+    ) -> None:
+        await ctx.respond(f"Foo!")
+
     # ...
 
     @arc.loader
@@ -112,6 +131,13 @@ extensions
     import arc
 
     plugin = arc.RESTPlugin("bar")
+
+    @plugin.include
+    @arc.slash_command("bar", "Bar command")
+    async def bar_cmd(
+        ctx: arc.RESTContext,
+    ) -> None:
+        await ctx.respond(f"Bar!")
 
     # ...
 

@@ -1,6 +1,8 @@
 ---
 title: Error Handling
 description: A guide on handling errors in arc
+hide:
+  - toc
 ---
 
 # Error Handling
@@ -20,7 +22,7 @@ To register a **local error handler** on a command, group, plugin, or the client
         raise RuntimeError("I'm an error!")
 
     @error_command_func.set_error_handler
-    async def(ctx: arc.GatewayContext, exc: Exception) -> None:
+    async def error_handler(ctx: arc.GatewayContext, exc: Exception) -> None:
         if isinstance(exc, RuntimeError):
             print(f"Handled error: {exc}")
             return
@@ -36,7 +38,7 @@ To register a **local error handler** on a command, group, plugin, or the client
         raise RuntimeError("I'm an error!")
 
     @error_command_func.set_error_handler
-    async def(ctx: arc.RESTContext, exc: Exception) -> None:
+    async def error_handler(ctx: arc.RESTContext, exc: Exception) -> None:
         if isinstance(exc, RuntimeError):
             print(f"Handled error: {exc}")
             return
@@ -44,7 +46,7 @@ To register a **local error handler** on a command, group, plugin, or the client
     ```
 
 !!! warning
-    Errors that the current error handler cannot handle **must** be re-raised, otherwise the error will be silently ignored.
+    Errors that the current error handler cannot handle **must** be re-raised, otherwise the error will be silently ignored. This is true of the global error handler (the one added to the client) as well, otherwise **tracebacks will not be printed** to the console.
 
 This can also be used as a regular function if using a decorator is not feasible:
 
@@ -68,7 +70,7 @@ This can also be used as a regular function if using a decorator is not feasible
 
 - Command
 - Command Group (if any)
-- Plugin
+- Plugin (if any)
 - Client
 
 If none of the error handlers handle an exception, it will be, by default, printed to the console with a full traceback.

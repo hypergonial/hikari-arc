@@ -8,9 +8,14 @@ hide:
 
 # Home
 
-Welcome to the documentation for `hikari-arc`, a command handler focused on type-safety & correctness.
+<figure markdown>
+  ![App Commands](./assets/app_commands.png)
+  <figcaption></figcaption>
+</figure>
 
-See [Getting Started](./getting_started.md) on how to get started.
+Welcome to the documentation for `hikari-arc`, a command handler built on [`hikari`](https://github.com/hikari-py/hikari) with a focus on type-safety & correctness, making the creation of commands on Discord easy!
+
+See [Getting Started](./getting_started.md) on how to get started, or the [Guides](./guides/) for learning material on specific topics.
 
 ## Helpful Resources
 
@@ -18,3 +23,8 @@ See [Getting Started](./getting_started.md) on how to get started.
 - [**Examples**](https://github.com/hypergonial/hikari-arc/tree/main/examples)
 - [**Hikari Documentation**](https://docs.hikari-py.dev/en/latest/)
 - [**Hikari Discord**](https://discord.gg/hikari)
+- [**Discord Developer Documentation**](https://discord.com/developers/docs/intro)
+
+### Acknowledgements
+
+Some illustrations used in this documentation are from the [Discord Developer Documentation](https://discord.com/developers/docs/intro).

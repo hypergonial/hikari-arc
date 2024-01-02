@@ -72,7 +72,6 @@ In the above example, we asked `arc` that every time we ask for a dependency of 
     ) -> None:
         db.value += 1
         await ctx.respond(f"Counter is at: `{db.value}`")
-
     ```
 
 === "REST"
@@ -86,7 +85,6 @@ In the above example, we asked `arc` that every time we ask for a dependency of 
     ) -> None:
         db.value += 1
         await ctx.respond(f"Counter is at: `{db.value}`")
-
     ```
 
 And here we request that `arc` injects the dependency we declared earlier into our command, passing the "database" to it. If you combine this example with the prior one, you should get a command that increments a counter every time it is invoked, and prints it's current state.
