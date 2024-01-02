@@ -50,19 +50,19 @@ This can also be used as a regular function if using a decorator is not feasible
 
 === "Gateway"
 
-```py
-@arc.loader
-async def load(client: arc.GatewayClient) -> None:
-    client.set_error_handler(some_func)
-```
+    ```py
+    @arc.loader
+    async def load(client: arc.GatewayClient) -> None:
+        client.set_error_handler(some_func)
+    ```
 
 === "REST"
 
-```py
-@arc.loader
-async def load(client: arc.RESTClient) -> None:
-    client.set_error_handler(some_func)
-```
+    ```py
+    @arc.loader
+    async def load(client: arc.RESTClient) -> None:
+        client.set_error_handler(some_func)
+    ```
 
 ## Error handler resolution order
 
