@@ -66,15 +66,7 @@ class LocaleRequest(abc.ABC):
 
 @attr.define(slots=True)
 class LocaleResponse:
-    """The response to a command or option locale request.
-
-    Parameters
-    ----------
-    name : str
-        The localized name of the command or option.
-    description : str | None
-        The localized description of the command or option.
-    """
+    """The response to a command or option locale request."""
 
     name: str | None = attr.field(default=None)
     """The localized name of the command or option."""

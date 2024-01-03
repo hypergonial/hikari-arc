@@ -11,8 +11,11 @@ Here you can find all the changelogs for `hikari-arc`.
 
 ## Unreleased
 
-- Make all first-order decorators work as second-order decorators as well.
 - Add localization support through locale providers.
+- Add `@GatewayClient.listen`, `GatewayClient.subscribe`, `GatewayClient.unsubscribe`.
+- Add `@GatewayPlugin.listen`, `GatewayPlugin.subscribe`, `GatewayPlugin.unsubscribe`.
+- Make all first-order decorators work as second-order decorators as well.
+
 
 ## v0.3.0
 

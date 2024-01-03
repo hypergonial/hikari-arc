@@ -65,6 +65,7 @@ nav:
         - guides/index.md
         - guides/interactions.md
         - guides/options.md
+        - guides/command_groups.md
         - guides/context_menu.md
         - guides/hooks.md
         - guides/error_handling.md
