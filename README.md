@@ -23,6 +23,8 @@ To check if arc has successfully installed or not, run the following:
 
 ```sh
 python3 -m arc
+# On Windows you may need to run:
+py -m arc
 ```
 
 > Please note that `hikari-arc` requires a Python version of *at least* 3.10.
