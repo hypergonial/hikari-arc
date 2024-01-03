@@ -1,11 +1,11 @@
-name: Run checks
+name: CI
 
 on: [push, pull_request]
 
 jobs:
   formatting:
     runs-on: ubuntu-latest
-    name: "Run ruff on Python 3.12"
+    name: "Run ruff via nox on Python 3.12"
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python 3.12

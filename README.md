@@ -3,9 +3,9 @@
 <div align="center">
 
 [![PyPI](https://img.shields.io/pypi/v/hikari-arc)](https://pypi.org/project/hikari-arc)
-[![CI](https://github.com/hypergonial/hikari-arc/actions/workflows/checks.yml/badge.svg)](https://github.com/hypergonial/hikari-arc/actions/workflows/checks.yml)
+[![CI](https://github.com/hypergonial/hikari-arc/actions/workflows/ci.yml/badge.svg)](https://github.com/hypergonial/hikari-arc/actions/workflows/ci.yml)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/charliermarsh/ruff/main/assets/badge/v1.json)](https://github.com/charliermarsh/ruff)
-![Pyright](https://badgen.net/badge/pyright/strict/2A6DB2)
+![Pyright](https://badgen.net/badge/Pyright/strict/2A6DB2)
 
 </div>
 
