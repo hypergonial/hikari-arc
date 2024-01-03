@@ -10,7 +10,7 @@ from arc.abc.command import CallableCommandBase, CommandBase, SubCommandBase
 from arc.abc.option import OptionWithChoices
 from arc.context import AutocompleteData, AutodeferMode, Context
 from arc.errors import AutocompleteError, CommandInvokeError
-from arc.internal.sigparse import parse_function_signature
+from arc.internal.sigparse import parse_command_signature
 from arc.internal.types import ClientT, CommandCallbackT, HookT, PostHookT, ResponseBuilderT, SlashCommandLike
 from arc.locale import CommandLocaleRequest, LocaleResponse
 
@@ -753,7 +753,7 @@ def slash_command(
 
     def decorator(func: t.Callable[t.Concatenate[Context[ClientT], ...], t.Awaitable[None]]) -> SlashCommand[ClientT]:
         guild_ids = [hikari.Snowflake(guild) for guild in guilds] if guilds else []
-        options = parse_function_signature(func)
+        options = parse_command_signature(func)
 
         return SlashCommand(
             callback=func,
@@ -819,7 +819,7 @@ def slash_subcommand(
     def decorator(
         func: t.Callable[t.Concatenate[Context[ClientT], ...], t.Awaitable[None]],
     ) -> SlashSubCommand[ClientT]:
-        options = parse_function_signature(func)
+        options = parse_command_signature(func)
 
         return SlashSubCommand(
             callback=func,

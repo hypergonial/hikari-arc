@@ -9,6 +9,7 @@ from arc.abc.client import Client
 from arc.context import Context
 from arc.errors import NoResponseIssuedError
 from arc.events import CommandErrorEvent
+from arc.internal.sigparse import parse_event_signature
 from arc.plugin import GatewayPluginBase, RESTPluginBase
 
 if t.TYPE_CHECKING:
@@ -98,6 +99,32 @@ class GatewayClient(Client[hikari.GatewayBotAware]):
 
         self.app.event_manager.dispatch(CommandErrorEvent(self, ctx, exception))
 
+    def subscribe(self, event_type: type[EventT], callback: EventCallbackT[EventT]) -> None:
+        """Subscribe to an event.
+
+        Parameters
+        ----------
+        event_type : type[EventT]
+            The event type to subscribe to.
+
+            `EventT` must be a subclass of `hikari.events.base_events.Event`.
+        callback : t.Callable[t.Concatenate[EventT, ...], t.Awaitable[None]]
+            The callback to call when the event is dispatched.
+        """
+        self.app.event_manager.subscribe(event_type, callback)  # pyright: ignore reportGeneralTypeIssues
+
+    def unsubscribe(self, event_type: type[EventT], callback: EventCallbackT[EventT]) -> None:
+        """Unsubscribe from an event.
+
+        Parameters
+        ----------
+        event_type : type[EventT]
+            The event type to unsubscribe from.
+        callback : t.Callable[t.Concatenate[EventT, ...], t.Awaitable[None]]
+            The callback to unsubscribe.
+        """
+        self.app.event_manager.unsubscribe(event_type, callback)  # pyright: ignore reportGeneralTypeIssues
+
     def listen(self, *event_types: t.Type[EventT]) -> t.Callable[[EventCallbackT[EventT]], EventCallbackT[EventT]]:
         """Generate a decorator to subscribe a callback to an event type.
 
@@ -105,21 +132,29 @@ class GatewayClient(Client[hikari.GatewayBotAware]):
 
         Parameters
         ----------
-        *event_types : t.Type[EventT] | None
-            The event types to subscribe to. The implementation may allow this
-            to be undefined. If this is the case, the event type will be inferred
+        *event_types : type[EventT]
+            The event types to subscribe to. If not provided, the event type will be inferred
             instead from the type hints on the function signature.
 
             `EventT` must be a subclass of `hikari.events.base_events.Event`.
 
         Returns
         -------
-        t.Callable[[EventT], EventT]
+        t.Callable[t.Callable[t.Concatenate[EventT, ...], t.Awaitable[None]]], t.Callable[t.Concatenate[EventT, ...], t.Awaitable[None]]]
             A decorator for a coroutine function that passes it to
             `EventManager.subscribe` before returning the function
             reference.
         """
-        return self.app.event_manager.listen(*event_types)
+
+        def decorator(func: EventCallbackT[EventT]) -> EventCallbackT[EventT]:
+            types = event_types or parse_event_signature(func)
+
+            for event_type in types:
+                self.subscribe(event_type, func)
+
+            return func
+
+        return decorator
 
 
 class RESTClient(Client[hikari.RESTBotAware]):

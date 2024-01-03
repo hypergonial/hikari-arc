@@ -25,8 +25,10 @@ HookableT = t.TypeVar("HookableT", bound="Hookable[t.Any]")
 P = t.ParamSpec("P")
 
 # Type aliases
-EventCallbackT: t.TypeAlias = "t.Callable[[EventT], t.Coroutine[t.Any, t.Any, None]]"
-ErrorHandlerCallbackT: t.TypeAlias = "t.Callable[[Context[ClientT], Exception], t.Coroutine[t.Any, t.Any, None]]"
+EventCallbackT: t.TypeAlias = "t.Callable[t.Concatenate[EventT, ...], t.Awaitable[None]]"
+ErrorHandlerCallbackT: t.TypeAlias = (
+    "t.Callable[t.Concatenate[Context[ClientT], Exception, ...], t.Coroutine[t.Any, t.Any, None]]"
+)
 SlashCommandLike: t.TypeAlias = "SlashCommand[ClientT] | SlashGroup[ClientT]"
 CommandCallbackT: t.TypeAlias = "t.Callable[t.Concatenate[Context[ClientT], ...], t.Awaitable[None]]"
 MessageContextCallbackT: t.TypeAlias = (

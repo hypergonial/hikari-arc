@@ -2,7 +2,7 @@ import hikari
 import pytest
 
 import arc
-from arc.internal.sigparse import parse_function_signature
+from arc.internal.sigparse import parse_command_signature
 
 
 async def correct_command(
@@ -21,7 +21,7 @@ async def correct_command(
 
 
 def test_correct_command() -> None:
-    options = parse_function_signature(correct_command)
+    options = parse_command_signature(correct_command)
     assert len(options) == 9
 
     assert isinstance(options["a"], arc.command.IntOption)
@@ -100,7 +100,7 @@ async def wrong_params_type(
 
 def test_wrong_params_type() -> None:
     with pytest.raises(TypeError):
-        parse_function_signature(wrong_params_type)
+        parse_command_signature(wrong_params_type)
 
 
 class WrongType:
@@ -113,7 +113,7 @@ async def wrong_opt_type(ctx: arc.GatewayContext, a: arc.Option[WrongType, arc.I
 
 def test_wrong_opt_type() -> None:
     with pytest.raises(TypeError):
-        parse_function_signature(wrong_opt_type)
+        parse_command_signature(wrong_opt_type)
 
 
 class MyType:
@@ -131,7 +131,7 @@ async def di_annotation(
 
 
 def test_di_annotation() -> None:
-    options = parse_function_signature(di_annotation)
+    options = parse_command_signature(di_annotation)
     assert len(options) == 2
 
     assert isinstance(options["a"], arc.command.IntOption)

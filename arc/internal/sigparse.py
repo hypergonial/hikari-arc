@@ -31,10 +31,10 @@ from arc.command.option import (
 if t.TYPE_CHECKING:
     from arc.abc.option import CommandOptionBase
     from arc.context import Context
-    from arc.internal.types import ClientT
+    from arc.internal.types import ClientT, EventT
 
 
-__all__ = ("parse_function_signature",)
+__all__ = ("parse_command_signature",)
 
 TYPE_TO_OPTION_MAPPING: dict[t.Type[t.Any], t.Type[CommandOptionBase[t.Any, t.Any, t.Any]]] = {
     bool: BoolOption,
@@ -249,8 +249,7 @@ def _parse_channel_union_type_hint(hint: t.Any) -> list[hikari.ChannelType]:
     return _channels_to_channel_types(arg for arg in args if arg is not type(None))
 
 
-# TODO Detect if param has a default value and also make it optional
-def parse_function_signature(  # noqa: C901
+def parse_command_signature(  # noqa: C901
     func: t.Callable[t.Concatenate[Context[ClientT], ...], t.Awaitable[None]],
 ) -> dict[str, CommandOptionBase[t.Any, t.Any, t.Any]]:
     """Parse a command callback function's signature and return a list of options.
@@ -365,6 +364,29 @@ def parse_function_signature(  # noqa: C901
         )
 
     return options
+
+
+def parse_event_signature(func: t.Callable[t.Concatenate[EventT, ...], t.Awaitable[None]]) -> list[type[EventT]]:
+    """Parse an event callback function's signature and return the event type, ignore other type hints."""
+    hints = t.get_type_hints(func)
+
+    # Remove the return type
+    hints.pop("return", None)
+
+    first = next(iter(hints.values()))
+
+    if _is_union(first):
+        events = [arg for arg in t.get_args(first) if issubclass(arg, hikari.Event)]
+        if not events:
+            raise TypeError("Expected event callback to have first argument that inherits from 'hikari.Event'")
+        return events  # pyright: ignore reportGeneralTypeIssues
+
+    elif issubclass(first, hikari.Event):
+        return [first]  # pyright: ignore reportGeneralTypeIssues
+
+    raise TypeError(
+        f"Expected event callback to have first argument that inherits from 'hikari.Event', got '{first!r}'"
+    )
 
 
 # MIT License
