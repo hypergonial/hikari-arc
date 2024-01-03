@@ -6,7 +6,7 @@ bot = hikari.GatewayBot("...", banner=None)
 client = arc.GatewayClient(bot)
 
 
-@client.include
+@client.include()
 @arc.slash_command("test", default_permissions=hikari.Permissions.ADMINISTRATOR)
 async def my_command(
     ctx: arc.GatewayContext,
@@ -38,7 +38,7 @@ async def my_subcommand(
     pass
 
 
-@subgroup.include
+@subgroup.include()
 @arc.slash_subcommand("test_subsubcommand", "My subsubcommand description")
 async def my_subsubcommand(
     ctx: arc.GatewayContext,

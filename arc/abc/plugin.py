@@ -51,6 +51,11 @@ class PluginBase(HasErrorHandler[ClientT], Hookable[ClientT]):
         """The error handler for this plugin."""
         return self._error_handler
 
+    @error_handler.setter
+    def error_handler(self, callback: ErrorHandlerCallbackT[ClientT] | None) -> None:
+        """Set the error handler for this plugin."""
+        self._error_handler = callback
+
     @property
     def hooks(self) -> t.MutableSequence[HookT[ClientT]]:
         """The pre-execution hooks for this plugin."""
@@ -134,7 +139,17 @@ class PluginBase(HasErrorHandler[ClientT], Hookable[ClientT]):
         else:
             raise TypeError(f"Unknown command type '{type(command).__name__}'.")
 
+    @t.overload
+    def include(self) -> t.Callable[[CommandBase[ClientT, BuilderT]], CommandBase[ClientT, BuilderT]]:
+        ...
+
+    @t.overload
     def include(self, command: CommandBase[ClientT, BuilderT]) -> CommandBase[ClientT, BuilderT]:
+        ...
+
+    def include(
+        self, command: CommandBase[ClientT, BuilderT] | None = None
+    ) -> CommandBase[ClientT, BuilderT] | t.Callable[[CommandBase[ClientT, BuilderT]], CommandBase[ClientT, BuilderT]]:
         """Add a command to this plugin.
 
         !!! note
@@ -150,11 +165,18 @@ class PluginBase(HasErrorHandler[ClientT], Hookable[ClientT]):
         RuntimeError
             If the command is already included in this plugin.
         """
-        if command.plugin is not None:
-            raise ValueError(f"Command '{command.name}' is already registered with plugin '{command.plugin.name}'.")
 
-        command._plugin_include_hook(self)
-        return command
+        def decorator(command: CommandBase[ClientT, BuilderT]) -> CommandBase[ClientT, BuilderT]:
+            if command.plugin is not None:
+                raise ValueError(f"Command '{command.name}' is already registered with plugin '{command.plugin.name}'.")
+
+            command._plugin_include_hook(self)
+            return command
+
+        if command is not None:
+            return decorator(command)
+
+        return decorator
 
     def include_slash_group(
         self,
@@ -226,7 +248,17 @@ class PluginBase(HasErrorHandler[ClientT], Hookable[ClientT]):
         group._plugin_include_hook(self)
         return group
 
+    @t.overload
     def inject_dependencies(self, func: t.Callable[P, T]) -> t.Callable[P, T]:
+        ...
+
+    @t.overload
+    def inject_dependencies(self) -> t.Callable[[t.Callable[P, T]], t.Callable[P, T]]:
+        ...
+
+    def inject_dependencies(
+        self, func: t.Callable[P, T] | None = None
+    ) -> t.Callable[P, T] | t.Callable[[t.Callable[P, T]], t.Callable[P, T]]:
         """First order decorator to inject dependencies into the decorated function.
 
         !!! warning
@@ -265,25 +297,32 @@ class PluginBase(HasErrorHandler[ClientT], Hookable[ClientT]):
         - [`Client.set_type_dependency`][arc.client.Client.set_type_dependency]
             A method to set dependencies for the client.
         """
-        if inspect.iscoroutinefunction(func):
 
-            @functools.wraps(func)
-            async def decorator_async(*args: P.args, **kwargs: P.kwargs) -> T:
-                if self._client is None:
-                    raise RuntimeError(
-                        f"Cannot inject dependencies into '{func.__name__}' before plugin '{self.name}' is included in a client."
-                    )
-                return await self._client.injector.call_with_async_di(func, *args, **kwargs)
+        def decorator(func: t.Callable[P, T]) -> t.Callable[P, T]:
+            if inspect.iscoroutinefunction(func):
 
-            return decorator_async  # pyright: ignore reportGeneralTypeIssues
-        else:
+                @functools.wraps(func)
+                async def decorator_async(*args: P.args, **kwargs: P.kwargs) -> T:
+                    if self._client is None:
+                        raise RuntimeError(
+                            f"Cannot inject dependencies into '{func.__name__}' before plugin '{self.name}' is included in a client."
+                        )
+                    return await self._client.injector.call_with_async_di(func, *args, **kwargs)
 
-            @functools.wraps(func)
-            def decorator(*args: P.args, **kwargs: P.kwargs) -> T:
-                if self._client is None:
-                    raise RuntimeError(
-                        f"Cannot inject dependencies into '{func.__name__}' before plugin '{self.name}' is included in a client."
-                    )
-                return self._client.injector.call_with_di(func, *args, **kwargs)
+                return decorator_async  # pyright: ignore reportGeneralTypeIssues
+            else:
 
-            return decorator
+                @functools.wraps(func)
+                def decorator(*args: P.args, **kwargs: P.kwargs) -> T:
+                    if self._client is None:
+                        raise RuntimeError(
+                            f"Cannot inject dependencies into '{func.__name__}' before plugin '{self.name}' is included in a client."
+                        )
+                    return self._client.injector.call_with_di(func, *args, **kwargs)
+
+                return decorator
+
+        if func is not None:
+            return decorator(func)
+
+        return decorator

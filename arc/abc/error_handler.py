@@ -17,7 +17,24 @@ class HasErrorHandler(abc.ABC, t.Generic[ClientT]):
     def error_handler(self) -> ErrorHandlerCallbackT[ClientT] | None:
         """The error handler for this object."""
 
+    @error_handler.setter
+    @abc.abstractmethod
+    def error_handler(self, callback: ErrorHandlerCallbackT[ClientT] | None) -> None:
+        """Set the error handler for this object."""
+
+    @t.overload
+    def set_error_handler(
+        self, callback: None = ...
+    ) -> t.Callable[[ErrorHandlerCallbackT[ClientT]], ErrorHandlerCallbackT[ClientT]]:
+        ...
+
+    @t.overload
     def set_error_handler(self, callback: ErrorHandlerCallbackT[ClientT]) -> ErrorHandlerCallbackT[ClientT]:
+        ...
+
+    def set_error_handler(
+        self, callback: ErrorHandlerCallbackT[ClientT] | None = None
+    ) -> ErrorHandlerCallbackT[ClientT] | t.Callable[[ErrorHandlerCallbackT[ClientT]], ErrorHandlerCallbackT[ClientT]]:
         """Decorator to set an error handler for this object. This can be added to commands, groups, or plugins.
 
         This function will be called when an exception is raised during the invocation of a command.
@@ -35,8 +52,15 @@ class HasErrorHandler(abc.ABC, t.Generic[ClientT]):
             await ctx.respond("foo failed")
         ```
         """
-        self._error_handler = callback
-        return callback
+
+        def decorator(func: ErrorHandlerCallbackT[ClientT]) -> ErrorHandlerCallbackT[ClientT]:
+            self.error_handler = func
+            return func
+
+        if callback is not None:
+            return decorator(callback)
+
+        return decorator
 
     @abc.abstractmethod
     async def _handle_exception(self, ctx: Context[ClientT], exc: Exception) -> None:

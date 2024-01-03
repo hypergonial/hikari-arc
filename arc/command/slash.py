@@ -413,11 +413,28 @@ class SlashGroup(CommandBase[ClientT, hikari.api.SlashCommandBuilder]):
         for sub in self.children.values():
             sub._request_option_locale(self._client, self)
 
+    @t.overload
+    def include(self) -> t.Callable[[SlashSubCommand[ClientT]], SlashSubCommand[ClientT]]:
+        ...
+
+    @t.overload
     def include(self, command: SlashSubCommand[ClientT]) -> SlashSubCommand[ClientT]:
-        """First-order decorator to add a subcommand to this group."""
-        command.parent = self
-        self.children[command.name] = command
-        return command
+        ...
+
+    def include(
+        self, command: SlashSubCommand[ClientT] | None = None
+    ) -> SlashSubCommand[ClientT] | t.Callable[[SlashSubCommand[ClientT]], SlashSubCommand[ClientT]]:
+        """Decorator to add a subcommand to this group."""
+
+        def decorator(command: SlashSubCommand[ClientT]) -> SlashSubCommand[ClientT]:
+            command.parent = self
+            self.children[command.name] = command
+            return command
+
+        if command is not None:
+            return decorator(command)
+
+        return decorator
 
     def include_subgroup(
         self,
@@ -528,11 +545,28 @@ class SlashSubGroup(SubCommandBase[ClientT, SlashGroup[ClientT]]):
         for subcommand in self.children.values():
             subcommand._request_option_locale(client, command)
 
+    @t.overload
+    def include(self) -> t.Callable[[SlashSubCommand[ClientT]], SlashSubCommand[ClientT]]:
+        ...
+
+    @t.overload
     def include(self, command: SlashSubCommand[ClientT]) -> SlashSubCommand[ClientT]:
+        ...
+
+    def include(
+        self, command: SlashSubCommand[ClientT] | None = None
+    ) -> SlashSubCommand[ClientT] | t.Callable[[SlashSubCommand[ClientT]], SlashSubCommand[ClientT]]:
         """First-order decorator to add a subcommand to this group."""
-        command.parent = self
-        self.children[command.name] = command
-        return command
+
+        def decorator(command: SlashSubCommand[ClientT]) -> SlashSubCommand[ClientT]:
+            command.parent = self
+            self.children[command.name] = command
+            return command
+
+        if command is not None:
+            return decorator(command)
+
+        return decorator
 
 
 @attr.define(slots=True, kw_only=True)

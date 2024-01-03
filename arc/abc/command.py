@@ -165,6 +165,11 @@ class CommandBase(HasErrorHandler[ClientT], Hookable[ClientT], t.Generic[ClientT
         """The error handler for this command."""
         return self._error_handler
 
+    @error_handler.setter
+    def error_handler(self, callback: ErrorHandlerCallbackT[ClientT] | None) -> None:
+        """Set the error handler for this command."""
+        self._error_handler = callback
+
     @property
     def hooks(self) -> t.MutableSequence[HookT[ClientT]]:
         """The pre-execution hooks for this command."""
@@ -441,6 +446,11 @@ class SubCommandBase(OptionBase[ClientT], HasErrorHandler[ClientT], Hookable[Cli
     def error_handler(self) -> ErrorHandlerCallbackT[ClientT] | None:
         """The error handler for this object."""
         return self._error_handler
+
+    @error_handler.setter
+    def error_handler(self, callback: ErrorHandlerCallbackT[ClientT] | None) -> None:
+        """Set the error handler for this object."""
+        self._error_handler = callback
 
     @property
     def hooks(self) -> t.MutableSequence[HookT[ClientT]]:
