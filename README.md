@@ -1,10 +1,12 @@
 # hikari-arc
 
 <div align="center">
+
 [![PyPI](https://img.shields.io/pypi/v/hikari-arc)](https://pypi.org/project/hikari-arc)
-[![CI](https://github.com/hypergonial/hikari-arc/actions/workflows/ci.yml/badge.svg)](https://github.com/hypergonial/hikari-arc/actions/workflows/ci.yml)
+[![CI](https://github.com/hypergonial/hikari-arc/actions/workflows/checks.yml/badge.svg)](https://github.com/hypergonial/hikari-arc/actions/workflows/checks.yml)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/charliermarsh/ruff/main/assets/badge/v1.json)](https://github.com/charliermarsh/ruff)
 ![Pyright](https://badgen.net/badge/pyright/strict/2A6DB2)
+
 </div>
 
 A command handler for [hikari](https://github.com/hikari-py/hikari) with a focus on type-safety and correctness.
