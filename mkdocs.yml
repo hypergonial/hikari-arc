@@ -84,6 +84,7 @@ nav:
         - api_reference/errors.md
         - api_reference/events.md
         - api_reference/plugin.md
+        - api_reference/localization.md
         - Utils:
             - api_reference/utils/index.md
             - api_reference/utils/hooks.md
