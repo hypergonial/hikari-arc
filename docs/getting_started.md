@@ -87,7 +87,7 @@ There are two main ways for a bot to connect to Discord & receive events, via ei
 
 A bot connected to the [**Gateway**](https://discord.com/developers/docs/topics/gateway "Discord's fancy way of saying WebSocket") needs to maintain a constant connection to Discord's servers through a [WebSocket](https://en.wikipedia.org/wiki/WebSocket),
 and in turn receives **events** that inform it about things happening on Discord in real time (messages being sent, channels being created etc...).
-[**Interactions**](./guides/interactions.md) are also delivered to a bot of this type through the Gateway as events. In addition, Gateway bots typically have a [*cache*][arc.client.GatewayClient.cache] and can manage complex state.
+[**Interactions**](./guides/interactions.md) are also delivered to a bot of this type through the Gateway as events. In addition, Gateway bots typically have a [*cache*][arc.client.GatewayClientBase.cache] and can manage complex state.
 This model is ideal for bots that need to do things other than just responding to slash commands, such as reading messages sent by users, or acting on other server events (e.g. a moderation bot).
 
 A **RESTBot** however, isn't constantly connected to Discord, instead, you're expected to host a small HTTP server, and Discord will send interactions to your server

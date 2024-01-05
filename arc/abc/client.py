@@ -53,7 +53,7 @@ logger = logging.getLogger(__name__)
 
 class Client(t.Generic[AppT], abc.ABC):
     """The abstract base class for an `arc` client.
-    See [`GatewayClient`][arc.client.GatewayClient] and [`RESTClient`][arc.client.RESTClient] for implementations.
+    See [`GatewayClientBase`][arc.client.GatewayClientBase] and [`RESTClientBase`][arc.client.RESTClientBase] for implementations.
 
     Parameters
     ----------
