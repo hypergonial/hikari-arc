@@ -4,7 +4,7 @@ import arc
 
 bot = hikari.GatewayBot("...")
 # Set the locales that the client will request in the provider callbacks.
-client = arc.GatewayClient(bot, provided_locales=[hikari.Locale.EN_US, hikari.Locale.ES_ES])
+client = arc.GatewayClientBase(bot, provided_locales=[hikari.Locale.EN_US, hikari.Locale.ES_ES])
 
 # These are just examples, you can provide localizations from anywhere you want.
 COMMAND_LOCALES = {

@@ -10,6 +10,7 @@ from arc.context import Context
 from arc.errors import NoResponseIssuedError
 from arc.events import CommandErrorEvent
 from arc.internal.sigparse import parse_event_signature
+from arc.internal.types import GatewayBotT, RESTBotT
 from arc.plugin import GatewayPluginBase, RESTPluginBase
 
 if t.TYPE_CHECKING:
@@ -17,7 +18,16 @@ if t.TYPE_CHECKING:
 
     from .internal.types import EventCallbackT, EventT, ResponseBuilderT
 
-__all__ = ("GatewayClient", "RESTClient")
+__all__ = (
+    "GatewayClientBase",
+    "RESTClientBase",
+    "GatewayClient",
+    "RESTClient",
+    "GatewayContext",
+    "RESTContext",
+    "RESTPlugin",
+    "GatewayPlugin",
+)
 
 
 T = t.TypeVar("T")
@@ -26,9 +36,9 @@ P = t.ParamSpec("P")
 logger = logging.getLogger(__name__)
 
 
-class GatewayClient(Client[hikari.GatewayBotAware]):
-    """The default implementation for an arc client with `hikari.GatewayBotAware` support.
-    If you want to use a `hikari.RESTBotAware`, use [`RESTClient`][arc.client.RESTClient] instead.
+class GatewayClientBase(Client[GatewayBotT]):
+    """The base class for an arc client with Gateway support.
+    If you want to use a RESTBot, use [`RESTClientBase`][arc.client.RESTClientBase] instead.
 
     Parameters
     ----------
@@ -48,6 +58,7 @@ class GatewayClient(Client[hikari.GatewayBotAware]):
     import arc
 
     bot = hikari.GatewayBot("TOKEN")
+    # Default client implementation
     client = arc.GatewayClient(bot)
 
     ...
@@ -58,7 +69,7 @@ class GatewayClient(Client[hikari.GatewayBotAware]):
 
     def __init__(
         self,
-        app: hikari.GatewayBotAware,
+        app: GatewayBotT,
         *,
         default_enabled_guilds: t.Sequence[hikari.Snowflake] | None = None,
         autosync: bool = True,
@@ -157,9 +168,9 @@ class GatewayClient(Client[hikari.GatewayBotAware]):
         return decorator
 
 
-class RESTClient(Client[hikari.RESTBotAware]):
-    """The default implementation for an arc client with `hikari.RESTBotAware` support.
-    If you want to use `hikari.GatewayBotAware`, use [`GatewayClient`][arc.client.GatewayClient] instead.
+class RESTClientBase(Client[RESTBotT]):
+    """The base class for an arc client with REST support.
+    If you want to use GatewayBot, use [`GatewayClient`][arc.client.GatewayClientBase] instead.
 
     Parameters
     ----------
@@ -180,6 +191,7 @@ class RESTClient(Client[hikari.RESTBotAware]):
     import arc
 
     bot = hikari.RESTBot("TOKEN")
+    # Default client implementation
     client = arc.RESTClient(bot)
 
     ...
@@ -193,7 +205,7 @@ class RESTClient(Client[hikari.RESTBotAware]):
 
     def __init__(
         self,
-        app: hikari.RESTBotAware,
+        app: RESTBotT,
         *,
         default_enabled_guilds: t.Sequence[hikari.Snowflake] | None = None,
         autosync: bool = True,
@@ -261,16 +273,22 @@ class RESTClient(Client[hikari.RESTBotAware]):
         return builder
 
 
-GatewayContext = Context[GatewayClient]
+GatewayClient = GatewayClientBase[hikari.GatewayBotAware]
+"""The default gateway client implementation. An alias for [`arc.GatewayClientBase[hikari.GatewayBotAware]`][arc.client.GatewayClientBase]."""
+
+RESTClient = RESTClientBase[hikari.RESTBotAware]
+"""The default REST client implementation. An alias for [`arc.RESTClientBase[hikari.RESTBotAware]`][arc.client.RESTClientBase]."""
+
+GatewayContext = Context[GatewayClientBase[hikari.GatewayBotAware]]
 """A context using the default gateway client implementation. An alias for [`arc.Context[arc.GatewayClient]`][arc.context.base.Context]."""
 
-RESTContext = Context[RESTClient]
+RESTContext = Context[RESTClientBase[hikari.RESTBotAware]]
 """A context using the default REST client implementation. An alias for [`arc.Context[arc.RESTClient]`][arc.context.base.Context]."""
 
-RESTPlugin = RESTPluginBase[RESTClient]
+RESTPlugin = RESTPluginBase[RESTClientBase[hikari.RESTBotAware]]
 """A plugin using the default REST client implementation. An alias for [`arc.RESTPluginBase[arc.RESTClient]`][arc.plugin.RESTPluginBase]."""
 
-GatewayPlugin = GatewayPluginBase[GatewayClient]
+GatewayPlugin = GatewayPluginBase[GatewayClientBase[hikari.GatewayBotAware]]
 """An alias for [`arc.GatewayPluginBase[arc.GatewayClient]`][arc.plugin.GatewayPluginBase]."""
 
 # MIT License

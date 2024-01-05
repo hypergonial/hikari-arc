@@ -7,7 +7,7 @@ import arc
 # Related documentation guide: https://arc.hypergonial.com/guides/hooks
 
 bot = hikari.GatewayBot("...")
-client = arc.GatewayClient(bot)
+client = arc.GatewayClientBase(bot)
 
 # Any function that takes a context as its first argument
 # and returns None or HookResult is a valid hook

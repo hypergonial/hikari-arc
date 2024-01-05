@@ -9,7 +9,7 @@ import arc
 bot = hikari.RESTBot("...")
 
 # Initialize arc with the bot:
-client = arc.RESTClient(bot)
+client = arc.RESTClientBase(bot)
 
 
 @client.include # Add command to client

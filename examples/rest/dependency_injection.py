@@ -10,7 +10,7 @@ class MyDatabase:
         self.value = value
 
 bot = hikari.RESTBot("...")
-client = arc.RESTClient(bot)
+client = arc.RESTClientBase(bot)
 
 # Create a new instance of 'MyDatabase'
 database = MyDatabase(value=0)

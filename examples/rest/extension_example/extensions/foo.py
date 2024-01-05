@@ -13,11 +13,11 @@ async def foo_cmd(
 # This will be called when the extension is loaded
 # A loader must be present for the extension to be valid
 @arc.loader
-def loader(client: arc.RESTClient) -> None:
+def loader(client: arc.RESTClientBase) -> None:
     client.add_plugin(plugin)
 
 # And this will be called when the extension is unloaded
 # Including this is optional, but if not present, the extension cannot be unloaded
 @arc.unloader
-def unloader(client: arc.RESTClient) -> None:
+def unloader(client: arc.RESTClientBase) -> None:
     client.remove_plugin(plugin)

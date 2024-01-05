@@ -6,7 +6,7 @@ if t.TYPE_CHECKING:
     import hikari
 
     from arc.abc import Client, Hookable, HookResult, OptionParams
-    from arc.client import GatewayClient, RESTClient
+    from arc.client import GatewayClientBase, RESTClientBase
     from arc.command import SlashCommand, SlashGroup
     from arc.context import AutocompleteData, Context
     from arc.locale import CommandLocaleRequest, CustomLocaleRequest, LocaleResponse, OptionLocaleRequest
@@ -16,8 +16,10 @@ if t.TYPE_CHECKING:
 AppT = t.TypeVar("AppT", bound="hikari.RESTAware")
 ChoiceT = t.TypeVar("ChoiceT", bound="int | float | str")
 ClientT = t.TypeVar("ClientT", bound="Client[t.Any]")
-GatewayClientT = t.TypeVar("GatewayClientT", bound="GatewayClient")
-RESTClientT = t.TypeVar("RESTClientT", bound="RESTClient")
+GatewayBotT = t.TypeVar("GatewayBotT", bound="hikari.GatewayBotAware")
+RESTBotT = t.TypeVar("RESTBotT", bound="hikari.RESTBotAware")
+GatewayClientT = t.TypeVar("GatewayClientT", bound="GatewayClientBase[t.Any]")
+RESTClientT = t.TypeVar("RESTClientT", bound="RESTClientBase[t.Any]")
 EventT = t.TypeVar("EventT", bound="hikari.Event")
 BuilderT = t.TypeVar("BuilderT", bound="hikari.api.SlashCommandBuilder | hikari.api.ContextMenuCommandBuilder")
 ParamsT = t.TypeVar("ParamsT", bound="OptionParams[t.Any]")

@@ -5,7 +5,7 @@ import arc
 # Related documentation guide: https://arc.hypergonial.com/guides/context_menu
 
 bot = hikari.RESTBot("...")
-client = arc.RESTClient(bot)
+client = arc.RESTClientBase(bot)
 
 # Context-menu commands cannot be put in groups, and do not support options.
 # Note that you can only define a MAXIMUM of 5 user and 5 message commands per bot.

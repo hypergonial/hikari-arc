@@ -14,7 +14,17 @@ from alluka import inject
 from arc import abc, command
 
 from .abc import HookResult, Option, with_hook, with_post_hook
-from .client import Client, GatewayClient, GatewayContext, GatewayPlugin, RESTClient, RESTContext, RESTPlugin
+from .client import (
+    Client,
+    GatewayClient,
+    GatewayClientBase,
+    GatewayContext,
+    GatewayPlugin,
+    RESTClient,
+    RESTClientBase,
+    RESTContext,
+    RESTPlugin,
+)
 from .command import (
     AttachmentParams,
     BoolParams,
@@ -86,6 +96,8 @@ __all__ = (
     "slash_command",
     "slash_subcommand",
     "Client",
+    "GatewayClientBase",
+    "RESTClientBase",
     "GatewayClient",
     "RESTClient",
     "ArcError",
