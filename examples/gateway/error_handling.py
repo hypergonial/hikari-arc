@@ -5,7 +5,7 @@ import arc
 # Related documentation guide: https://arc.hypergonial.com/guides/error_handling
 
 bot = hikari.GatewayBot("...")
-client = arc.GatewayClientBase(bot)
+client = arc.GatewayClient(bot)
 
 @client.include
 @arc.slash_command("name", "description")

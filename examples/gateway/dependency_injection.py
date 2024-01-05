@@ -10,7 +10,7 @@ class MyDatabase:
         self.value = value
 
 bot = hikari.GatewayBot("...")
-client = arc.GatewayClientBase(bot)
+client = arc.GatewayClient(bot)
 
 # Create a new instance of 'MyDatabase'
 database = MyDatabase(value=0)

@@ -5,7 +5,7 @@ import arc
 # Related documentation guide: https://arc.hypergonial.com/guides/plugin_extensions
 
 bot = hikari.RESTBot("...")
-client = arc.RESTClientBase(bot)
+client = arc.RESTClient(bot)
 
 # Load all extensions located in the 'extensions' directory
 client.load_extensions_from("extensions")

@@ -5,7 +5,7 @@ import arc
 # Related documentation guide: https://arc.hypergonial.com/guides/options
 
 bot = hikari.RESTBot("...")
-client = arc.RESTClientBase(bot)
+client = arc.RESTClient(bot)
 
 
 @client.include
@@ -42,7 +42,7 @@ async def all_the_options(
 
 # Define an autocompletion callback
 # This can either return a list of the option type, or a list of hikari.CommandChoice
-async def provide_opts(data: arc.AutocompleteData[arc.RESTClientBase, str]) -> list[str]:
+async def provide_opts(data: arc.AutocompleteData[arc.RESTClient, str]) -> list[str]:
     if data.focused_value and len(data.focused_value) > 20:
         return ["That", "is", "so", "long!"]
     return ["Short", "is", "better!"]

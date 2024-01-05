@@ -5,7 +5,7 @@ import arc
 bot = hikari.GatewayBot("...")
 
 # Initialize arc with the bot:
-client = arc.GatewayClientBase(bot)
+client = arc.GatewayClient(bot)
 
 
 @client.include # Add command to client

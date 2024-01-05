@@ -5,7 +5,7 @@ import arc
 # Related documentation guide: https://arc.hypergonial.com/guides/error_handling
 
 bot = hikari.RESTBot("...")
-client = arc.RESTClientBase(bot)
+client = arc.RESTClient(bot)
 
 @client.include
 @arc.slash_command("name", "description")
