@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import itertools
 import logging
-import pprint
 import typing as t
 from collections import defaultdict
 from contextlib import suppress
@@ -325,7 +324,6 @@ async def _sync_commands(client: Client[AppT]) -> None:
 
     commands = _get_all_commands(client)
     _process_localizations(client, commands)
-    pprint.PrettyPrinter(indent=4).pprint(commands)
 
     global_commands = commands.pop(None, None)
 
