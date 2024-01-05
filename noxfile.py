@@ -4,7 +4,8 @@ import nox
 from nox import options
 
 PATH_TO_PROJECT = os.path.join(".", "arc")
-SCRIPT_PATHS = [PATH_TO_PROJECT, "noxfile.py", os.path.join(".", "tests")]
+EXAMPLES_PATH = os.path.join(".", "examples")
+SCRIPT_PATHS = [PATH_TO_PROJECT, EXAMPLES_PATH, "noxfile.py", os.path.join(".", "tests")]
 
 options.sessions = ["format_fix", "pyright", "pytest", "docs"]
 
@@ -27,7 +28,7 @@ def format(session: nox.Session) -> None:
 def pyright(session: nox.Session) -> None:
     session.install(".")
     session.install("-U", "pyright")
-    session.run("pyright", PATH_TO_PROJECT)
+    session.run("pyright", PATH_TO_PROJECT, EXAMPLES_PATH)
 
 
 @nox.session()

@@ -1,5 +1,5 @@
 [tool.ruff]
-exclude = ["examples", "docs", "build"]
+exclude = ["docs", "build"]
 select = [
     "E",
     "F",

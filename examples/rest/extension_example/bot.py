@@ -1,4 +1,5 @@
 import hikari
+
 import arc
 
 # Extensions are a way to split your code into multiple files

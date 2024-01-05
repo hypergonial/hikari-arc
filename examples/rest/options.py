@@ -1,4 +1,5 @@
 import hikari
+
 import arc
 
 # Options allow users to provide additional information to slash commands
@@ -35,10 +36,12 @@ async def all_the_options(
         f"\nChannel: {channel.mention if channel else '`None`'}"
     )
 
+
 # Note that this is not all possible option types, for more information, see the documentation:
 # https://arc.hypergonial.com/guides/options
 
 # Autocomplete
+
 
 # Define an autocompletion callback
 # This can either return a list of the option type, or a list of hikari.CommandChoice
@@ -47,16 +50,19 @@ async def provide_opts(data: arc.AutocompleteData[arc.RESTClient, str]) -> list[
         return ["That", "is", "so", "long!"]
     return ["Short", "is", "better!"]
 
+
 # Only 'str', 'int' and 'float' support autocompletion
+
 
 @client.include
 @arc.slash_command("autocomplete", "Autocomplete options!")
 async def autocomplete_command(
     ctx: arc.RESTContext,
     # Set the 'autocomplete_with' parameter to the function that will be used to autocomplete the option
-    complete_me: arc.Option[str, arc.StrParams(description="I'll complete you!", autocomplete_with=provide_opts)]
+    complete_me: arc.Option[str, arc.StrParams(description="I'll complete you!", autocomplete_with=provide_opts)],
 ) -> None:
     await ctx.respond(f"You wrote: `{complete_me}`")
+
 
 # Note that 'choices' and 'autocomplete_with' are mutually exclusive, you can only use one of them!
 
