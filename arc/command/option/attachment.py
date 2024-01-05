@@ -14,6 +14,7 @@ if t.TYPE_CHECKING:
 __all__ = ("AttachmentOption", "AttachmentParams")
 
 
+@t.final
 class AttachmentParams(OptionParams[hikari.Attachment]):
     """The parameters for an attachment option.
 

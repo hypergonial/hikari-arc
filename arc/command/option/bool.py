@@ -14,6 +14,7 @@ if t.TYPE_CHECKING:
 __all__ = ("BoolOption", "BoolParams")
 
 
+@t.final
 class BoolParams(OptionParams[bool]):
     """The parameters for a bool option.
 

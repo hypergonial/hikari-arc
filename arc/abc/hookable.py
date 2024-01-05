@@ -9,6 +9,7 @@ if t.TYPE_CHECKING:
     import typing_extensions as te
 
 
+@t.final
 class HookResult:
     """The result of a hook.
 

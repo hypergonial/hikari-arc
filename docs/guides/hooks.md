@@ -21,7 +21,7 @@ def my_hook(ctx: arc.Context[Any]) -> None:
 !!! question "Can hooks be async?"
     Hooks can either be async or sync, both variants are supported.
 
-For a list of built-in hooks, see [here](../api_reference/utils/hooks.md).
+For a list of built-in hooks, see [here](../api_reference/utils/hooks/basic.md).
 
 ## Pre-execution VS Post-execution hooks
 
@@ -191,3 +191,36 @@ So using this logic, the hooks above will be evaluated in the following order:
 - `hook_b`, `hook_c` - Plugins are next.
 - `hook_d` - Groups can also have hooks!
 - `hook_e`, `hook_f` - Note that decorators in Python are ordered from bottom to top!
+
+## Limiters
+
+Limiters (or cooldowns, as known in some libraries) are a special type of pre-execution hook that can block a command's execution for a certain period of time if it's been used too much. All limiters must implement the [`LimiterProto`][arc.abc.limiter.LimiterProto] protocol to be a valid `arc` limiter.
+
+For a list of all built-in limiters, see [here](../api_reference/utils/hooks/limiters.md).
+
+```py
+@client.include
+# Limit the command to 2 uses every 10 seconds per channel.
+@arc.with_hook(arc.channel_limiter(10.0, 2))
+@arc.slash_command("ping", "Pong!")
+async def ping(ctx: arc.GatewayContext) -> None:
+    await ctx.respond("Pong!")
+
+
+@ping.set_error_handler
+async def ping_error_handler(
+    ctx: arc.GatewayContext, error: Exception
+) -> None:
+    if isinstance(error, arc.UnderCooldownError):
+        await ctx.respond(
+            "Command is on cooldown!"
+            f"\nTry again in `{error.retry_after}` seconds."
+        )
+    else:
+        raise error
+```
+
+!!! warning
+    You should be prepared to handle [`UnderCooldownError`][arc.errors.UnderCooldownError], it gets raised by built-in limiters when a ratelimit is exceeded. For more about error handling, see the [error handling](./error_handling.md) section.
+
+If you need to reset the limiters for a specific context during command execution, you may use [`Context.command.reset_all_limiters()`][arc.abc.command.CallableCommandProto.reset_all_limiters].

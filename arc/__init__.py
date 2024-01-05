@@ -47,7 +47,16 @@ from .command import (
     user_command,
 )
 from .context import AutocompleteData, AutodeferMode, Context, InteractionResponse
-from .errors import ArcError, AutocompleteError, CommandInvokeError
+from .errors import (
+    ArcError,
+    AutocompleteError,
+    CommandInvokeError,
+    DMOnlyError,
+    GuildOnlyError,
+    InvokerMissingPermissionsError,
+    NotOwnerError,
+    UnderCooldownError,
+)
 from .events import ArcEvent, CommandErrorEvent
 from .extension import loader, unloader
 from .internal.about import __author__, __author_email__, __license__, __maintainer__, __url__, __version__
@@ -60,7 +69,19 @@ from .locale import (
     OptionLocaleRequest,
 )
 from .plugin import GatewayPluginBase, PluginBase, RESTPluginBase
-from .utils import bot_has_permissions, dm_only, guild_only, has_permissions, owner_only
+from .utils import (
+    bot_has_permissions,
+    channel_limiter,
+    custom_limiter,
+    dm_only,
+    global_limiter,
+    guild_limiter,
+    guild_only,
+    has_permissions,
+    member_limiter,
+    owner_only,
+    user_limiter,
+)
 
 __all__ = (
     "__version__",
@@ -102,6 +123,11 @@ __all__ = (
     "RESTClient",
     "ArcError",
     "AutocompleteError",
+    "UnderCooldownError",
+    "InvokerMissingPermissionsError",
+    "GuildOnlyError",
+    "NotOwnerError",
+    "DMOnlyError",
     "CommandInvokeError",
     "PluginBase",
     "RESTPluginBase",
@@ -131,6 +157,12 @@ __all__ = (
     "guild_only",
     "has_permissions",
     "owner_only",
+    "global_limiter",
+    "guild_limiter",
+    "channel_limiter",
+    "user_limiter",
+    "member_limiter",
+    "custom_limiter",
 )
 
 # MIT License

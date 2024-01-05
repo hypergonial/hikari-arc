@@ -23,6 +23,7 @@ __all__ = (
 )
 
 
+@t.final
 class LocaleRequestType(enum.IntEnum):
     """The type of locale request."""
 
@@ -64,6 +65,7 @@ class LocaleRequest(abc.ABC):
         return self._command.qualified_name
 
 
+@t.final
 @attr.define(slots=True)
 class LocaleResponse:
     """The response to a command or option locale request."""
@@ -75,6 +77,7 @@ class LocaleResponse:
     """The localized description of the command or option."""
 
 
+@t.final
 @attr.define(slots=True)
 class CommandLocaleRequest(LocaleRequest):
     """A request to localize a command."""
@@ -98,6 +101,7 @@ class CommandLocaleRequest(LocaleRequest):
         return self._description
 
 
+@t.final
 @attr.define(slots=True)
 class OptionLocaleRequest(LocaleRequest):
     """A request to localize a command option."""
@@ -127,6 +131,7 @@ class OptionLocaleRequest(LocaleRequest):
         return self._description
 
 
+@t.final
 @attr.define(slots=True)
 class CustomLocaleRequest(LocaleRequest):
     """A custom locale request made by the user."""

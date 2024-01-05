@@ -1,9 +1,10 @@
+from __future__ import annotations
+
 import typing as t
 
 import hikari
 
 from arc.abc.hookable import HookResult
-from arc.context import Context
 from arc.errors import (
     BotMissingPermissionsError,
     DMOnlyError,
@@ -11,6 +12,9 @@ from arc.errors import (
     InvokerMissingPermissionsError,
     NotOwnerError,
 )
+
+if t.TYPE_CHECKING:
+    from arc.context import Context
 
 
 def guild_only(ctx: Context[t.Any]) -> HookResult:

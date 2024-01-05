@@ -16,6 +16,7 @@ if t.TYPE_CHECKING:
 __all__ = ("FloatOption", "FloatParams")
 
 
+@t.final
 class FloatParams(OptionWithChoicesParams[float, ClientT]):
     """The parameters for a float option.
 

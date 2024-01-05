@@ -14,6 +14,7 @@ if t.TYPE_CHECKING:
 __all__ = ("MentionableOption", "MentionableParams")
 
 
+@t.final
 class MentionableParams(OptionParams[hikari.Role | hikari.User]):
     """The parameters for a mentionable option.
     This is an option of type `hikari.Role | hikari.User`.

@@ -16,6 +16,7 @@ __all__ = ("AutocompleteData",)
 
 
 # Don't slot, because we want to use cached_property.
+@t.final
 @attr.define(slots=False, kw_only=True)
 class AutocompleteData(t.Generic[ClientT, ChoiceT]):
     """The data that is provided to an autocomplete callback."""

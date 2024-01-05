@@ -106,9 +106,80 @@ Trying to use any other type as an option will lead to errors.
 
     To allow any channel type (including categories and threads!) use `hikari.PartialChannel`.
 
-## Autocomplete
+## Choices & Autocomplete
 
-`str`, `int` and `float` support autocomplete, which means that you can dynamically offer choices as the user is typing in their input.
+`str`, `int` and `float` support setting **choices** or **autocomplete**, the latter of which means that you can dynamically offer choices as the user is typing in their input.
+
+### Choices
+
+Choices can be added to an option to define tell the user what values are valid. The choices will be shown as suggestions when the user has the option selected.
+
+!!! warning
+    If choices are present, they will be the **only valid** values for the option.
+
+=== "Gateway"
+
+    ```py
+    @client.include
+    @arc.slash_command("choices", "I can't choose!")
+    async def choices_command(
+        ctx: arc.GatewayContext,
+        # Set the 'choices' parameter to all the valid values your option can be
+        choose_me: arc.Option[int, arc.IntParams(description="Choose me!", choices=[1, 2, 3])]
+    ) -> None:
+        await ctx.respond(f"You wrote: `{choose_me}`")
+    ```
+
+=== "REST"
+
+    ```py
+    @client.include
+    @arc.slash_command("choices", "I can't choose!")
+    async def choices_command(
+        ctx: arc.RESTContext,
+        # Set the 'choices' parameter to all the valid values your option can be
+        choose_me: arc.Option[int, arc.IntParams(description="Choose me!", choices=[1, 2, 3])]
+    ) -> None:
+        await ctx.respond(f"You wrote: `{choose_me}`")
+    ```
+
+You can also pass a mapping if you want to name your choices. Your command will receive the value, but your users will only see the names:
+
+=== "Gateway"
+
+    ```py
+    @client.include
+    @arc.slash_command("choices", "I can't choose!")
+    async def choices_command(
+        ctx: arc.GatewayContext,
+        # Set the 'choices' parameter to all the valid values your option can be
+        choose_me: arc.Option[int, arc.IntParams(description="Choose me!", choices={"one": 1, "two": 2, "three": 3})]
+    ) -> None:
+        await ctx.respond(f"You wrote: `{choose_me}`")
+    ```
+
+=== "REST"
+
+    ```py
+    @client.include
+    @arc.slash_command("choices", "I can't choose!")
+    async def choices_command(
+        ctx: arc.RESTContext,
+        # Set the 'choices' parameter to all the valid values your option can be
+        choose_me: arc.Option[int, arc.IntParams(description="Choose me!", choices={"one": 1, "two": 2, "three": 3})]
+    ) -> None:
+        await ctx.respond(f"You wrote: `{choose_me}`")
+    ```
+
+!!! tip
+    If you're simply looking to restrict the range of a numeric value or the length of a string, use the `min`/`max` or `min_length`/`max_length` parameters respectively.
+
+### Autocomplete
+
+Autocomplete is useful when you want to provide suggestions to the value of the option depending on what the user has typed, or even other option values if they have already been specified.
+
+!!! warning
+    Autocompleted options can still be **submitted with any value**, regardless of what values have been suggested to the user, unlike choices. You should validate your input.
 
 First, you need to define an autocomplete callback, this will be called repeatedly as the user is typing in the option:
 
@@ -161,3 +232,6 @@ Then, to add autocomplete to an option, specify the `autocomplete_with=` argumen
     ```
 
 With the following example, the autocompletion suggestions should change as your input reaches 20 characters.
+
+!!! warning
+    You cannot have `autocomplete_with=` and `choices=` defined at the same time.

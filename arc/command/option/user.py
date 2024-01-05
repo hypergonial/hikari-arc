@@ -15,6 +15,7 @@ if t.TYPE_CHECKING:
 __all__ = ("UserOption", "UserParams")
 
 
+@t.final
 class UserParams(OptionParams[hikari.User]):
     """The parameters for a user option.
 

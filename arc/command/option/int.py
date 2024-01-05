@@ -16,6 +16,7 @@ if t.TYPE_CHECKING:
 __all__ = ("IntOption", "IntParams")
 
 
+@t.final
 class IntParams(OptionWithChoicesParams[int, ClientT]):
     """The parameters for an int option.
 

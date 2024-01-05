@@ -6,7 +6,7 @@ import typing as t
 import attr
 import hikari
 
-from arc.abc.command import CallableCommandBase, CommandBase, SubCommandBase
+from arc.abc.command import CallableCommandBase, CallableCommandProto, CommandBase, SubCommandBase
 from arc.abc.option import OptionWithChoices
 from arc.context import AutocompleteData, AutodeferMode, Context
 from arc.errors import AutocompleteError, CommandInvokeError
@@ -18,7 +18,7 @@ if t.TYPE_CHECKING:
     from asyncio.futures import Future
 
     from arc.abc.client import Client
-    from arc.abc.command import CallableCommandProto, CommandProto
+    from arc.abc.command import CommandProto
     from arc.abc.option import CommandOptionBase
     from arc.abc.plugin import PluginBase
 
@@ -570,7 +570,9 @@ class SlashSubGroup(SubCommandBase[ClientT, SlashGroup[ClientT]]):
 
 
 @attr.define(slots=True, kw_only=True)
-class SlashSubCommand(SubCommandBase[ClientT, SlashGroup[ClientT] | SlashSubGroup[ClientT]]):
+class SlashSubCommand(
+    SubCommandBase[ClientT, SlashGroup[ClientT] | SlashSubGroup[ClientT]], CallableCommandProto[ClientT]
+):
     """A subcommand of a slash command group."""
 
     callback: CommandCallbackT[ClientT]

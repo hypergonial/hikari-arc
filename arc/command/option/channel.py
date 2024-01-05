@@ -14,6 +14,7 @@ if t.TYPE_CHECKING:
 __all__ = ("ChannelOption", "ChannelParams")
 
 
+@t.final
 class ChannelParams(OptionParams[hikari.PartialChannel]):
     """The parameters for a channel option.
     The channel types are inferred from the type hint.

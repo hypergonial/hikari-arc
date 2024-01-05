@@ -9,8 +9,9 @@ hide:
 
 Here you can find all the changelogs for `hikari-arc`.
 
-## Unreleased
+## v0.5.0
 
+- Add [limiters](./guides/hooks.md#limiters).
 - Add `GatewayClientBase` and `RESTClientBase` to aid in creating custom client types. Examples on how to do this have also been added to the repository.
 - Fix `InteractionResponse.retrieve_message()` failing due to incorrect assertion.
 - Fix subcommands & subgroups unable to have hooks or an error handler.

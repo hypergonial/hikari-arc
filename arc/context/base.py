@@ -22,7 +22,10 @@ __all__ = ("Context", "InteractionResponse", "AutodeferMode")
 logger = logging.getLogger(__name__)
 
 
+@t.final
 class AutodeferMode(enum.IntEnum):
+    """An enum representing autodefer configuration."""
+
     OFF = 0
     """Do not autodefer."""
 
@@ -89,6 +92,7 @@ class _ResponseGlue:
         )
 
 
+@t.final
 class InteractionResponse:
     """Represents a message response to an interaction, allows for standardized handling of such responses.
     This class is not meant to be directly instantiated, and is instead returned by [Context][arc.context.base.Context]
@@ -228,6 +232,7 @@ class InteractionResponse:
         return await self._context._create_response(message)
 
 
+@t.final
 class Context(t.Generic[ClientT]):
     """A context object that is proxying a Discord command interaction."""
 

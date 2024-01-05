@@ -17,6 +17,7 @@ if t.TYPE_CHECKING:
 __all__ = ("StrOption", "StrParams")
 
 
+@t.final
 class StrParams(OptionWithChoicesParams[str, ClientT]):
     """The parameters for a string option.
 

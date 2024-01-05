@@ -87,7 +87,9 @@ nav:
         - api_reference/localization.md
         - Utils:
             - api_reference/utils/index.md
-            - api_reference/utils/hooks.md
+            - Hooks:
+                - api_reference/utils/hooks/basic.md
+                - api_reference/utils/hooks/limiters.md
         - ABC:
             - api_reference/abc/index.md
             - api_reference/abc/client.md
@@ -95,6 +97,7 @@ nav:
             - api_reference/abc/option.md
             - api_reference/abc/plugin.md
             - api_reference/abc/hooks.md
+            - api_reference/abc/limiter.md
             - api_reference/abc/error_handler.md
     - Changelog: changelog.md
 

@@ -10,6 +10,7 @@ import hikari
 
 from arc.abc.error_handler import HasErrorHandler
 from arc.abc.hookable import Hookable, HookResult
+from arc.abc.limiter import LimiterProto
 from arc.abc.option import OptionBase
 from arc.context import AutodeferMode
 from arc.internal.types import (
@@ -25,7 +26,7 @@ from arc.locale import CommandLocaleRequest
 
 if t.TYPE_CHECKING:
     from arc.abc.plugin import PluginBase
-    from arc.context import Context
+    from arc.context.base import Context
 
 
 class CommandProto(t.Protocol):
@@ -48,13 +49,18 @@ class CommandProto(t.Protocol):
 
 
 class CallableCommandProto(t.Protocol[ClientT]):
-    """A protocol for any command-like object that can be called directly. This includes commands and subcommands."""
+    """A protocol for any command-like object that can be called directly.
+
+    This includes commands and subcommands, but not groups or subgroups.
+    """
 
     name: str
     """The name of the command."""
     name_localizations: t.Mapping[hikari.Locale, str]
     """The name of the command in different locales."""
+
     callback: CommandCallbackT[ClientT]
+    """The callback to invoke when this command is called."""
 
     @property
     @abc.abstractmethod
@@ -65,6 +71,26 @@ class CallableCommandProto(t.Protocol[ClientT]):
     @abc.abstractmethod
     def qualified_name(self) -> t.Sequence[str]:
         """The fully qualified name of this command."""
+
+    @property
+    @abc.abstractmethod
+    def hooks(self) -> t.MutableSequence[HookT[ClientT]]:
+        """The pre-execution hooks for this command."""
+
+    @property
+    @abc.abstractmethod
+    def post_hooks(self) -> t.MutableSequence[PostHookT[ClientT]]:
+        """The post-execution hooks for this command."""
+
+    @abc.abstractmethod
+    def reset_all_limiters(self, context: Context[ClientT]) -> None:
+        """Reset all limiters for this command.
+
+        Parameters
+        ----------
+        context : Context
+            The context to reset the limiters for.
+        """
 
     @abc.abstractmethod
     async def __call__(self, ctx: Context[ClientT], *args: t.Any, **kwargs: t.Any) -> None:
@@ -110,10 +136,12 @@ class CallableCommandProto(t.Protocol[ClientT]):
     async def _handle_exception(self, ctx: Context[ClientT], exc: Exception) -> None:
         ...
 
+    @abc.abstractmethod
     def _resolve_hooks(self) -> t.Sequence[HookT[ClientT]]:
         """Resolve all pre-execution hooks that apply to this object."""
         ...
 
+    @abc.abstractmethod
     def _resolve_post_hooks(self) -> t.Sequence[PostHookT[ClientT]]:
         """Resolve all post-execution hooks that apply to this object."""
         ...
@@ -360,10 +388,10 @@ class CommandBase(HasErrorHandler[ClientT], Hookable[ClientT], t.Generic[ClientT
         try:
             hooks = command._resolve_hooks()
             for hook in hooks:
-                if inspect.iscoroutinefunction(hook):
-                    res = await hook(ctx)
-                else:
-                    res = hook(ctx)
+                res = hook(ctx)
+
+                if inspect.isawaitable(res):
+                    res = await res
 
                 res = t.cast(HookResult | None, res)
 
@@ -405,13 +433,27 @@ class CommandBase(HasErrorHandler[ClientT], Hookable[ClientT], t.Generic[ClientT
 
 
 @attr.define(slots=True, kw_only=True)
-class CallableCommandBase(CommandBase[ClientT, BuilderT]):
-    """A command that can be called directly. Note that this does not include subcommands, as those are options."""
+class CallableCommandBase(CommandBase[ClientT, BuilderT], CallableCommandProto[ClientT]):
+    """A top-level command that can be called directly. Note that this does not include subcommands, as those are options."""
 
     callback: CommandCallbackT[ClientT]
     """The callback to invoke when this command is called."""
 
     _invoke_task: asyncio.Task[t.Any] | None = attr.field(init=False, default=None)
+
+    def reset_all_limiters(self, context: Context[ClientT]) -> None:
+        """Reset all limiters for this command.
+
+        Parameters
+        ----------
+        context : Context
+            The context to reset the limiters for.
+        """
+        limiters: t.Generator[LimiterProto[ClientT], None, None] = (
+            lim for lim in self._resolve_hooks() if isinstance(lim, LimiterProto)
+        )
+        for limiter in limiters:
+            limiter.reset(context)
 
     async def __call__(self, ctx: Context[ClientT], *args: t.Any, **kwargs: t.Any) -> None:
         await self.callback(ctx, *args, **kwargs)
@@ -462,6 +504,20 @@ class SubCommandBase(OptionBase[ClientT], HasErrorHandler[ClientT], Hookable[Cli
     def post_hooks(self) -> t.MutableSequence[PostHookT[ClientT]]:
         """The post-execution hooks for this object."""
         return self._post_hooks
+
+    def reset_all_limiters(self, context: Context[ClientT]) -> None:
+        """Reset all limiters for this command.
+
+        Parameters
+        ----------
+        context : Context
+            The context to reset the limiters for.
+        """
+        limiters: t.Generator[LimiterProto[ClientT], None, None] = (
+            lim for lim in self._resolve_hooks() if isinstance(lim, LimiterProto)
+        )
+        for limiter in limiters:
+            limiter.reset(context)
 
 
 # MIT License

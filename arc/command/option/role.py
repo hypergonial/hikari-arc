@@ -14,6 +14,7 @@ if t.TYPE_CHECKING:
 __all__ = ("RoleOption", "RoleParams")
 
 
+@t.final
 class RoleParams(OptionParams[hikari.Role]):
     """The parameters for a user option.
 

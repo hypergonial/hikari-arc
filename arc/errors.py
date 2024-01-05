@@ -1,6 +1,11 @@
+from __future__ import annotations
+
 import typing as t
 
-import hikari
+if t.TYPE_CHECKING:
+    import hikari
+
+    from arc.abc.limiter import LimiterProto
 
 __all__ = (
     "ArcError",
@@ -107,6 +112,24 @@ class ResponseAlreadyIssuedError(InteractionResponseError):
 
     Note that certain actions can only be done in an initial response, such as sending modals or builders.
     """
+
+
+class UnderCooldownError(ArcError):
+    """Raised when a built-in ratelimiter is acquired while it is exhausted, and the
+    `wait` parameter is set to `False`.
+
+    Attributes
+    ----------
+    retry_after : float
+        The amount of time in seconds until the command is off cooldown.
+    limiter : arc.abc.limiter.LimiterProto
+        The limiter that was rate limited.
+    """
+
+    def __init__(self, limiter: LimiterProto[t.Any], retry_after: float, *args: t.Any) -> None:
+        self.retry_after = retry_after
+        self.limiter = limiter
+        super().__init__(*args)
 
 
 # MIT License

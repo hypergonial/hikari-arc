@@ -40,6 +40,7 @@ ignore_errors = true
 pythonVersion = "3.10"
 typeCheckingMode = "strict"
 reportPrivateUsage = false
+reportMissingTypeStubs = true
 reportUnnecessaryTypeIgnoreComment = "warning"
 reportUninitializedInstanceVariable = "error"
 reportShadowedImports = "warning"
