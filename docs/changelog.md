@@ -9,9 +9,9 @@ hide:
 
 Here you can find all the changelogs for `hikari-arc`.
 
-## Unreleased
+## v0.4.0
 
-- Add localization support through locale providers.
+- Add localization support through locale providers. See the localization example for more.
 - Add `@GatewayClient.listen`, `GatewayClient.subscribe`, `GatewayClient.unsubscribe`.
 - Add `@GatewayPlugin.listen`, `GatewayPlugin.subscribe`, `GatewayPlugin.unsubscribe`.
 - Make all first-order decorators work as second-order decorators as well.
