@@ -145,7 +145,6 @@ class InteractionResponse:
         if self._message:
             return self._message
 
-        assert isinstance(self._context.interaction, (hikari.ComponentInteraction, hikari.ModalInteraction))
         return await self._context.interaction.fetch_initial_response()
 
     async def delete(self) -> None:

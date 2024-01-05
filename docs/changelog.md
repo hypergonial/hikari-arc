@@ -9,6 +9,10 @@ hide:
 
 Here you can find all the changelogs for `hikari-arc`.
 
+## v0.4.1
+
+- Fix `InteractionResponse.retrieve_message()` failing due to incorrect assertion.
+
 ## v0.4.0
 
 - Add localization support through locale providers. See the localization example for more.
