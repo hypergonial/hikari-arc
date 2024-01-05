@@ -35,6 +35,10 @@ This should set up linting & typechecking to be performed as you edit the source
 
 You can also run `nox` by using the shortcut Ctrl+Shift+B. This uses VS Code's tasks system, [see here](https://go.microsoft.com/fwlink/?LinkId=733558) for more information.
 
+Custom snippets are also available:
+
+- `!!!` + TAB: Set up a new source file, insert annotations import & license
+
 #### PyCharm and other JetBrains IDEs
 
 Configuration should be applied automatically, however there is no good extension for [`ruff`](https://astral.sh/ruff), so you should doubly make sure `nox` successfully completes before committing your changes.

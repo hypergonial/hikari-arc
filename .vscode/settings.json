@@ -1,4 +1,5 @@
 {
+    "editor.tabCompletion": "onlySnippets",
     "python.analysis.autoImportCompletions": true,
     "python.analysis.typeCheckingMode": "strict",
     "editor.formatOnSave": true,
