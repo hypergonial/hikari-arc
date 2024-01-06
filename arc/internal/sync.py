@@ -203,7 +203,7 @@ async def _sync_global_commands(client: Client[AppT], commands: CommandMapping) 
 
     upstream = await client.app.rest.fetch_application_commands(client.application)
 
-    published: set[str] = set()
+    published: dict[hikari.CommandType, set[str]] = defaultdict(set)
 
     for existing in upstream:
         # Ignore unsupported command types
@@ -223,11 +223,11 @@ async def _sync_global_commands(client: Client[AppT], commands: CommandMapping) 
             commands[existing.type][existing.name]._register_instance(existing)
             unchanged += 1
 
-        published.add(existing.name)
+        published[existing.type].add(existing.name)
 
     for mapping in commands.values():
         for existing in mapping.values():
-            if existing.name in published:
+            if existing.name in published[existing.command_type]:
                 continue
 
             await existing.publish()
@@ -262,7 +262,7 @@ async def _sync_commands_for_guild(
 
     upstream = await client.app.rest.fetch_application_commands(client.application, guild)
 
-    built: set[str] = set()
+    built: dict[hikari.CommandType, set[str]] = defaultdict(set)
 
     builders: list[hikari.api.CommandBuilder] = []
 
@@ -284,11 +284,11 @@ async def _sync_commands_for_guild(
             builders.append(_rebuild_hikari_command(existing))
             unchanged += 1
 
-        built.add(existing.name)
+        built[existing.type].add(existing.name)
 
     for mapping in commands.values():
         for existing in mapping.values():
-            if existing.name in built:
+            if existing.name in built[existing.command_type]:
                 continue
             builders.append(existing._build())
             created += 1
