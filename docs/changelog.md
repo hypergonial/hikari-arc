@@ -11,6 +11,7 @@ Here you can find all the changelogs for `hikari-arc`.
 
 ## v0.5.0
 
+- **Breaking:** Re-order OptionParams object parameters. `description=` is now the first & only positional argument. `name=` has been moved to the second parameter and is now keyword-only.
 - Add [limiters](./guides/hooks.md#limiters).
 - Add `GatewayClientBase` and `RESTClientBase` to aid in creating custom client types. Examples on how to do this have also been added to the repository.
 - Fix `InteractionResponse.retrieve_message()` failing due to incorrect assertion.

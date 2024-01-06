@@ -22,10 +22,13 @@ class FloatParams(OptionWithChoicesParams[float, ClientT]):
 
     Parameters
     ----------
-    name : str
-        The name of the option
     description : str
         The description of the option
+
+    Other Parameters
+    ----------------
+    name : str
+        The name of the option. If not provided, the name of the parameter will be used.
     name_localizations : Mapping[hikari.Locale, str] | None
         The name of the option in different locales
     description_localizations : Mapping[hikari.Locale, str] | None
@@ -45,9 +48,9 @@ class FloatParams(OptionWithChoicesParams[float, ClientT]):
 
     def __init__(
         self,
-        name: str | None = None,
         description: str = "No description provided.",
         *,
+        name: str | None = None,
         name_localizations: t.Mapping[hikari.Locale, str] = {},
         description_localizations: t.Mapping[hikari.Locale, str] = {},
         min: float | None = None,

@@ -28,7 +28,7 @@ This is what that looks like in action:
     @arc.slash_command("name", "description")
     async def options_cmd(
         ctx: arc.GatewayContext,
-        number: arc.Option[int, arc.IntParams(description="A number")]
+        number: arc.Option[int, arc.IntParams("A number")]
     ) -> None:
         await ctx.respond(f"You provided {number}!")
     ```
@@ -40,7 +40,7 @@ This is what that looks like in action:
     @arc.slash_command("name", "description")
     async def options_cmd(
         ctx: arc.RESTContext,
-        number: arc.Option[int, arc.IntParams(description="A number")]
+        number: arc.Option[int, arc.IntParams("A number")]
     ) -> None:
         await ctx.respond(f"You provided {number}!")
     ```
@@ -54,8 +54,8 @@ To make an option **not required**, you should set a default value:
     @arc.slash_command("name", "description")
     async def options_cmd(
         ctx: arc.GatewayContext,
-        number: arc.Option[int, arc.IntParams(description="A number")] = 10,
-        user: arc.Option[hikari.User | None, arc.UserParams(description="A user.")] = None,
+        number: arc.Option[int, arc.IntParams("A number")] = 10,
+        user: arc.Option[hikari.User | None, arc.UserParams("A user")] = None,
     ) -> None:
         await ctx.respond(f"You provided {number} and {user.mention if user else None}!")
     ```
@@ -67,8 +67,8 @@ To make an option **not required**, you should set a default value:
     @arc.slash_command("name", "description")
     async def options_cmd(
         ctx: arc.RESTContext,
-        number: arc.Option[int, arc.IntParams(description="A number")] = 10,
-        user: arc.Option[hikari.User | None, arc.UserParams(description="A user.")] = None,
+        number: arc.Option[int, arc.IntParams("A number")] = 10,
+        user: arc.Option[hikari.User | None, arc.UserParams("A user")] = None,
     ) -> None:
         await ctx.respond(f"You provided {number} and {user.mention if user else None}!")
     ```
@@ -125,7 +125,7 @@ Choices can be added to an option to define tell the user what values are valid.
     async def choices_command(
         ctx: arc.GatewayContext,
         # Set the 'choices' parameter to all the valid values your option can be
-        choose_me: arc.Option[int, arc.IntParams(description="Choose me!", choices=[1, 2, 3])]
+        choose_me: arc.Option[int, arc.IntParams("Choose me!", choices=[1, 2, 3])]
     ) -> None:
         await ctx.respond(f"You wrote: `{choose_me}`")
     ```
@@ -138,7 +138,7 @@ Choices can be added to an option to define tell the user what values are valid.
     async def choices_command(
         ctx: arc.RESTContext,
         # Set the 'choices' parameter to all the valid values your option can be
-        choose_me: arc.Option[int, arc.IntParams(description="Choose me!", choices=[1, 2, 3])]
+        choose_me: arc.Option[int, arc.IntParams("Choose me!", choices=[1, 2, 3])]
     ) -> None:
         await ctx.respond(f"You wrote: `{choose_me}`")
     ```
@@ -153,7 +153,7 @@ You can also pass a mapping if you want to name your choices. Your command will 
     async def choices_command(
         ctx: arc.GatewayContext,
         # Set the 'choices' parameter to all the valid values your option can be
-        choose_me: arc.Option[int, arc.IntParams(description="Choose me!", choices={"one": 1, "two": 2, "three": 3})]
+        choose_me: arc.Option[int, arc.IntParams("Choose me!", choices={"one": 1, "two": 2, "three": 3})]
     ) -> None:
         await ctx.respond(f"You wrote: `{choose_me}`")
     ```
@@ -166,7 +166,7 @@ You can also pass a mapping if you want to name your choices. Your command will 
     async def choices_command(
         ctx: arc.RESTContext,
         # Set the 'choices' parameter to all the valid values your option can be
-        choose_me: arc.Option[int, arc.IntParams(description="Choose me!", choices={"one": 1, "two": 2, "three": 3})]
+        choose_me: arc.Option[int, arc.IntParams("Choose me!", choices={"one": 1, "two": 2, "three": 3})]
     ) -> None:
         await ctx.respond(f"You wrote: `{choose_me}`")
     ```
@@ -213,7 +213,7 @@ Then, to add autocomplete to an option, specify the `autocomplete_with=` argumen
     async def autocomplete_command(
         ctx: arc.GatewayContext,
         # Set the 'autocomplete_with' parameter to the function that will be used to autocomplete the option
-        complete_me: arc.Option[str, arc.StrParams(description="I'll complete you!", autocomplete_with=provide_opts)]
+        complete_me: arc.Option[str, arc.StrParams("I'll complete you!", autocomplete_with=provide_opts)]
     ) -> None:
         await ctx.respond(f"You wrote: `{complete_me}`")
     ```
@@ -226,7 +226,7 @@ Then, to add autocomplete to an option, specify the `autocomplete_with=` argumen
     async def autocomplete_command(
         ctx: arc.RESTContext,
         # Set the 'autocomplete_with' parameter to the function that will be used to autocomplete the option
-        complete_me: arc.Option[str, arc.StrParams(description="I'll complete you!", autocomplete_with=provide_opts)]
+        complete_me: arc.Option[str, arc.StrParams("I'll complete you!", autocomplete_with=provide_opts)]
     ) -> None:
         await ctx.respond(f"You wrote: `{complete_me}`")
     ```

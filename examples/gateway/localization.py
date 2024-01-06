@@ -50,7 +50,7 @@ def custom_locale_provider(request: arc.CustomLocaleRequest) -> str:
 @client.include
 @arc.slash_command(name="hi", description="Say hi to someone!")
 async def hi_slash(
-    ctx: arc.GatewayContext, user: arc.Option[hikari.User, arc.UserParams(description="The user to say hi to.")]
+    ctx: arc.GatewayContext, user: arc.Option[hikari.User, arc.UserParams("The user to say hi to.")]
 ) -> None:
     # ctx.loc can be used to request custom localizations that are not related to commands or options.
     # Additional keyword arguments passed to the method will be passed to .format()

@@ -54,9 +54,9 @@ class OptionParams(t.Generic[T]):
 
     def __init__(
         self,
-        name: str | None = None,
         description: str = "No description provided.",
         *,
+        name: str | None = None,
         name_localizations: t.Mapping[hikari.Locale, str] | None = None,
         description_localizations: t.Mapping[hikari.Locale, str] | None = None,
     ) -> None:
@@ -110,9 +110,9 @@ class OptionWithChoicesParams(OptionParams[ChoiceT], t.Generic[ChoiceT, ClientT]
 
     def __init__(
         self,
-        name: str | None = None,
         description: str = "No description provided.",
         *,
+        name: str | None = None,
         name_localizations: t.Mapping[hikari.Locale, str] | None = None,
         description_localizations: t.Mapping[hikari.Locale, str] | None = None,
         choices: t.Sequence[ChoiceT | hikari.CommandChoice] | t.Mapping[str, ChoiceT] | None = None,

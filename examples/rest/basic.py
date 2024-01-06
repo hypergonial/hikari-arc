@@ -14,12 +14,12 @@ client = arc.RESTClient(bot)
 
 
 @client.include  # Add command to client
-@arc.slash_command(name="hi", description="Say hi to someone!")  # Define command
+@arc.slash_command("hi", "Say hi to someone!")  # Define command
 async def hi_slash(
     # The context contains information about the command invocation
     ctx: arc.RESTContext,
     # To add an option to a command, use the following syntax:
-    user: arc.Option[hikari.User, arc.UserParams(description="The user to say hi to.")],
+    user: arc.Option[hikari.User, arc.UserParams("The user to say hi to.")],
 ) -> None:
     await ctx.respond(f"Hey {user.mention}!")
 
