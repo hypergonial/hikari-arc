@@ -430,6 +430,7 @@ class CallableCommandBase(CommandBase[ClientT, BuilderT]):
 ParentT = t.TypeVar("ParentT")
 
 
+@attr.define(slots=True, kw_only=True)
 class SubCommandBase(OptionBase[ClientT], HasErrorHandler[ClientT], Hookable[ClientT], t.Generic[ClientT, ParentT]):
     """An abstract base class for all slash subcommands and subgroups."""
 
