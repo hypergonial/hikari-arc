@@ -14,7 +14,7 @@ if t.TYPE_CHECKING:
     import asyncio
 
     from arc.abc.command import CallableCommandProto
-    from arc.internal.types import UserContextCallbackT
+    from arc.internal.types import UserCommandCallbackT
 
 __all__ = ("UserCommand", "user_command")
 
@@ -72,7 +72,7 @@ def user_command(
     autodefer: bool | AutodeferMode | hikari.UndefinedType = hikari.UNDEFINED,
     default_permissions: hikari.Permissions | hikari.UndefinedType = hikari.UNDEFINED,
     name_localizations: t.Mapping[hikari.Locale, str] | None = None,
-) -> t.Callable[[UserContextCallbackT[ClientT]], UserCommand[ClientT]]:
+) -> t.Callable[[UserCommandCallbackT[ClientT]], UserCommand[ClientT]]:
     """A decorator that creates a context-menu command on a user.
 
     Parameters
@@ -106,7 +106,7 @@ def user_command(
     ```
     """
 
-    def decorator(callback: UserContextCallbackT[ClientT]) -> UserCommand[ClientT]:
+    def decorator(callback: UserCommandCallbackT[ClientT]) -> UserCommand[ClientT]:
         guild_ids = tuple(hikari.Snowflake(i) for i in guilds) if guilds is not hikari.UNDEFINED else hikari.UNDEFINED
 
         return UserCommand(

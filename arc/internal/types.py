@@ -27,16 +27,14 @@ HookableT = t.TypeVar("HookableT", bound="Hookable[t.Any]")
 P = t.ParamSpec("P")
 
 # Type aliases
-EventCallbackT: t.TypeAlias = "t.Callable[t.Concatenate[EventT, ...], t.Awaitable[None]]"
-ErrorHandlerCallbackT: t.TypeAlias = (
-    "t.Callable[t.Concatenate[Context[ClientT], Exception, ...], t.Coroutine[t.Any, t.Any, None]]"
-)
+EventCallbackT: t.TypeAlias = "t.Callable[[EventT], t.Awaitable[None]]"
+ErrorHandlerCallbackT: t.TypeAlias = "t.Callable[[Context[ClientT], Exception], t.Awaitable[None]]"
 SlashCommandLike: t.TypeAlias = "SlashCommand[ClientT] | SlashGroup[ClientT]"
 CommandCallbackT: t.TypeAlias = "t.Callable[t.Concatenate[Context[ClientT], ...], t.Awaitable[None]]"
-MessageContextCallbackT: t.TypeAlias = (
+MessageCommandCallbackT: t.TypeAlias = (
     "t.Callable[t.Concatenate[Context[ClientT], hikari.Message, ...], t.Awaitable[None]]"
 )
-UserContextCallbackT: t.TypeAlias = "t.Callable[t.Concatenate[Context[ClientT], hikari.User, ...], t.Awaitable[None]]"
+UserCommandCallbackT: t.TypeAlias = "t.Callable[t.Concatenate[Context[ClientT], hikari.User, ...], t.Awaitable[None]]"
 AutocompleteCallbackT: t.TypeAlias = "t.Callable[[AutocompleteData[ClientT, ChoiceT]], t.Awaitable[t.Sequence[ChoiceT]]] | t.Callable[[AutocompleteData[ClientT, ChoiceT]], t.Awaitable[t.Sequence[hikari.api.AutocompleteChoiceBuilder]]]"
 ResponseBuilderT: t.TypeAlias = (
     "hikari.api.InteractionMessageBuilder | hikari.api.InteractionDeferredBuilder | hikari.api.InteractionModalBuilder"
@@ -44,9 +42,9 @@ ResponseBuilderT: t.TypeAlias = (
 HookT: t.TypeAlias = "t.Callable[[Context[ClientT]], t.Awaitable[HookResult]] | t.Callable[[Context[ClientT]], HookResult] | t.Callable[[Context[ClientT]], None] | t.Callable[[Context[ClientT]], t.Awaitable[None]]"
 PostHookT: t.TypeAlias = "t.Callable[[Context[ClientT]], None] | t.Callable[[Context[ClientT]], t.Awaitable[None]]"
 LifeCycleHookT: t.TypeAlias = "t.Callable[[ClientT], t.Awaitable[None]]"
-CommandLocaleRequestT: t.TypeAlias = "t.Callable[t.Concatenate[CommandLocaleRequest, ...], LocaleResponse]"
-OptionLocaleRequestT: t.TypeAlias = "t.Callable[t.Concatenate[OptionLocaleRequest, ...], LocaleResponse]"
-CustomLocaleRequestT: t.TypeAlias = "t.Callable[t.Concatenate[CustomLocaleRequest, ...], str]"
+CommandLocaleRequestT: t.TypeAlias = "t.Callable[[CommandLocaleRequest], LocaleResponse]"
+OptionLocaleRequestT: t.TypeAlias = "t.Callable[[OptionLocaleRequest], LocaleResponse]"
+CustomLocaleRequestT: t.TypeAlias = "t.Callable[[CustomLocaleRequest], str]"
 
 # MIT License
 #

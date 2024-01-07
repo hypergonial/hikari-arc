@@ -8,7 +8,7 @@ import hikari
 from arc.abc.command import CallableCommandBase
 from arc.context import AutodeferMode, Context
 from arc.errors import CommandInvokeError
-from arc.internal.types import ClientT, MessageContextCallbackT, ResponseBuilderT
+from arc.internal.types import ClientT, MessageCommandCallbackT, ResponseBuilderT
 
 if t.TYPE_CHECKING:
     import asyncio
@@ -69,7 +69,7 @@ def message_command(
     autodefer: bool | AutodeferMode | hikari.UndefinedType = hikari.UNDEFINED,
     default_permissions: hikari.Permissions | hikari.UndefinedType = hikari.UNDEFINED,
     name_localizations: t.Mapping[hikari.Locale, str] | None = None,
-) -> t.Callable[[MessageContextCallbackT[ClientT]], MessageCommand[ClientT]]:
+) -> t.Callable[[MessageCommandCallbackT[ClientT]], MessageCommand[ClientT]]:
     """A decorator that creates a context-menu command on a message.
 
     Parameters
@@ -105,7 +105,7 @@ def message_command(
     ```
     """
 
-    def decorator(callback: MessageContextCallbackT[ClientT]) -> MessageCommand[ClientT]:
+    def decorator(callback: MessageCommandCallbackT[ClientT]) -> MessageCommand[ClientT]:
         guild_ids = tuple(hikari.Snowflake(i) for i in guilds) if guilds is not hikari.UNDEFINED else hikari.UNDEFINED
 
         return MessageCommand(
