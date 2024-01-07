@@ -140,7 +140,7 @@ class GatewayPluginBase(PluginBase[GatewayClientT]):
         ----------
         event : type[hikari.Event]
             The event to subscribe to.
-        callback : Callable[[EventT], Awaitable[None]]
+        callback : t.Callable[[EventT], t.Awaitable[None]]
             The callback to call when the event is dispatched.
         """
         if event not in self.listeners:
@@ -158,7 +158,7 @@ class GatewayPluginBase(PluginBase[GatewayClientT]):
         ----------
         event : type[hikari.Event]
             The event to unsubscribe from.
-        callback : Callable[[EventT], Awaitable[None]]
+        callback : t.Callable[[EventT], t.Awaitable[None]]
             The callback to unsubscribe.
         """
         if event not in self.listeners:

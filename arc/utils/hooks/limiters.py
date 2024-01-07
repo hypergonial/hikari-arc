@@ -119,7 +119,7 @@ class RateLimiter(LimiterProto[ClientT]):
         The period, in seconds, after which the bucket resets.
     limit : int
         The amount of requests allowed in a bucket.
-    get_key_with : Callable[[Context[t.Any]], str]
+    get_key_with : t.Callable[[Context[t.Any]], str]
         A callable that returns a key for the ratelimiter bucket.
     """
 
@@ -318,7 +318,7 @@ def custom_limiter(period: float, limit: int, get_key_with: t.Callable[[Context[
         The period, in seconds, after which the bucket resets.
     limit : int
         The amount of requests allowed in a bucket.
-    get_key_with : Callable[[Context[t.Any]], str]
+    get_key_with : t.Callable[[Context[t.Any]], str]
         A callable that returns a key for the ratelimiter bucket. This key is used to identify the bucket.
         For instance, to create a ratelimiter that is shared across all contexts in a guild,
         you would use `lambda ctx: str(ctx.guild_id)`.
