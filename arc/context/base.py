@@ -45,18 +45,18 @@ class AutodeferMode(enum.IntEnum):
 class _ResponseGlue:
     """A glue object to allow for easy creation of responses in both REST and Gateway contexts."""
 
-    content: hikari.UndefinedOr[t.Any] = hikari.UNDEFINED
+    content: t.Any | hikari.UndefinedType = hikari.UNDEFINED
     flags: int | hikari.MessageFlag | hikari.UndefinedType = hikari.UNDEFINED
-    tts: hikari.UndefinedOr[bool] = hikari.UNDEFINED
-    component: hikari.UndefinedOr[hikari.api.ComponentBuilder] = hikari.UNDEFINED
-    components: hikari.UndefinedOr[t.Sequence[hikari.api.ComponentBuilder]] = hikari.UNDEFINED
-    attachment: hikari.UndefinedOr[hikari.Resourceish] = hikari.UNDEFINED
-    attachments: hikari.UndefinedOr[t.Sequence[hikari.Resourceish]] = hikari.UNDEFINED
-    embed: hikari.UndefinedOr[hikari.Embed] = hikari.UNDEFINED
-    embeds: hikari.UndefinedOr[t.Sequence[hikari.Embed]] = hikari.UNDEFINED
-    mentions_everyone: hikari.UndefinedOr[bool] = hikari.UNDEFINED
-    user_mentions: hikari.UndefinedOr[hikari.SnowflakeishSequence[hikari.PartialUser] | bool] = hikari.UNDEFINED
-    role_mentions: hikari.UndefinedOr[hikari.SnowflakeishSequence[hikari.PartialRole] | bool] = hikari.UNDEFINED
+    tts: bool | hikari.UndefinedType = hikari.UNDEFINED
+    component: hikari.api.ComponentBuilder | hikari.UndefinedType = hikari.UNDEFINED
+    components: t.Sequence[hikari.api.ComponentBuilder] | hikari.UndefinedType = hikari.UNDEFINED
+    attachment: hikari.Resourceish | hikari.UndefinedType = hikari.UNDEFINED
+    attachments: t.Sequence[hikari.Resourceish] | hikari.UndefinedType = hikari.UNDEFINED
+    embed: hikari.Embed | hikari.UndefinedType = hikari.UNDEFINED
+    embeds: t.Sequence[hikari.Embed] | hikari.UndefinedType = hikari.UNDEFINED
+    mentions_everyone: bool | hikari.UndefinedType = hikari.UNDEFINED
+    user_mentions: t.Sequence[hikari.Snowflakeish | hikari.PartialUser] | bool | hikari.UndefinedType = hikari.UNDEFINED
+    role_mentions: t.Sequence[hikari.Snowflakeish | hikari.PartialRole] | bool | hikari.UndefinedType = hikari.UNDEFINED
 
     def _to_dict(self) -> dict[str, t.Any]:
         return {
@@ -160,41 +160,45 @@ class InteractionResponse:
 
     async def edit(
         self,
-        content: hikari.UndefinedOr[t.Any] = hikari.UNDEFINED,
+        content: t.Any | hikari.UndefinedType = hikari.UNDEFINED,
         *,
-        component: hikari.UndefinedOr[hikari.api.ComponentBuilder] = hikari.UNDEFINED,
-        components: hikari.UndefinedOr[t.Sequence[hikari.api.ComponentBuilder]] = hikari.UNDEFINED,
-        attachment: hikari.UndefinedOr[hikari.Resourceish] = hikari.UNDEFINED,
-        attachments: hikari.UndefinedOr[t.Sequence[hikari.Resourceish]] = hikari.UNDEFINED,
-        embed: hikari.UndefinedOr[hikari.Embed] = hikari.UNDEFINED,
-        embeds: hikari.UndefinedOr[t.Sequence[hikari.Embed]] = hikari.UNDEFINED,
-        mentions_everyone: hikari.UndefinedOr[bool] = hikari.UNDEFINED,
-        user_mentions: hikari.UndefinedOr[hikari.SnowflakeishSequence[hikari.PartialUser] | bool] = hikari.UNDEFINED,
-        role_mentions: hikari.UndefinedOr[hikari.SnowflakeishSequence[hikari.PartialRole] | bool] = hikari.UNDEFINED,
+        component: hikari.api.ComponentBuilder | hikari.UndefinedType = hikari.UNDEFINED,
+        components: t.Sequence[hikari.api.ComponentBuilder] | hikari.UndefinedType = hikari.UNDEFINED,
+        attachment: hikari.Resourceish | hikari.UndefinedType = hikari.UNDEFINED,
+        attachments: t.Sequence[hikari.Resourceish] | hikari.UndefinedType = hikari.UNDEFINED,
+        embed: hikari.Embed | hikari.UndefinedType = hikari.UNDEFINED,
+        embeds: t.Sequence[hikari.Embed] | hikari.UndefinedType = hikari.UNDEFINED,
+        mentions_everyone: bool | hikari.UndefinedType = hikari.UNDEFINED,
+        user_mentions: t.Sequence[hikari.Snowflakeish | hikari.PartialUser]
+        | bool
+        | hikari.UndefinedType = hikari.UNDEFINED,
+        role_mentions: t.Sequence[hikari.Snowflakeish | hikari.PartialRole]
+        | bool
+        | hikari.UndefinedType = hikari.UNDEFINED,
     ) -> InteractionResponse:
         """A short-hand method to edit the message belonging to this response.
 
         Parameters
         ----------
-        content : hikari.UndefinedOr[t.Any], optional
+        content : t.Any | hikari.UndefinedType
             The content of the message. Anything passed here will be cast to str.
-        attachment : hikari.UndefinedOr[hikari.Resourceish], optional
+        attachment : hikari.Resourceish | hikari.UndefinedType
             An attachment to add to this message.
-        attachments : hikari.UndefinedOr[t.Sequence[hikari.Resourceish]], optional
+        attachments : t.Sequence[hikari.Resourceish] | hikari.UndefinedType
             A sequence of attachments to add to this message.
-        component : hikari.UndefinedOr[hikari.api.ComponentBuilder], optional
+        component : hikari.api.ComponentBuilder | hikari.UndefinedType
             A component to add to this message.
-        components : hikari.UndefinedOr[t.Sequence[hikari.api.ComponentBuilder]], optional
+        components : t.Sequence[hikari.api.ComponentBuilder] | hikari.UndefinedType
             A sequence of components to add to this message.
-        embed : hikari.UndefinedOr[hikari.Embed], optional
+        embed : hikari.Embed | hikari.UndefinedType
             An embed to add to this message.
-        embeds : hikari.UndefinedOr[t.Sequence[hikari.Embed]], optional
+        embeds : t.Sequence[hikari.Embed] | hikari.UndefinedType
             A sequence of embeds to add to this message.
-        mentions_everyone : hikari.UndefinedOr[bool], optional
+        mentions_everyone : bool | hikari.UndefinedType
             If True, mentioning @everyone will be allowed.
-        user_mentions : hikari.UndefinedOr[hikari.SnowflakeishSequence[hikari.PartialUser] | bool], optional
+        user_mentions : t.Sequence[hikari.Snowflakish | hikari.PartialUser] | bool | hikari.UndefinedType
             The set of allowed user mentions in this message. Set to True to allow all.
-        role_mentions : hikari.UndefinedOr[hikari.SnowflakeishSequence[hikari.PartialRole] | bool], optional
+        role_mentions : t.Sequence[hikari.Snowflakish | hikari.PartialRole] | bool | hikari.UndefinedType
             The set of allowed role mentions in this message. Set to True to allow all.
 
         Returns
@@ -407,9 +411,9 @@ class Context(t.Generic[ClientT]):
         ----------
         key : str
             The key of the string to localize.
-        use_guild : bool, optional
+        use_guild : bool
             Whether to use the guild or not, if in a guild.
-        force_locale : hikari.Locale | None, optional
+        force_locale : hikari.Locale | None
             Force a locale to use, instead of the context's locale.
         kwargs : t.Any
             The keyword arguments to pass to the string formatter.
@@ -461,51 +465,55 @@ class Context(t.Generic[ClientT]):
 
     async def respond(
         self,
-        content: hikari.UndefinedOr[t.Any] = hikari.UNDEFINED,
+        content: t.Any | hikari.UndefinedType = hikari.UNDEFINED,
         *,
         flags: int | hikari.MessageFlag | hikari.UndefinedType = hikari.UNDEFINED,
-        tts: hikari.UndefinedOr[bool] = hikari.UNDEFINED,
-        component: hikari.UndefinedOr[hikari.api.ComponentBuilder] = hikari.UNDEFINED,
-        components: hikari.UndefinedOr[t.Sequence[hikari.api.ComponentBuilder]] = hikari.UNDEFINED,
-        attachment: hikari.UndefinedOr[hikari.Resourceish] = hikari.UNDEFINED,
-        attachments: hikari.UndefinedOr[t.Sequence[hikari.Resourceish]] = hikari.UNDEFINED,
-        embed: hikari.UndefinedOr[hikari.Embed] = hikari.UNDEFINED,
-        embeds: hikari.UndefinedOr[t.Sequence[hikari.Embed]] = hikari.UNDEFINED,
-        mentions_everyone: hikari.UndefinedOr[bool] = hikari.UNDEFINED,
-        user_mentions: hikari.UndefinedOr[hikari.SnowflakeishSequence[hikari.PartialUser] | bool] = hikari.UNDEFINED,
-        role_mentions: hikari.UndefinedOr[hikari.SnowflakeishSequence[hikari.PartialRole] | bool] = hikari.UNDEFINED,
-        delete_after: hikari.UndefinedOr[float | int | datetime.timedelta] = hikari.UNDEFINED,
+        tts: bool | hikari.UndefinedType = hikari.UNDEFINED,
+        attachment: hikari.Resourceish | hikari.UndefinedType = hikari.UNDEFINED,
+        attachments: t.Sequence[hikari.Resourceish] | hikari.UndefinedType = hikari.UNDEFINED,
+        component: hikari.api.ComponentBuilder | hikari.UndefinedType = hikari.UNDEFINED,
+        components: t.Sequence[hikari.api.ComponentBuilder] | hikari.UndefinedType = hikari.UNDEFINED,
+        embed: hikari.Embed | hikari.UndefinedType = hikari.UNDEFINED,
+        embeds: t.Sequence[hikari.Embed] | hikari.UndefinedType = hikari.UNDEFINED,
+        mentions_everyone: bool | hikari.UndefinedType = hikari.UNDEFINED,
+        user_mentions: t.Sequence[hikari.Snowflakeish | hikari.PartialUser]
+        | bool
+        | hikari.UndefinedType = hikari.UNDEFINED,
+        role_mentions: t.Sequence[hikari.Snowflake | hikari.PartialRole]
+        | bool
+        | hikari.UndefinedType = hikari.UNDEFINED,
+        delete_after: float | int | datetime.timedelta | hikari.UndefinedType = hikari.UNDEFINED,
     ) -> InteractionResponse:
         """Short-hand method to create a new message response via the interaction this context represents.
         This function automatically determines if the response should be an initial response or a followup.
 
         Parameters
         ----------
-        content : hikari.UndefinedOr[Any], optional
+        content : Any | hikari.UndefinedType
             The content of the message. Anything passed here will be cast to str.
-        tts : hikari.UndefinedOr[bool], optional
+        tts : bool | hikari.UndefinedType
             If the message should be tts or not.
-        attachment : hikari.UndefinedOr[hikari.Resourceish], optional
+        attachment : hikari.Resourceish | hikari.UndefinedType
             An attachment to add to this message.
-        attachments : hikari.UndefinedOr[t.Sequence[hikari.Resourceish]], optional
+        attachments : t.Sequence[hikari.Resourceish] | hikari.UndefinedType
             A sequence of attachments to add to this message.
-        component : hikari.UndefinedOr[hikari.api.special_endpoints.ComponentBuilder], optional
+        component : hikari.api.special_endpoints.ComponentBuilder | hikari.UndefinedType
             A component to add to this message.
-        components : hikari.UndefinedOr[t.Sequence[hikari.api.special_endpoints.ComponentBuilder]], optional
+        components : t.Sequence[hikari.api.special_endpoints.ComponentBuilder] | hikari.UndefinedType
             A sequence of components to add to this message.
-        embed : hikari.UndefinedOr[hikari.Embed], optional
+        embed : hikari.Embed | hikari.UndefinedType
             An embed to add to this message.
-        embeds : hikari.UndefinedOr[Sequence[hikari.Embed]], optional
+        embeds : Sequence[hikari.Embed] | hikari.UndefinedType
             A sequence of embeds to add to this message.
-        mentions_everyone : hikari.UndefinedOr[bool], optional
+        mentions_everyone : bool | hikari.UndefinedType
             If True, mentioning @everyone will be allowed.
-        user_mentions : hikari.UndefinedOr[hikari.SnowflakeishSequence[hikari.PartialUser] | bool], optional
+        user_mentions : hikari.SnowflakeishSequence[hikari.PartialUser] | bool | hikari.UndefinedType
             The set of allowed user mentions in this message. Set to True to allow all.
-        role_mentions : hikari.UndefinedOr[hikari.SnowflakeishSequence[hikari.PartialRole] | bool], optional
+        role_mentions : hikari.SnowflakeishSequence[hikari.PartialRole] | bool | hikari.UndefinedType
             The set of allowed role mentions in this message. Set to True to allow all.
-        flags : int | hikari.MessageFlag | hikari.UndefinedType, optional
+        flags : int | hikari.MessageFlag | hikari.UndefinedType
             Message flags that should be included with this message.
-        delete_after: hikari.UndefinedOr[float | int | datetime.timedelta], optional
+        delete_after: float | int | datetime.timedelta | hikari.UndefinedType
             Delete the response after the specified delay.
 
         Returns
@@ -664,43 +672,48 @@ class Context(t.Generic[ClientT]):
 
     async def edit_initial_response(
         self,
-        content: hikari.UndefinedNoneOr[t.Any] = hikari.UNDEFINED,
+        content: t.Any | None | hikari.UndefinedType = hikari.UNDEFINED,
         *,
-        component: hikari.UndefinedNoneOr[hikari.api.ComponentBuilder] = hikari.UNDEFINED,
-        components: hikari.UndefinedNoneOr[t.Sequence[hikari.api.ComponentBuilder]] = hikari.UNDEFINED,
-        attachment: hikari.UndefinedNoneOr[hikari.Resourceish] = hikari.UNDEFINED,
-        attachments: hikari.UndefinedNoneOr[t.Sequence[hikari.Resourceish]] = hikari.UNDEFINED,
-        embed: hikari.UndefinedNoneOr[hikari.Embed] = hikari.UNDEFINED,
-        embeds: hikari.UndefinedNoneOr[t.Sequence[hikari.Embed]] = hikari.UNDEFINED,
-        mentions_everyone: hikari.UndefinedOr[bool] = hikari.UNDEFINED,
-        user_mentions: hikari.UndefinedOr[hikari.SnowflakeishSequence[hikari.PartialUser] | bool] = hikari.UNDEFINED,
-        role_mentions: hikari.UndefinedOr[hikari.SnowflakeishSequence[hikari.PartialRole] | bool] = hikari.UNDEFINED,
+        attachment: hikari.Resourceish | None | hikari.UndefinedType = hikari.UNDEFINED,
+        attachments: t.Sequence[hikari.Resourceish] | None | hikari.UndefinedType = hikari.UNDEFINED,
+        component: hikari.api.ComponentBuilder | None | hikari.UndefinedType = hikari.UNDEFINED,
+        components: t.Sequence[hikari.api.ComponentBuilder] | None | hikari.UndefinedType = hikari.UNDEFINED,
+        embed: hikari.Embed | None | hikari.UndefinedType = hikari.UNDEFINED,
+        embeds: t.Sequence[hikari.Embed] | None | hikari.UndefinedType = hikari.UNDEFINED,
+        mentions_everyone: bool | hikari.UndefinedType = hikari.UNDEFINED,
+        user_mentions: t.Sequence[hikari.Snowflakeish | hikari.PartialUser]
+        | bool
+        | hikari.UndefinedType = hikari.UNDEFINED,
+        role_mentions: t.Sequence[hikari.Snowflake | hikari.PartialRole]
+        | bool
+        | hikari.UndefinedType = hikari.UNDEFINED,
     ) -> InteractionResponse:
-        """A short-hand method to edit the initial response belonging to this interaction. If you want to edit a followup,
-        you should use the [`edit()`][arc.context.base.InteractionResponse.edit] method of the returned
-        [`InteractionResponse`][arc.context.base.InteractionResponse] response object instead.
+        """A short-hand method to edit the initial response belonging to this interaction.
+
+        If you want to edit a followup, you should use the [`edit()`][arc.context.base.InteractionResponse.edit]
+        method of the returned [`InteractionResponse`][arc.context.base.InteractionResponse] response object instead.
 
         Parameters
         ----------
-        content : hikari.UndefinedOr[Any], optional
+        content : t.Any | None | hikari.UndefinedType
             The content of the message. Anything passed here will be cast to str.
-        attachment : hikari.UndefinedOr[hikari.Resourceish], optional
+        attachment : hikari.Resourceish | None | hikari.UndefinedType
             An attachment to add to this message.
-        attachments : hikari.UndefinedOr[t.Sequence[hikari.Resourceish]], optional
+        attachments : t.Sequence[hikari.Resourceish] | None | hikari.UndefinedType
             A sequence of attachments to add to this message.
-        component : hikari.UndefinedOr[hikari.api.special_endpoints.ComponentBuilder], optional
+        component : hikari.api.ComponentBuilder | None | hikari.UndefinedType
             A component to add to this message.
-        components : hikari.UndefinedOr[t.Sequence[hikari.api.special_endpoints.ComponentBuilder]], optional
+        components : t.Sequence[hikari.api.ComponentBuilder] | None | hikari.UndefinedType
             A sequence of components to add to this message.
-        embed : hikari.UndefinedOr[hikari.Embed], optional
+        embed : hikari.Embed | None | hikari.UndefinedType
             An embed to add to this message.
-        embeds : hikari.UndefinedOr[Sequence[hikari.Embed]], optional
+        embeds : t.Sequence[hikari.Embed] | None | hikari.UndefinedType
             A sequence of embeds to add to this message.
-        mentions_everyone : hikari.UndefinedOr[bool], optional
+        mentions_everyone : bool | hikari.UndefinedType
             If True, mentioning @everyone will be allowed.
-        user_mentions : hikari.UndefinedOr[hikari.SnowflakeishSequence[hikari.PartialUser] | bool], optional
+        user_mentions : t.Sequence[hikari.Snowflakeish | hikari.PartialUser] | bool | hikari.UndefinedType
             The set of allowed user mentions in this message. Set to True to allow all.
-        role_mentions : hikari.UndefinedOr[hikari.SnowflakeishSequence[hikari.PartialRole] | bool], optional
+        role_mentions : t.Sequence[hikari.Snowflakeish | hikari.PartialRole] | bool | hikari.UndefinedType
             The set of allowed role mentions in this message. Set to True to allow all.
 
         Returns
@@ -732,14 +745,14 @@ class Context(t.Generic[ClientT]):
             else:
                 raise NoResponseIssuedError("This interaction was not yet issued an initial response.")
 
-    async def defer(self, flags: hikari.UndefinedOr[int | hikari.MessageFlag] = hikari.UNDEFINED) -> None:
+    async def defer(self, flags: int | hikari.MessageFlag | hikari.UndefinedType = hikari.UNDEFINED) -> None:
         """Short-hand method to defer an interaction response. Raises ResponseAlreadyIssuedError
         if the interaction was already responded to.
 
         Parameters
         ----------
-        flags : hikari.UndefinedOr[int | hikari.MessageFlag], optional
-            Message flags that should be included with this defer request, by default None
+        flags : int | hikari.MessageFlag | hikari.UndefinedType
+            Message flags that should be included with this defer request
 
         Raises
         ------

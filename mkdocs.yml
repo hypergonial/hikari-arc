@@ -47,7 +47,6 @@ theme:
     - navigation.instant
     - navigation.instant.progress
     - navigation.tabs
-    - navigation.expand
     - navigation.indexes
     - navigation.footer
     - navigation.top

@@ -25,6 +25,8 @@ from arc.internal.types import (
 from arc.locale import CommandLocaleRequest
 
 if t.TYPE_CHECKING:
+    import typing_extensions as te
+
     from arc.abc.plugin import PluginBase
     from arc.context.base import Context
 
@@ -48,7 +50,7 @@ class CommandProto(t.Protocol):
         """The fully qualified name of this command."""
 
 
-class CallableCommandProto(t.Protocol[ClientT]):
+class CallableCommandProto(CommandProto, t.Protocol[ClientT]):
     """A protocol for any command-like object that can be called directly.
 
     This includes commands and subcommands, but not groups or subgroups.
@@ -147,12 +149,66 @@ class CallableCommandProto(t.Protocol[ClientT]):
         ...
 
 
+@t.final
+@attr.define(slots=True, kw_only=True, weakref_slot=False)
+class _CommandSettings:
+    """All the command settings that need to propagate and be inherited."""
+
+    autodefer: AutodeferMode | hikari.UndefinedType
+    default_permissions: hikari.Permissions | hikari.UndefinedType
+    is_nsfw: bool | hikari.UndefinedType
+    is_dm_enabled: bool | hikari.UndefinedType
+
+    def apply(self, other: te.Self) -> te.Self:
+        """Apply 'other' to this, copying all the non-undefined settings to it."""
+        return type(self)(
+            autodefer=other.autodefer if other.autodefer is not hikari.UNDEFINED else self.autodefer,
+            default_permissions=other.default_permissions
+            if other.default_permissions is not hikari.UNDEFINED
+            else self.default_permissions,
+            is_nsfw=other.is_nsfw if other.is_nsfw is not hikari.UNDEFINED else self.is_nsfw,
+            is_dm_enabled=other.is_dm_enabled if other.is_dm_enabled is not hikari.UNDEFINED else self.is_dm_enabled,
+        )
+
+    @classmethod
+    def default(cls) -> te.Self:
+        """Get the default command settings."""
+        return cls(autodefer=AutodeferMode.ON, default_permissions=hikari.UNDEFINED, is_nsfw=False, is_dm_enabled=True)
+
+
 @attr.define(slots=True, kw_only=True)
 class CommandBase(HasErrorHandler[ClientT], Hookable[ClientT], t.Generic[ClientT, BuilderT]):
-    """An abstract base class for all application commands."""
+    """An abstract base class for all application commands.
+
+    This notably does not include subcommands & subgroups as those are in reality options.
+    """
 
     name: str
     """The name of this command."""
+
+    guilds: t.Sequence[hikari.Snowflake] | hikari.UndefinedType = hikari.UNDEFINED
+    """The guilds this command is available in."""
+
+    _autodefer: AutodeferMode | hikari.UndefinedType = attr.field(default=hikari.UNDEFINED, alias="autodefer")
+    """If ON, this command will be automatically deferred if it takes longer than 2 seconds to respond."""
+
+    _is_dm_enabled: bool | hikari.UndefinedType = attr.field(default=hikari.UNDEFINED, alias="is_dm_enabled")
+    """Whether this command is enabled in DMs."""
+
+    _default_permissions: hikari.Permissions | hikari.UndefinedType = attr.field(
+        default=hikari.UNDEFINED, alias="default_permissions"
+    )
+    """The default permissions for this command.
+    Keep in mind that guild administrators can change this, it should only be used to provide safe defaults."""
+
+    _is_nsfw: bool | hikari.UndefinedType = attr.field(default=hikari.UNDEFINED, alias="is_nsfw")
+    """Whether this command is NSFW. If true, the command will only be available in NSFW channels."""
+
+    name_localizations: t.Mapping[hikari.Locale, str] = attr.field(factory=dict)
+    """The localizations for this command's name."""
+
+    _instances: dict[hikari.Snowflake | None, hikari.PartialCommand] = attr.field(factory=dict)
+    """A mapping of guild IDs to command instances. None corresponds to the global instance, if any."""
 
     _client: ClientT | None = attr.field(init=False, default=None)
     """The client that is handling this command."""
@@ -160,33 +216,14 @@ class CommandBase(HasErrorHandler[ClientT], Hookable[ClientT], t.Generic[ClientT
     _plugin: PluginBase[ClientT] | None = attr.field(init=False, default=None)
     """The plugin that this command belongs to, if any."""
 
-    guilds: hikari.UndefinedOr[t.Sequence[hikari.Snowflake]] = hikari.UNDEFINED
-    """The guilds this command is available in."""
-
-    autodefer: AutodeferMode = AutodeferMode.ON
-    """If ON, this command will be automatically deferred if it takes longer than 2 seconds to respond."""
-
-    is_dm_enabled: bool = True
-    """Whether this command is enabled in DMs."""
-
-    default_permissions: hikari.UndefinedOr[hikari.Permissions] = hikari.UNDEFINED
-    """The default permissions for this command.
-    Keep in mind that guild administrators can change this, it should only be used to provide safe defaults."""
-
-    name_localizations: t.Mapping[hikari.Locale, str] = attr.field(factory=dict)
-    """The localizations for this command's name."""
-
-    is_nsfw: bool = False
-    """Whether this command is NSFW. If true, the command will only be available in NSFW channels."""
-
-    _instances: dict[hikari.Snowflake | None, hikari.PartialCommand] = attr.field(factory=dict)
-    """A mapping of guild IDs to command instances. None corresponds to the global instance, if any."""
-
     _error_handler: ErrorHandlerCallbackT[ClientT] | None = attr.field(init=False, default=None)
+    """The error handler for this command."""
 
     _hooks: list[HookT[ClientT]] = attr.field(init=False, factory=list)
+    """The pre-execution hooks for this command."""
 
     _post_hooks: list[PostHookT[ClientT]] = attr.field(init=False, factory=list)
+    """The post-execution hooks for this command."""
 
     @property
     def error_handler(self) -> ErrorHandlerCallbackT[ClientT] | None:
@@ -232,6 +269,29 @@ class CommandBase(HasErrorHandler[ClientT], Hookable[ClientT], t.Generic[ClientT
         """The plugin that this command belongs to, if any."""
         return self._plugin
 
+    @property
+    def autodefer(self) -> AutodeferMode:
+        """The resolved autodefer configuration for this command."""
+        settings = self._resolve_settings()
+        return settings.autodefer if settings.autodefer is not hikari.UNDEFINED else AutodeferMode.ON
+
+    @property
+    def is_dm_enabled(self) -> bool:
+        """Whether this command is enabled in DMs."""
+        settings = self._resolve_settings()
+        return settings.is_dm_enabled if settings.is_dm_enabled is not hikari.UNDEFINED else True
+
+    @property
+    def default_permissions(self) -> hikari.Permissions | hikari.UndefinedType:
+        """The resolved default permissions for this command."""
+        return self._resolve_settings().default_permissions
+
+    @property
+    def is_nsfw(self) -> bool:
+        """Whether this command is NSFW. If true, the command will only be available in NSFW channels."""
+        settings = self._resolve_settings()
+        return settings.is_nsfw if settings.is_nsfw is not hikari.UNDEFINED else False
+
     def _register_instance(
         self, instance: hikari.PartialCommand, guild: hikari.SnowflakeishOr[hikari.PartialGuild] | None = None
     ) -> None:
@@ -248,6 +308,24 @@ class CommandBase(HasErrorHandler[ClientT], Hookable[ClientT], t.Generic[ClientT
                 await self.plugin._handle_exception(ctx, exc)
             else:
                 await self.client._on_error(ctx, exc)
+
+    def _resolve_settings(self) -> _CommandSettings:
+        """Resolve all settings that apply to this command."""
+        if self._plugin:
+            settings = self._plugin._resolve_settings()
+        elif self._client:
+            settings = self._client._cmd_settings
+        else:
+            settings = _CommandSettings.default()
+
+        return settings.apply(
+            _CommandSettings(
+                autodefer=self._autodefer,
+                default_permissions=self._default_permissions,
+                is_nsfw=self._is_nsfw,
+                is_dm_enabled=self._is_dm_enabled,
+            )
+        )
 
     def _resolve_hooks(self) -> list[HookT[ClientT]]:
         plugin_hooks = self.plugin._resolve_hooks() if self.plugin else []
@@ -482,7 +560,7 @@ class SubCommandBase(OptionBase[ClientT], HasErrorHandler[ClientT], Hookable[Cli
 
     _post_hooks: list[PostHookT[ClientT]] = attr.field(factory=list, init=False)
 
-    parent: ParentT | None = attr.field(default=None, init=False)
+    _parent: ParentT | None = attr.field(default=None, init=False, alias="parent")
     """The parent of this subcommand or subgroup."""
 
     @property
@@ -504,6 +582,15 @@ class SubCommandBase(OptionBase[ClientT], HasErrorHandler[ClientT], Hookable[Cli
     def post_hooks(self) -> t.MutableSequence[PostHookT[ClientT]]:
         """The post-execution hooks for this object."""
         return self._post_hooks
+
+    @property
+    def parent(self) -> ParentT:
+        """The parent of this subcommand or subgroup."""
+        if self._parent is None:
+            raise RuntimeError(
+                f"Subcommand '{self.name}' was not included in a parent, '{type(self).__name__}.parent' cannot be accessed until it is included in a parent."
+            )
+        return self._parent
 
     def reset_all_limiters(self, context: Context[ClientT]) -> None:
         """Reset all limiters for this command.

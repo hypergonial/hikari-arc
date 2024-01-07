@@ -139,7 +139,7 @@ def test_my_group() -> None:
     subcmd = group.children["test_subcommand"]
 
     assert subcmd.client is client
-    assert subcmd.parent is group
+    assert subcmd._parent is group
     assert subcmd.name == "test_subcommand"
     assert subcmd.description == "My subcommand description"
     assert isinstance(subcmd, arc.SlashSubCommand)
@@ -149,7 +149,7 @@ def test_my_group() -> None:
     subgroup = group.children["my_subgroup"]
 
     assert subgroup.client is client
-    assert subgroup.parent is group
+    assert subgroup._parent is group
     assert subgroup.name == "my_subgroup"
     assert subgroup.description == "My subgroup description"
     assert isinstance(subgroup, arc.SlashSubGroup)

@@ -8,6 +8,7 @@ import typing as t
 
 import hikari
 
+from arc.abc.command import _CommandSettings
 from arc.abc.error_handler import HasErrorHandler
 from arc.abc.hookable import Hookable
 from arc.command import MessageCommand, SlashCommand, SlashGroup, UserCommand
@@ -16,7 +17,6 @@ from arc.internal.types import BuilderT, ClientT, ErrorHandlerCallbackT, HookT, 
 
 if t.TYPE_CHECKING:
     from arc.abc.command import CommandBase
-    from arc.command import SlashSubCommand, SlashSubGroup
 
 __all__ = ("PluginBase",)
 
@@ -31,17 +31,52 @@ class PluginBase(HasErrorHandler[ClientT], Hookable[ClientT]):
     ----------
     name : str
         The name of this plugin. This must be unique across all plugins.
+    default_enabled_guilds : t.Sequence[hikari.Snowflake] | hikari.UndefinedType
+        The default guilds to enable commands in
+    autodefer : bool | AutodeferMode
+        If True, all commands in this plugin will automatically defer if it is taking longer than 2 seconds to respond.
+        This can be overridden on a per-command basis.
+    is_dm_enabled : bool | hikari.UndefinedType
+        Whether commands in this plugin are enabled in DMs
+        This can be overridden on a per-command basis.
+    default_permissions : hikari.Permissions | hikari.UndefinedType
+        The default permissions for this plugin
+        This can be overridden on a per-command basis.
+    is_nsfw : bool | hikari.UndefinedType
+        Whether this plugin is only usable in NSFW channels
+
+    !!! note
+        Parameters left as `hikari.UNDEFINED` will be inherited from the parent client.
     """
 
     def __init__(
-        self, name: str, *, default_enabled_guilds: hikari.UndefinedOr[t.Sequence[hikari.Snowflake]] = hikari.UNDEFINED
+        self,
+        name: str,
+        *,
+        default_enabled_guilds: t.Sequence[hikari.Snowflakeish | hikari.PartialGuild]
+        | hikari.UndefinedType = hikari.UNDEFINED,
+        autodefer: bool | AutodeferMode | hikari.UndefinedType = hikari.UNDEFINED,
+        is_dm_enabled: bool | hikari.UndefinedType = hikari.UNDEFINED,
+        default_permissions: hikari.Permissions | hikari.UndefinedType = hikari.UNDEFINED,
+        is_nsfw: bool | hikari.UndefinedType = hikari.UNDEFINED,
     ) -> None:
         self._client: ClientT | None = None
         self._name = name
+        self._default_enabled_guilds = (
+            tuple(hikari.Snowflake(i) for i in default_enabled_guilds)
+            if default_enabled_guilds is not hikari.UNDEFINED
+            else hikari.UNDEFINED
+        )
+        self._cmd_settings = _CommandSettings(
+            autodefer=AutodeferMode(autodefer) if isinstance(autodefer, bool) else autodefer,
+            is_dm_enabled=is_dm_enabled,
+            default_permissions=default_permissions,
+            is_nsfw=is_nsfw,
+        )
+
         self._slash_commands: dict[str, SlashCommandLike[ClientT]] = {}
         self._user_commands: dict[str, UserCommand[ClientT]] = {}
         self._message_commands: dict[str, MessageCommand[ClientT]] = {}
-        self._default_enabled_guilds = default_enabled_guilds
         self._error_handler: ErrorHandlerCallbackT[ClientT] | None = None
         self._hooks: list[HookT[ClientT]] = []
         self._post_hooks: list[PostHookT[ClientT]] = []
@@ -86,7 +121,7 @@ class PluginBase(HasErrorHandler[ClientT], Hookable[ClientT]):
         return self._client
 
     @property
-    def default_enabled_guilds(self) -> hikari.UndefinedOr[t.Sequence[hikari.Snowflake]]:
+    def default_enabled_guilds(self) -> t.Sequence[hikari.Snowflake] | hikari.UndefinedType:
         """The default guilds to enable commands in."""
         return self._default_enabled_guilds
 
@@ -98,6 +133,10 @@ class PluginBase(HasErrorHandler[ClientT], Hookable[ClientT]):
                 raise exc
         except Exception as exc:
             await self.client._on_error(ctx, exc)
+
+    def _resolve_settings(self) -> _CommandSettings:
+        settings = self._client._cmd_settings if self._client is not None else _CommandSettings.default()
+        return settings.apply(self._cmd_settings)
 
     def _resolve_hooks(self) -> list[HookT[ClientT]]:
         return self._hooks
@@ -183,13 +222,13 @@ class PluginBase(HasErrorHandler[ClientT], Hookable[ClientT]):
         name: str,
         description: str = "No description provided.",
         *,
-        guilds: hikari.UndefinedOr[t.Sequence[hikari.Snowflake]] = hikari.UNDEFINED,
-        autodefer: bool | AutodeferMode = True,
-        is_dm_enabled: bool = True,
-        default_permissions: hikari.UndefinedOr[hikari.Permissions] = hikari.UNDEFINED,
-        name_localizations: dict[hikari.Locale, str] | None = None,
-        description_localizations: dict[hikari.Locale, str] | None = None,
-        is_nsfw: bool = False,
+        guilds: t.Sequence[hikari.Snowflakeish | hikari.PartialGuild] | hikari.UndefinedType = hikari.UNDEFINED,
+        autodefer: bool | AutodeferMode | hikari.UndefinedType = hikari.UNDEFINED,
+        is_dm_enabled: bool | hikari.UndefinedType = hikari.UNDEFINED,
+        is_nsfw: bool | hikari.UndefinedType = hikari.UNDEFINED,
+        default_permissions: hikari.Permissions | hikari.UndefinedType = hikari.UNDEFINED,
+        name_localizations: t.Mapping[hikari.Locale, str] | None = None,
+        description_localizations: t.Mapping[hikari.Locale, str] | None = None,
     ) -> SlashGroup[ClientT]:
         """Add a new slash command group to this client.
 
@@ -199,26 +238,29 @@ class PluginBase(HasErrorHandler[ClientT], Hookable[ClientT]):
             The name of the slash command group.
         description : str
             The description of the slash command group.
-        guilds : hikari.UndefinedOr[t.Sequence[hikari.Snowflake]], optional
-            The guilds to register the slash command group in, by default hikari.UNDEFINED
-        autodefer : bool | AutodeferMode, optional
+        guilds : t.Sequence[hikari.Snowflake] | hikari.UndefinedType
+            The guilds to register the slash command group in
+        autodefer : bool | AutodeferMode
             If True, all commands in this group will automatically defer if it is taking longer than 2 seconds to respond.
             This can be overridden on a per-subcommand basis.
-        is_dm_enabled : bool, optional
-            Whether the slash command group is enabled in DMs, by default True
-        default_permissions : hikari.UndefinedOr[hikari.Permissions], optional
-            The default permissions for the slash command group, by default hikari.UNDEFINED
-        name_localizations : dict[hikari.Locale, str], optional
-            The name of the slash command group in different locales, by default None
-        description_localizations : dict[hikari.Locale, str], optional
-            The description of the slash command group in different locales, by default None
-        is_nsfw : bool, optional
-            Whether the slash command group is only usable in NSFW channels, by default False
+        is_dm_enabled : bool
+            Whether the slash command group is enabled in DMs
+        default_permissions : hikari.Permissions | hikari.UndefinedType
+            The default permissions for the slash command group
+        name_localizations : dict[hikari.Locale, str]
+            The name of the slash command group in different locales
+        description_localizations : dict[hikari.Locale, str]
+            The description of the slash command group in different locales
+        is_nsfw : bool
+            Whether the slash command group is only usable in NSFW channels
 
         Returns
         -------
         SlashGroup[te.Self]
             The slash command group that was created.
+
+        !!! note
+            Parameters left as `hikari.UNDEFINED` will be inherited from the parent plugin or client.
 
         Usage
         -----
@@ -231,14 +273,13 @@ class PluginBase(HasErrorHandler[ClientT], Hookable[ClientT]):
             await ctx.respond("Hello!")
         ```
         """
-        children: dict[str, SlashSubCommand[ClientT] | SlashSubGroup[ClientT]] = {}
+        guild_ids = tuple(hikari.Snowflake(i) for i in guilds) if guilds is not hikari.UNDEFINED else hikari.UNDEFINED
 
-        group = SlashGroup(
+        group: SlashGroup[ClientT] = SlashGroup(
             name=name,
             description=description,
-            children=children,
-            guilds=guilds,
-            autodefer=AutodeferMode(autodefer),
+            guilds=guild_ids,
+            autodefer=AutodeferMode(autodefer) if isinstance(autodefer, bool) else autodefer,
             is_dm_enabled=is_dm_enabled,
             default_permissions=default_permissions,
             name_localizations=name_localizations or {},

@@ -6,7 +6,7 @@ import typing as t
 import attr
 import hikari
 
-from arc.abc.command import CallableCommandBase, CallableCommandProto, CommandBase, SubCommandBase
+from arc.abc.command import CallableCommandBase, CallableCommandProto, CommandBase, SubCommandBase, _CommandSettings
 from arc.abc.option import OptionWithChoices
 from arc.context import AutocompleteData, AutodeferMode, Context
 from arc.errors import AutocompleteError, CommandInvokeError
@@ -230,7 +230,7 @@ class SlashCommand(CallableCommandBase[ClientT, hikari.api.SlashCommandBuilder])
 class SlashGroup(CommandBase[ClientT, hikari.api.SlashCommandBuilder]):
     """A group for slash subcommands and subgroups."""
 
-    children: dict[str, SlashSubCommand[ClientT] | SlashSubGroup[ClientT]] = attr.field(factory=dict)
+    children: dict[str, SlashSubCommand[ClientT] | SlashSubGroup[ClientT]] = attr.field(factory=dict, init=False)
     """Subcommands and subgroups that belong to this group."""
 
     description: str = "No description provided."
@@ -289,7 +289,7 @@ class SlashGroup(CommandBase[ClientT, hikari.api.SlashCommandBuilder]):
         """Invoke a subcommand."""
         ctx = self._get_context(interaction, subcommand)
 
-        if (autodefer := subcommand._resolve_autodefer()) and autodefer.should_autodefer:
+        if (autodefer := subcommand.autodefer) and autodefer.should_autodefer:
             ctx._start_autodefer(autodefer)
 
         self._invoke_task = asyncio.create_task(self._handle_callback(subcommand, ctx, *args, **kwargs))
@@ -427,7 +427,7 @@ class SlashGroup(CommandBase[ClientT, hikari.api.SlashCommandBuilder]):
         """Decorator to add a subcommand to this group."""
 
         def decorator(command: SlashSubCommand[ClientT]) -> SlashSubCommand[ClientT]:
-            command.parent = self
+            command._parent = self
             self.children[command.name] = command
             return command
 
@@ -442,8 +442,8 @@ class SlashGroup(CommandBase[ClientT, hikari.api.SlashCommandBuilder]):
         description: str = "No description provided.",
         *,
         autodefer: AutodeferMode | bool | hikari.UndefinedType = hikari.UNDEFINED,
-        name_localizations: dict[hikari.Locale, str] | None = None,
-        description_localizations: dict[hikari.Locale, str] | None = None,
+        name_localizations: t.Mapping[hikari.Locale, str] | None = None,
+        description_localizations: t.Mapping[hikari.Locale, str] | None = None,
     ) -> SlashSubGroup[ClientT]:
         """Create a subgroup and add it to this group.
 
@@ -451,24 +451,24 @@ class SlashGroup(CommandBase[ClientT, hikari.api.SlashCommandBuilder]):
         ----------
         name : str
             The name of the subgroup.
-        description : str, optional
-            The description of the subgroup, by default "No description provided."
-        autodefer : bool | AutodeferMode | hikari.UndefinedType, optional
+        description : str
+            The description of the subgroup
+        autodefer : bool | AutodeferMode | hikari.UndefinedType
             If True, all commands in this subgroup will automatically defer if it is taking longer than 2 seconds to respond.
             If not provided, then this setting will be inherited from the parent.
-        name_localizations : dict[hikari.Locale, str] | None, optional
-            Localizations for the name of the subgroup, by default None
-        description_localizations : dict[hikari.Locale, str] | None, optional
-            Localizations for the description of the subgroup, by default None
+        name_localizations : dict[hikari.Locale, str] | None
+            Localizations for the name of the subgroup
+        description_localizations : dict[hikari.Locale, str] | None
+            Localizations for the description of the subgroup
         """
         group: SlashSubGroup[ClientT] = SlashSubGroup(
             name=name,
             description=description,
-            autodefer=AutodeferMode(autodefer) if autodefer else hikari.UNDEFINED,
+            autodefer=AutodeferMode(autodefer) if isinstance(autodefer, bool) else autodefer,
             name_localizations=name_localizations or {},
             description_localizations=description_localizations or {},
         )
-        group.parent = self
+        group._parent = self
         self.children[name] = group
         return group
 
@@ -477,15 +477,13 @@ class SlashGroup(CommandBase[ClientT, hikari.api.SlashCommandBuilder]):
 class SlashSubGroup(SubCommandBase[ClientT, SlashGroup[ClientT]]):
     """A subgroup of a slash command group."""
 
-    children: dict[str, SlashSubCommand[ClientT]] = attr.field(factory=dict)
+    children: dict[str, SlashSubCommand[ClientT]] = attr.field(factory=dict, init=False)
     """Subcommands that belong to this subgroup."""
 
-    autodefer: AutodeferMode | hikari.UndefinedType = hikari.UNDEFINED
+    _autodefer: AutodeferMode | hikari.UndefinedType = attr.field(default=hikari.UNDEFINED, alias="autodefer")
     """If True, this subcommand will automatically defer if it is taking longer than 2 seconds to respond.
     If undefined, then it will be inherited from the parent.
     """
-
-    _plugin: PluginBase[ClientT] | None = attr.field(default=None, init=False)
 
     @property
     def option_type(self) -> hikari.OptionType:
@@ -497,23 +495,24 @@ class SlashSubGroup(SubCommandBase[ClientT, SlashGroup[ClientT]]):
 
     @property
     def qualified_name(self) -> t.Sequence[str]:
-        if self.parent is None:
-            raise ValueError("Cannot get qualified name of subgroup without parent.")
-
         return (self.parent.name, self.name)
 
     @property
     def client(self) -> ClientT:
         """The client that includes this subgroup."""
-        if self.parent is None:
-            raise ValueError("Cannot get client of subgroup without parent.")
-
         return self.parent.client
 
     @property
     def plugin(self) -> PluginBase[ClientT] | None:
         """The plugin that includes this subgroup."""
-        return self._plugin
+        return self.parent.plugin
+
+    @property
+    def autodefer(self) -> AutodeferMode:
+        """The resolved autodefer configuration for this subcommand."""
+        autodefer = self._resolve_settings().autodefer
+        assert autodefer is not hikari.UNDEFINED
+        return autodefer
 
     def _to_dict(self) -> dict[str, t.Any]:
         return {
@@ -521,13 +520,25 @@ class SlashSubGroup(SubCommandBase[ClientT, SlashGroup[ClientT]]):
             "options": [subcommand.to_command_option() for subcommand in self.children.values()],
         }
 
+    def _resolve_settings(self) -> _CommandSettings:
+        settings = self._parent._resolve_settings() if self._parent else _CommandSettings.default()
+
+        return settings.apply(
+            _CommandSettings(
+                autodefer=self.autodefer,
+                default_permissions=hikari.UNDEFINED,
+                is_nsfw=hikari.UNDEFINED,
+                is_dm_enabled=hikari.UNDEFINED,
+            )
+        )
+
     def _resolve_hooks(self) -> list[HookT[ClientT]]:
-        assert self.parent is not None
-        return self.parent._resolve_hooks() + self._hooks
+        assert self._parent is not None
+        return self._parent._resolve_hooks() + self._hooks
 
     def _resolve_post_hooks(self) -> list[PostHookT[ClientT]]:
-        assert self.parent is not None
-        return self.parent._resolve_post_hooks() + self._post_hooks
+        assert self._parent is not None
+        return self._parent._resolve_post_hooks() + self._post_hooks
 
     async def _handle_exception(self, ctx: Context[ClientT], exc: Exception) -> None:
         try:
@@ -536,8 +547,8 @@ class SlashSubGroup(SubCommandBase[ClientT, SlashGroup[ClientT]]):
             else:
                 raise exc
         except Exception as e:
-            assert self.parent is not None
-            await self.parent._handle_exception(ctx, e)
+            assert self._parent is not None
+            await self._parent._handle_exception(ctx, e)
 
     def _request_option_locale(self, client: Client[t.Any], command: CommandProto) -> None:
         super()._request_option_locale(client, command)
@@ -559,7 +570,7 @@ class SlashSubGroup(SubCommandBase[ClientT, SlashGroup[ClientT]]):
         """First-order decorator to add a subcommand to this group."""
 
         def decorator(command: SlashSubCommand[ClientT]) -> SlashSubCommand[ClientT]:
-            command.parent = self
+            command._parent = self
             self.children[command.name] = command
             return command
 
@@ -581,20 +592,32 @@ class SlashSubCommand(
     options: t.MutableMapping[str, CommandOptionBase[ClientT, t.Any, t.Any]] = attr.field(factory=dict)
     """The options of this subcommand."""
 
-    autodefer: AutodeferMode | hikari.UndefinedType = hikari.UNDEFINED
+    _autodefer: AutodeferMode | hikari.UndefinedType = attr.field(default=hikari.UNDEFINED, alias="autodefer")
     """If True, this subcommand will automatically defer if it is taking longer than 2 seconds to respond.
     If undefined, then it will be inherited from the parent.
     """
 
     _invoke_task: asyncio.Task[t.Any] | None = attr.field(default=None, init=False)
 
+    def _resolve_settings(self) -> _CommandSettings:
+        settings = self._parent._resolve_settings() if self._parent else _CommandSettings.default()
+
+        return settings.apply(
+            _CommandSettings(
+                autodefer=self._autodefer,
+                default_permissions=hikari.UNDEFINED,
+                is_nsfw=hikari.UNDEFINED,
+                is_dm_enabled=hikari.UNDEFINED,
+            )
+        )
+
     def _resolve_hooks(self) -> list[HookT[ClientT]]:
-        assert self.parent is not None
-        return self.parent._resolve_hooks() + self._hooks
+        assert self._parent is not None
+        return self._parent._resolve_hooks() + self._hooks
 
     def _resolve_post_hooks(self) -> list[PostHookT[ClientT]]:
-        assert self.parent is not None
-        return self.parent._resolve_post_hooks() + self._post_hooks
+        assert self._parent is not None
+        return self._parent._resolve_post_hooks() + self._post_hooks
 
     async def _handle_exception(self, ctx: Context[ClientT], exc: Exception) -> None:
         try:
@@ -603,34 +626,39 @@ class SlashSubCommand(
             else:
                 raise exc
         except Exception as e:
-            assert self.parent is not None
-            await self.parent._handle_exception(ctx, e)
+            assert self._parent is not None
+            await self._parent._handle_exception(ctx, e)
 
     @property
     def qualified_name(self) -> t.Sequence[str]:
-        if self.parent is None:
+        if self._parent is None:
             raise ValueError("Cannot get qualified name of subcommand without parent.")
 
-        if isinstance(self.parent, SlashSubGroup):
-            if self.parent.parent is None:
+        if isinstance(self._parent, SlashSubGroup):
+            if self._parent._parent is None:
                 raise ValueError("Cannot get qualified name of subcommand without parent.")
 
-            return (self.parent.parent.name, self.parent.name, self.name)
+            return (self._parent._parent.name, self._parent.name, self.name)
 
-        return (self.parent.name, self.name)
+        return (self._parent.name, self.name)
 
     @property
     def root(self) -> SlashGroup[ClientT]:
         """The root group of this subcommand."""
-        if self.parent is None:
+        if self._parent is None:
             raise ValueError("Cannot get root of subcommand without parent.")
 
-        if isinstance(self.parent, SlashSubGroup):
-            if self.parent.parent is None:
+        if isinstance(self._parent, SlashSubGroup):
+            if self._parent._parent is None:
                 raise ValueError("Cannot get root of subcommand without parent.")
 
-            return self.parent.parent
+            return self._parent._parent
 
+        return self._parent
+
+    @property
+    def parent(self) -> SlashGroup[ClientT] | SlashSubGroup[ClientT]:
+        """The parent of this subcommand."""
         return self.parent
 
     @property
@@ -651,30 +679,18 @@ class SlashSubCommand(
         """The plugin that includes this subcommand."""
         return self.root.plugin
 
+    @property
+    def autodefer(self) -> AutodeferMode:
+        """The resolved autodefer configuration for this subcommand."""
+        autodefer = self._resolve_settings().autodefer
+        assert autodefer is not hikari.UNDEFINED
+        return autodefer
+
     def _request_option_locale(self, client: Client[t.Any], command: CommandProto) -> None:
         super()._request_option_locale(client, command)
 
         for option in self.options.values():
             option._request_option_locale(client, command)
-
-    def _resolve_autodefer(self) -> AutodeferMode:
-        """Resolve autodefer for this subcommand."""
-        if self.autodefer is not hikari.UNDEFINED:
-            return self.autodefer
-
-        if self.parent is None:
-            return AutodeferMode.OFF
-
-        if isinstance(self.parent, SlashSubGroup):
-            if self.parent.autodefer is not hikari.UNDEFINED:
-                return self.parent.autodefer
-
-            if self.parent.parent is None:
-                return AutodeferMode.OFF
-
-            return self.parent.parent.autodefer
-
-        return self.parent.autodefer
 
     async def __call__(self, ctx: Context[ClientT], *args: t.Any, **kwargs: t.Any) -> None:
         """Invoke this subcommand with the given context.
@@ -704,13 +720,13 @@ def slash_command(
     name: str,
     description: str = "No description provided.",
     *,
-    guilds: t.Sequence[hikari.SnowflakeishOr[hikari.PartialGuild]] | None = None,
-    is_dm_enabled: bool = True,
-    is_nsfw: bool = False,
-    autodefer: bool | AutodeferMode = True,
-    default_permissions: hikari.UndefinedOr[hikari.Permissions] = hikari.UNDEFINED,
-    name_localizations: dict[hikari.Locale, str] | None = None,
-    description_localizations: dict[hikari.Locale, str] | None = None,
+    guilds: t.Sequence[hikari.PartialGuild | hikari.Snowflakeish] | hikari.UndefinedType = hikari.UNDEFINED,
+    is_dm_enabled: bool | hikari.UndefinedType = hikari.UNDEFINED,
+    is_nsfw: bool | hikari.UndefinedType = hikari.UNDEFINED,
+    autodefer: bool | AutodeferMode | hikari.UndefinedType = hikari.UNDEFINED,
+    default_permissions: hikari.Permissions | hikari.UndefinedType = hikari.UNDEFINED,
+    name_localizations: t.Mapping[hikari.Locale, str] | None = None,
+    description_localizations: t.Mapping[hikari.Locale, str] | None = None,
 ) -> t.Callable[[t.Callable[t.Concatenate[Context[ClientT], ...], t.Awaitable[None]]], SlashCommand[ClientT]]:
     """A decorator that creates a slash command.
 
@@ -718,27 +734,30 @@ def slash_command(
     ----------
     name : str
         The name of the slash command.
-    description : str, optional
-        The description of the command, by default "No description provided."
-    guilds : t.Sequence[hikari.SnowflakeishOr[hikari.PartialGuild]] | None, optional
-        The guilds this command should be enabled in, if left as None, the command is global, by default None
-    is_dm_enabled : bool, optional
-        If True, the command is usable in direct messages, by default True
-    is_nsfw : bool, optional
-        If True, the command is only usable in NSFW channels, by default False
-    autodefer : bool | AutodeferMode, optional
-        If True, this command will be automatically deferred if it takes longer than 2 seconds to respond, by default True
-    default_permissions : hikari.UndefinedOr[hikari.Permissions], optional
-        The default permissions required to use this command, these can be overriden by guild admins, by default hikari.UNDEFINED
-    name_localizations : dict[hikari.Locale, str] | None, optional
-        Localizations for the name of this command, by default None
-    description_localizations : dict[hikari.Locale, str] | None, optional
-        Localizations for the description of this command, by default None
+    description : str
+        The description of the command
+    guilds : t.Sequence[hikari.PartialGuild | hikari.Snowflakeish] | hikari.UndefinedType
+        The guilds this command should be enabled in, if left as undefined, the command is global
+    is_dm_enabled : bool | hikari.UndefinedType
+        If True, the command is usable in direct messages
+    is_nsfw : bool | hikari.UndefinedType
+        If True, the command is only usable in NSFW channels
+    autodefer : bool | AutodeferMode | hikari.UndefinedType
+        If True, this command will be automatically deferred if it takes longer than 2 seconds to respond
+    default_permissions : hikari.Permissions | hikari.UndefinedType
+        The default permissions required to use this command, these can be overriden by guild admins
+    name_localizations : dict[hikari.Locale, str] | None
+        Localizations for the name of this command
+    description_localizations : dict[hikari.Locale, str] | None
+        Localizations for the description of this command
 
     Returns
     -------
     t.Callable[[t.Callable[t.Concatenate[Context[ClientT], ...], t.Awaitable[None]]], SlashCommand[ClientT]]
         The decorated slash command.
+
+    !!! note
+        Parameters left as `hikari.UNDEFINED` will be inherited from the parent plugin or client.
 
     Usage
     -----
@@ -754,13 +773,13 @@ def slash_command(
     """
 
     def decorator(func: t.Callable[t.Concatenate[Context[ClientT], ...], t.Awaitable[None]]) -> SlashCommand[ClientT]:
-        guild_ids = [hikari.Snowflake(guild) for guild in guilds] if guilds else []
+        guild_ids = tuple(hikari.Snowflake(i) for i in guilds) if guilds is not hikari.UNDEFINED else hikari.UNDEFINED
         options = parse_command_signature(func)
 
         return SlashCommand(
             callback=func,
             options=options,
-            autodefer=AutodeferMode(autodefer),
+            autodefer=AutodeferMode(autodefer) if isinstance(autodefer, bool) else autodefer,
             name=name,
             description=description,
             name_localizations=name_localizations or {},
@@ -779,8 +798,8 @@ def slash_subcommand(
     description: str = "No description provided.",
     *,
     autodefer: bool | AutodeferMode | hikari.UndefinedType = hikari.UNDEFINED,
-    name_localizations: dict[hikari.Locale, str] | None = None,
-    description_localizations: dict[hikari.Locale, str] | None = None,
+    name_localizations: t.Mapping[hikari.Locale, str] | None = None,
+    description_localizations: t.Mapping[hikari.Locale, str] | None = None,
 ) -> t.Callable[[t.Callable[t.Concatenate[Context[ClientT], ...], t.Awaitable[None]]], SlashSubCommand[ClientT]]:
     """A decorator that creates a slash sub command. It should be included in a slash command group.
 
@@ -788,20 +807,23 @@ def slash_subcommand(
     ----------
     name : str
         The name of the slash command.
-    description : str, optional
-        The description of the command, by default "No description provided."
-    autodefer : bool | AutodeferMode | hikari.UndefinedType, optional
-        If True, this command will be automatically deferred if it takes longer than 2 seconds to respond, by default True
+    description : str
+        The description of the command
+    autodefer : bool | AutodeferMode | hikari.UndefinedType
+        If True, this command will be automatically deferred if it takes longer than 2 seconds to respond
         If undefined, then this setting will be be inherited from the parent
-    name_localizations : dict[hikari.Locale, str] | None, optional
-        Localizations for the name of this command, by default None
-    description_localizations : dict[hikari.Locale, str] | None, optional
-        Localizations for the description of this command, by default None
+    name_localizations : dict[hikari.Locale, str] | None
+        Localizations for the name of this command
+    description_localizations : dict[hikari.Locale, str] | None
+        Localizations for the description of this command
 
     Returns
     -------
     t.Callable[[t.Callable[t.Concatenate[Context[ClientT], ...], t.Awaitable[None]]], SlashCommand[ClientT]]
         The decorated slash command.
+
+    !!! note
+        Parameters left as `hikari.UNDEFINED` will be inherited from the parent group, plugin or client.
 
     Usage
     -----
@@ -827,7 +849,7 @@ def slash_subcommand(
             callback=func,
             options=options,
             name=name,
-            autodefer=AutodeferMode(autodefer) if autodefer else hikari.UNDEFINED,
+            autodefer=AutodeferMode(autodefer) if isinstance(autodefer, bool) else autodefer,
             description=description,
             name_localizations=name_localizations or {},
             description_localizations=description_localizations or {},

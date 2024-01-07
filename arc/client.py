@@ -16,6 +16,8 @@ from arc.plugin import GatewayPluginBase, RESTPluginBase
 if t.TYPE_CHECKING:
     import typing_extensions as te
 
+    from arc import AutodeferMode
+
     from .internal.types import EventCallbackT, EventT, ResponseBuilderT
 
 __all__ = (
@@ -38,18 +40,31 @@ logger = logging.getLogger(__name__)
 
 class GatewayClientBase(Client[GatewayBotT]):
     """The base class for an arc client with Gateway support.
+
     If you want to use a RESTBot, use [`RESTClientBase`][arc.client.RESTClientBase] instead.
 
     Parameters
     ----------
     app : hikari.GatewayBotAware
         The application this client is for.
-    default_enabled_guilds : t.Sequence[hikari.Snowflake] | None, optional
-        The guilds that slash commands will be registered in by default, by default None
-    autosync : bool, optional
-        Whether to automatically sync commands on startup, by default True
-    provided_locales : t.Sequence[hikari.Locale] | None, optional
-        The locales that will be provided to the client by locale provider callbacks, by default None
+    default_enabled_guilds : t.Sequence[hikari.Snowflakeish] | None
+        The guilds that commands will be registered in by default
+    autosync : bool
+        Whether to automatically sync commands on startup
+    autodefer : bool | AutodeferMode
+        Whether to automatically defer responses
+        This applies to all commands, and can be overridden on a per-command basis.
+    default_permissions : hikari.Permissions | hikari.UndefinedType
+        The default permissions for commands
+        This applies to all commands, and can be overridden on a per-command basis.
+    is_nsfw : bool
+        Whether commands are NSFW
+        This applies to all commands, and can be overridden on a per-command basis.
+    is_dm_enabled : bool
+        Whether commands are enabled in DMs
+        This applies to all commands, and can be overridden on a per-command basis.
+    provided_locales : t.Sequence[hikari.Locale] | None
+        The locales that will be provided to the client by locale provider callbacks
 
     Usage
     -----
@@ -71,12 +86,24 @@ class GatewayClientBase(Client[GatewayBotT]):
         self,
         app: GatewayBotT,
         *,
-        default_enabled_guilds: t.Sequence[hikari.Snowflake] | None = None,
+        default_enabled_guilds: t.Sequence[hikari.Snowflakeish | hikari.PartialGuild]
+        | hikari.UndefinedType = hikari.UNDEFINED,
         autosync: bool = True,
+        autodefer: bool | AutodeferMode = True,
+        default_permissions: hikari.Permissions | hikari.UndefinedType = hikari.UNDEFINED,
+        is_nsfw: bool = False,
+        is_dm_enabled: bool = True,
         provided_locales: t.Sequence[hikari.Locale] | None = None,
     ) -> None:
         super().__init__(
-            app, default_enabled_guilds=default_enabled_guilds, autosync=autosync, provided_locales=provided_locales
+            app,
+            default_enabled_guilds=default_enabled_guilds,
+            autosync=autosync,
+            autodefer=autodefer,
+            default_permissions=default_permissions,
+            is_nsfw=is_nsfw,
+            is_dm_enabled=is_dm_enabled,
+            provided_locales=provided_locales,
         )
         self.app.event_manager.subscribe(hikari.StartedEvent, self._on_gatewaybot_startup)
         self.app.event_manager.subscribe(hikari.StoppingEvent, self._on_gatewaybot_shutdown)
@@ -170,18 +197,31 @@ class GatewayClientBase(Client[GatewayBotT]):
 
 class RESTClientBase(Client[RESTBotT]):
     """The base class for an arc client with REST support.
+
     If you want to use GatewayBot, use [`GatewayClient`][arc.client.GatewayClientBase] instead.
 
     Parameters
     ----------
-    app : hikari.RESTBotAware
+    app : hikari.GatewayBotAware
         The application this client is for.
-    default_enabled_guilds : t.Sequence[hikari.Snowflake] | None, optional
-        The guilds that slash commands will be registered in by default, by default None
-    autosync : bool, optional
-        Whether to automatically sync commands on startup, by default True
-    provided_locales : t.Sequence[hikari.Locale] | None, optional
-        The locales that will be provided to the client by locale provider callbacks, by default None
+    default_enabled_guilds : t.Sequence[hikari.Snowflakeish | hikari.PartialGuild] | None
+        The guilds that commands will be registered in by default
+    autosync : bool
+        Whether to automatically sync commands on startup
+    autodefer : bool | AutodeferMode
+        Whether to automatically defer responses
+        This applies to all commands, and can be overridden on a per-command basis.
+    default_permissions : hikari.Permissions | hikari.UndefinedType
+        The default permissions for commands
+        This applies to all commands, and can be overridden on a per-command basis.
+    is_nsfw : bool
+        Whether commands are NSFW
+        This applies to all commands, and can be overridden on a per-command basis.
+    is_dm_enabled : bool
+        Whether commands are enabled in DMs
+        This applies to all commands, and can be overridden on a per-command basis.
+    provided_locales : t.Sequence[hikari.Locale] | None
+        The locales that will be provided to the client by locale provider callbacks
 
 
     Usage
@@ -207,12 +247,24 @@ class RESTClientBase(Client[RESTBotT]):
         self,
         app: RESTBotT,
         *,
-        default_enabled_guilds: t.Sequence[hikari.Snowflake] | None = None,
+        default_enabled_guilds: t.Sequence[hikari.Snowflakeish | hikari.PartialGuild]
+        | hikari.UndefinedType = hikari.UNDEFINED,
         autosync: bool = True,
+        autodefer: bool | AutodeferMode = True,
+        default_permissions: hikari.Permissions | hikari.UndefinedType = hikari.UNDEFINED,
+        is_nsfw: bool = False,
+        is_dm_enabled: bool = True,
         provided_locales: t.Sequence[hikari.Locale] | None = None,
     ) -> None:
         super().__init__(
-            app, default_enabled_guilds=default_enabled_guilds, autosync=autosync, provided_locales=provided_locales
+            app,
+            default_enabled_guilds=default_enabled_guilds,
+            autosync=autosync,
+            autodefer=autodefer,
+            default_permissions=default_permissions,
+            is_nsfw=is_nsfw,
+            is_dm_enabled=is_dm_enabled,
+            provided_locales=provided_locales,
         )
         self.app.add_startup_callback(self._on_restbot_startup)
         self.app.add_shutdown_callback(self._on_restbot_shutdown)

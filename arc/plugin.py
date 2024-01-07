@@ -2,12 +2,14 @@ from __future__ import annotations
 
 import typing as t
 
+import hikari
+
 from arc.abc.plugin import PluginBase
 from arc.internal.sigparse import parse_event_signature
 from arc.internal.types import EventCallbackT, EventT, GatewayClientT, RESTClientT
 
 if t.TYPE_CHECKING:
-    import hikari
+    from arc.context.base import AutodeferMode
 
 __all__ = ("RESTPluginBase", "GatewayPluginBase")
 
@@ -23,6 +25,22 @@ class RESTPluginBase(PluginBase[RESTClientT]):
     ----------
     name : str
         The name of this plugin. This must be unique across all plugins.
+    default_enabled_guilds : t.Sequence[hikari.Snowflake] | hikari.UndefinedType
+        The default guilds to enable commands in
+    autodefer : bool | AutodeferMode
+        If True, all commands in this plugin will automatically defer if it is taking longer than 2 seconds to respond.
+        This can be overridden on a per-command basis.
+    is_dm_enabled : bool | hikari.UndefinedType
+        Whether commands in this plugin are enabled in DMs
+        This can be overridden on a per-command basis.
+    default_permissions : hikari.Permissions | hikari.UndefinedType
+        The default permissions for this plugin
+        This can be overridden on a per-command basis.
+    is_nsfw : bool | hikari.UndefinedType
+        Whether this plugin is only usable in NSFW channels
+
+    !!! note
+        Parameters left as `hikari.UNDEFINED` will be inherited from the parent client.
 
     Usage
     -----
@@ -53,6 +71,22 @@ class GatewayPluginBase(PluginBase[GatewayClientT]):
     ----------
     name : str
         The name of this plugin. This must be unique across all plugins.
+    default_enabled_guilds : t.Sequence[hikari.Snowflake] | hikari.UndefinedType
+        The default guilds to enable commands in
+    autodefer : bool | AutodeferMode
+        If True, all commands in this plugin will automatically defer if it is taking longer than 2 seconds to respond.
+        This can be overridden on a per-command basis.
+    is_dm_enabled : bool | hikari.UndefinedType
+        Whether commands in this plugin are enabled in DMs
+        This can be overridden on a per-command basis.
+    default_permissions : hikari.Permissions | hikari.UndefinedType
+        The default permissions for this plugin
+        This can be overridden on a per-command basis.
+    is_nsfw : bool | hikari.UndefinedType
+        Whether this plugin is only usable in NSFW channels
+
+    !!! note
+        Parameters left as `hikari.UNDEFINED` will be inherited from the parent client.
 
     Usage
     -----
@@ -70,8 +104,25 @@ class GatewayPluginBase(PluginBase[GatewayClientT]):
     ```
     """
 
-    def __init__(self, name: str) -> None:
-        super().__init__(name)
+    def __init__(
+        self,
+        name: str,
+        *,
+        default_enabled_guilds: t.Sequence[hikari.Snowflakeish | hikari.PartialGuild]
+        | hikari.UndefinedType = hikari.UNDEFINED,
+        autodefer: bool | AutodeferMode | hikari.UndefinedType = hikari.UNDEFINED,
+        is_dm_enabled: bool | hikari.UndefinedType = hikari.UNDEFINED,
+        default_permissions: hikari.Permissions | hikari.UndefinedType = hikari.UNDEFINED,
+        is_nsfw: bool | hikari.UndefinedType = hikari.UNDEFINED,
+    ) -> None:
+        super().__init__(
+            name=name,
+            default_enabled_guilds=default_enabled_guilds,
+            autodefer=autodefer,
+            is_dm_enabled=is_dm_enabled,
+            default_permissions=default_permissions,
+            is_nsfw=is_nsfw,
+        )
         self._listeners: dict[type[hikari.Event], set[EventCallbackT[t.Any]]] = {}
 
     @property

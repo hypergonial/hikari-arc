@@ -15,9 +15,10 @@ from contextlib import suppress
 import alluka
 import hikari
 
+from arc.abc.command import _CommandSettings
 from arc.abc.plugin import PluginBase
 from arc.command.message import MessageCommand
-from arc.command.slash import SlashCommand, SlashGroup, SlashSubCommand, SlashSubGroup
+from arc.command.slash import SlashCommand, SlashGroup
 from arc.command.user import UserCommand
 from arc.context import AutodeferMode, Context
 from arc.errors import ExtensionLoadError, ExtensionUnloadError
@@ -59,10 +60,22 @@ class Client(t.Generic[AppT], abc.ABC):
     ----------
     app : AppT
         The application this client is for.
-    default_enabled_guilds : t.Sequence[hikari.Snowflake] | None, optional
-        The guilds that slash commands will be registered in by default, by default None
-    autosync : bool, optional
-        Whether to automatically sync commands on startup, by default True
+    default_enabled_guilds : t.Sequence[hikari.Snowflake] | None
+        The guilds that slash commands will be registered in by default
+    autosync : bool
+        Whether to automatically sync commands on startup
+    autodefer : bool | AutodeferMode
+        Whether to automatically defer commands that take longer than 2 seconds to respond
+        This applies to all commands, and can be overridden on a per-command basis.
+    default_permissions : hikari.Permissions | hikari.UndefinedType
+        The default permissions for commands
+        This applies to all commands, and can be overridden on a per-command basis.
+    is_nsfw : bool
+        Whether to mark commands as NSFW
+        This applies to all commands, and can be overridden on a per-command basis.
+    is_dm_enabled : bool
+        Whether to enable commands in DMs
+        This applies to all commands, and can be overridden on a per-command basis.
     """
 
     __slots__: t.Sequence[str] = (
@@ -86,20 +99,36 @@ class Client(t.Generic[AppT], abc.ABC):
         "_command_locale_provider",
         "_option_locale_provider",
         "_custom_locale_provider",
+        "_cmd_settings",
     )
 
     def __init__(
         self,
         app: AppT,
         *,
-        default_enabled_guilds: t.Sequence[hikari.Snowflake] | None = None,
+        default_enabled_guilds: t.Sequence[hikari.Snowflakeish | hikari.PartialGuild]
+        | hikari.UndefinedType = hikari.UNDEFINED,
         autosync: bool = True,
+        autodefer: bool | AutodeferMode = True,
+        default_permissions: hikari.Permissions | hikari.UndefinedType = hikari.UNDEFINED,
+        is_nsfw: bool = False,
+        is_dm_enabled: bool = True,
         provided_locales: t.Sequence[hikari.Locale] | None = None,
     ) -> None:
         self._app = app
-        self._default_enabled_guilds = default_enabled_guilds
+        self._default_enabled_guilds = (
+            tuple(hikari.Snowflake(i) for i in default_enabled_guilds)
+            if default_enabled_guilds is not hikari.UNDEFINED
+            else hikari.UNDEFINED
+        )
         self._autosync = autosync
         self._provided_locales: t.Sequence[hikari.Locale] | None = provided_locales
+        self._cmd_settings = _CommandSettings(
+            autodefer=AutodeferMode(autodefer),
+            default_permissions=default_permissions,
+            is_nsfw=is_nsfw,
+            is_dm_enabled=is_dm_enabled,
+        )
 
         self._application: hikari.Application | None = None
         self._slash_commands: dict[str, SlashCommandLike[te.Self]] = {}
@@ -148,7 +177,7 @@ class Client(t.Generic[AppT], abc.ABC):
         return self._injector
 
     @property
-    def default_enabled_guilds(self) -> t.Sequence[hikari.Snowflake] | None:
+    def default_enabled_guilds(self) -> t.Sequence[hikari.Snowflake] | hikari.UndefinedType:
         """The guilds that slash commands will be registered in by default."""
         return self._default_enabled_guilds
 
@@ -413,12 +442,12 @@ class Client(t.Generic[AppT], abc.ABC):
         name: str,
         description: str = "No description provided.",
         *,
-        guilds: hikari.UndefinedOr[t.Sequence[hikari.Snowflake]] = hikari.UNDEFINED,
-        autodefer: bool | AutodeferMode = True,
-        is_dm_enabled: bool = True,
-        default_permissions: hikari.UndefinedOr[hikari.Permissions] = hikari.UNDEFINED,
-        name_localizations: dict[hikari.Locale, str] | None = None,
-        description_localizations: dict[hikari.Locale, str] | None = None,
+        guilds: t.Sequence[hikari.Snowflakeish | hikari.PartialGuild] | hikari.UndefinedType = hikari.UNDEFINED,
+        autodefer: bool | AutodeferMode | hikari.UndefinedType = hikari.UNDEFINED,
+        is_dm_enabled: bool | hikari.UndefinedType = hikari.UNDEFINED,
+        default_permissions: hikari.Permissions | hikari.UndefinedType = hikari.UNDEFINED,
+        name_localizations: t.Mapping[hikari.Locale, str] | None = None,
+        description_localizations: t.Mapping[hikari.Locale, str] | None = None,
         is_nsfw: bool = False,
     ) -> SlashGroup[te.Self]:
         """Add a new slash command group to this client.
@@ -429,26 +458,29 @@ class Client(t.Generic[AppT], abc.ABC):
             The name of the slash command group.
         description : str
             The description of the slash command group.
-        guilds : hikari.UndefinedOr[t.Sequence[hikari.Snowflake]], optional
-            The guilds to register the slash command group in, by default hikari.UNDEFINED
-        autodefer : bool | AutodeferMode, optional
+        guilds : t.Sequence[hikari.Snowflake] | hikari.UndefinedType
+            The guilds to register the slash command group in
+        autodefer : bool | AutodeferMode
             If True, all commands in this group will automatically defer if it is taking longer than 2 seconds to respond.
             This can be overridden on a per-subcommand basis.
-        is_dm_enabled : bool, optional
-            Whether the slash command group is enabled in DMs, by default True
-        default_permissions : hikari.UndefinedOr[hikari.Permissions], optional
-            The default permissions for the slash command group, by default hikari.UNDEFINED
-        name_localizations : dict[hikari.Locale, str], optional
-            The name of the slash command group in different locales, by default None
-        description_localizations : dict[hikari.Locale, str], optional
-            The description of the slash command group in different locales, by default None
-        is_nsfw : bool, optional
-            Whether the slash command group is only usable in NSFW channels, by default False
+        is_dm_enabled : bool
+            Whether the slash command group is enabled in DMs
+        default_permissions : hikari.Permissions | hikari.UndefinedType
+            The default permissions for the slash command group
+        name_localizations : dict[hikari.Locale, str]
+            The name of the slash command group in different locales
+        description_localizations : dict[hikari.Locale, str]
+            The description of the slash command group in different locales
+        is_nsfw : bool
+            Whether the slash command group is only usable in NSFW channels
 
         Returns
         -------
         SlashGroup[te.Self]
             The slash command group that was created.
+
+        !!! note
+            Parameters left as `hikari.UNDEFINED` will be inherited from the parent client.
 
         Usage
         -----
@@ -461,14 +493,13 @@ class Client(t.Generic[AppT], abc.ABC):
             await ctx.respond("Hello!")
         ```
         """
-        children: dict[str, SlashSubCommand[te.Self] | SlashSubGroup[te.Self]] = {}
+        guild_ids = tuple(hikari.Snowflake(i) for i in guilds) if guilds is not hikari.UNDEFINED else hikari.UNDEFINED
 
-        group = SlashGroup(
+        group: SlashGroup[te.Self] = SlashGroup(
             name=name,
             description=description,
-            children=children,
-            guilds=guilds,
-            autodefer=AutodeferMode(autodefer),
+            guilds=guild_ids,
+            autodefer=AutodeferMode(autodefer) if isinstance(autodefer, bool) else autodefer,
             is_dm_enabled=is_dm_enabled,
             default_permissions=default_permissions,
             name_localizations=name_localizations or {},
@@ -931,8 +962,8 @@ class Client(t.Generic[AppT], abc.ABC):
         ----------
         dir_path : str
             The path to the directory to load extensions from.
-        recursive : bool, optional
-            Whether to load extensions from subdirectories, by default False
+        recursive : bool
+            Whether to load extensions from subdirectories
 
         Returns
         -------
@@ -1074,7 +1105,7 @@ class Client(t.Generic[AppT], abc.ABC):
         self._injector.set_type_dependency(type_, instance)
         return self
 
-    def get_type_dependency(self, type_: t.Type[T]) -> hikari.UndefinedOr[T]:
+    def get_type_dependency(self, type_: t.Type[T]) -> T | hikari.UndefinedType:
         """Get a type dependency for this client.
 
         Parameters
@@ -1084,7 +1115,7 @@ class Client(t.Generic[AppT], abc.ABC):
 
         Returns
         -------
-        hikari.UndefinedOr[T]
+        T | hikari.UndefinedType
             The instance of the dependency, if it exists.
         """
         return self._injector.get_type_dependency(type_, default=hikari.UNDEFINED)
@@ -1170,8 +1201,8 @@ class Client(t.Generic[AppT], abc.ABC):
 
         Parameters
         ----------
-        guild : hikari.SnowflakeishOr[hikari.PartialGuild] | None, optional
-            The guild to purge commands from, by default None
+        guild : hikari.SnowflakeishOr[hikari.PartialGuild] | None
+            The guild to purge commands from
             If a `guild` is not provided, this will purge global commands.
 
         !!! warning

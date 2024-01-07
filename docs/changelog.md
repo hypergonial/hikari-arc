@@ -13,6 +13,7 @@ Here you can find all the changelogs for `hikari-arc`.
 
 - **Breaking:** Re-order OptionParams object parameters. `description=` is now the first & only positional argument. `name=` has been moved to the second parameter and is now keyword-only.
 - Add [limiters](./guides/hooks.md#limiters).
+- Add  `autodefer`, `default_permissions`, `is_dm_enabled` and `is_nsfw` to client & plugin types. If set, these settings will be applied to all commands added to the client/plugin. They can still however be overridden by individual commands.
 - Add `GatewayClientBase` and `RESTClientBase` to aid in creating custom client types. Examples on how to do this have also been added to the repository.
 - Fix `InteractionResponse.retrieve_message()` failing due to incorrect assertion.
 - Fix subcommands & subgroups unable to have hooks or an error handler.

@@ -63,11 +63,11 @@ class MessageCommand(CallableCommandBase[ClientT, hikari.api.ContextMenuCommandB
 def message_command(
     name: str,
     *,
-    guilds: t.Sequence[hikari.SnowflakeishOr[hikari.PartialGuild]] | None = None,
-    is_dm_enabled: bool = True,
-    is_nsfw: bool = False,
-    autodefer: bool | AutodeferMode = True,
-    default_permissions: hikari.UndefinedOr[hikari.Permissions] = hikari.UNDEFINED,
+    guilds: t.Sequence[hikari.PartialGuild | hikari.Snowflakeish] | hikari.UndefinedType = hikari.UNDEFINED,
+    is_dm_enabled: bool | hikari.UndefinedType = hikari.UNDEFINED,
+    is_nsfw: bool | hikari.UndefinedType = hikari.UNDEFINED,
+    autodefer: bool | AutodeferMode | hikari.UndefinedType = hikari.UNDEFINED,
+    default_permissions: hikari.Permissions | hikari.UndefinedType = hikari.UNDEFINED,
     name_localizations: t.Mapping[hikari.Locale, str] | None = None,
 ) -> t.Callable[[MessageContextCallbackT[ClientT]], MessageCommand[ClientT]]:
     """A decorator that creates a context-menu command on a message.
@@ -76,19 +76,22 @@ def message_command(
     ----------
     name : str
         The name of the command.
-    guilds : t.Sequence[hikari.SnowflakeishOr[hikari.PartialGuild]] | None
-        The guilds this command is available in.
-    is_dm_enabled : bool
+    guilds : t.Sequence[hikari.PartialGuild | hikari.Snowflakeish] | hikari.UndefinedType
+        The guilds this command should be enabled in, if left as undefined, the command is global
+    is_dm_enabled : bool | hikari.UndefinedType
         Whether this command is enabled in DMs.
-    is_nsfw : bool
+    is_nsfw : bool | hikari.UndefinedType
         Whether this command is NSFW.
-    autodefer : bool | AutodeferMode
-        If True, this command will be automatically deferred if it takes longer than 2 seconds to respond, by default True
-    default_permissions : hikari.UndefinedOr[hikari.Permissions]
+    autodefer : bool | AutodeferMode | hikari.UndefinedType
+        If True, this command will be automatically deferred if it takes longer than 2 seconds to respond
+    default_permissions : hikari.Permissions | hikari.UndefinedType
         The default permissions for this command.
         Keep in mind that guild administrators can change this, it should only be used to provide safe defaults.
     name_localizations : t.Mapping[hikari.Locale, str] | None
         The localizations for this command's name.
+
+    !!! note
+        Parameters left as `hikari.UNDEFINED` will be inherited from the parent plugin or client.
 
     Usage
     -----
@@ -103,12 +106,12 @@ def message_command(
     """
 
     def decorator(callback: MessageContextCallbackT[ClientT]) -> MessageCommand[ClientT]:
-        guild_ids = [hikari.Snowflake(guild) for guild in guilds] if guilds else []
+        guild_ids = tuple(hikari.Snowflake(i) for i in guilds) if guilds is not hikari.UNDEFINED else hikari.UNDEFINED
 
         return MessageCommand(
             callback=callback,
             name=name,
-            autodefer=AutodeferMode(autodefer),
+            autodefer=AutodeferMode(autodefer) if isinstance(autodefer, bool) else autodefer,
             guilds=guild_ids,
             is_dm_enabled=is_dm_enabled,
             is_nsfw=is_nsfw,
