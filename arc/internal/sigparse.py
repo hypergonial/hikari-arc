@@ -366,7 +366,7 @@ def parse_command_signature(  # noqa: C901
     return options
 
 
-def parse_event_signature(func: t.Callable[t.Concatenate[EventT, ...], t.Awaitable[None]]) -> list[type[EventT]]:
+def parse_event_signature(func: t.Callable[[EventT], t.Awaitable[None]]) -> list[type[EventT]]:
     """Parse an event callback function's signature and return the event type, ignore other type hints."""
     hints = t.get_type_hints(func)
 

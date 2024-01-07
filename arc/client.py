@@ -146,7 +146,7 @@ class GatewayClientBase(Client[GatewayBotT]):
             The event type to subscribe to.
 
             `EventT` must be a subclass of `hikari.events.base_events.Event`.
-        callback : t.Callable[t.Concatenate[EventT, ...], t.Awaitable[None]]
+        callback : t.Callable[EventT], t.Awaitable[None]]
             The callback to call when the event is dispatched.
         """
         self.app.event_manager.subscribe(event_type, callback)  # pyright: ignore reportGeneralTypeIssues
@@ -158,7 +158,7 @@ class GatewayClientBase(Client[GatewayBotT]):
         ----------
         event_type : type[EventT]
             The event type to unsubscribe from.
-        callback : t.Callable[t.Concatenate[EventT, ...], t.Awaitable[None]]
+        callback : t.Callable[[EventT], t.Awaitable[None]]
             The callback to unsubscribe.
         """
         self.app.event_manager.unsubscribe(event_type, callback)  # pyright: ignore reportGeneralTypeIssues
@@ -178,7 +178,7 @@ class GatewayClientBase(Client[GatewayBotT]):
 
         Returns
         -------
-        t.Callable[t.Callable[t.Concatenate[EventT, ...], t.Awaitable[None]]], t.Callable[t.Concatenate[EventT, ...], t.Awaitable[None]]]
+        t.Callable[t.Callable[[EventT], t.Awaitable[None]]], t.Callable[[EventT], t.Awaitable[None]]]
             A decorator for a coroutine function that passes it to
             `EventManager.subscribe` before returning the function
             reference.
