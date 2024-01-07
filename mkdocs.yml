@@ -58,8 +58,6 @@ theme:
 nav:
     - Home: index.md
     - Getting Started: getting_started.md
-    - Tutorial:
-        - tutorial/index.md
     - Guides:
         - guides/index.md
         - guides/interactions.md
