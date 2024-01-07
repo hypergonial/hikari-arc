@@ -1,8 +1,10 @@
+import inspect
+
 import hikari
 import pytest
 
 import arc
-from arc.internal.sigparse import parse_command_signature
+from arc.internal.sigparse import CHANNEL_TYPES_MAPPING, parse_command_signature
 
 
 async def correct_command(
@@ -147,6 +149,15 @@ def test_di_annotation() -> None:
     assert options["c"].is_required
     assert options["c"].min_length == 100
     assert options["c"].max_length is None
+
+
+def test_ensure_parse_channel_types_has_every_channel_class() -> None:
+    for _, attribute in inspect.getmembers(
+        hikari, lambda a: isinstance(a, type) and issubclass(a, hikari.PartialChannel)
+    ):
+        result = CHANNEL_TYPES_MAPPING.get(attribute)
+
+        assert result is not None, f"Missing channel type for {attribute}"
 
 
 # MIT License
