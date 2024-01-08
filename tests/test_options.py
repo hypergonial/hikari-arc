@@ -1,6 +1,8 @@
+import sys
 import typing as t
 
 import hikari
+import pytest
 import typing_extensions as te
 
 from arc.abc.option import OptionType
@@ -30,6 +32,10 @@ def test_optiontype_has_all_hikari_option_types() -> None:
 
 
 def test_context_get_option_has_all_option_overloads() -> None:
+    # Do not test on 3.10-, as it does not support Literal
+    if sys.version_info.minor <= 10:
+        pytest.skip("Literal is not supported in Python 3.10 or lower")
+
     literals = _get_literals(Context.get_option)  # type: ignore
 
     for option_type in OptionType:
