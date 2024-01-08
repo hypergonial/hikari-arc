@@ -4,7 +4,7 @@ import hikari
 import pytest
 
 import arc
-from arc.internal.sigparse import CHANNEL_TYPES_MAPPING, parse_command_signature
+from arc.internal.sigparse import CHANNEL_TYPES_MAPPING, TYPE_TO_OPTION_MAPPING, parse_command_signature
 
 
 async def correct_command(
@@ -157,7 +157,11 @@ def test_ensure_parse_channel_types_has_every_channel_class() -> None:
     ):
         result = CHANNEL_TYPES_MAPPING.get(attribute)
 
-        assert result is not None, f"Missing channel type for {attribute}"
+        assert result is not None, f"Missing channel type for {attribute} in CHANNEL_TYPES_MAPPING"
+
+        result = attribute in TYPE_TO_OPTION_MAPPING
+
+        assert result is True, f"Missing channel type for {attribute} in TYPE_TO_OPTION_MAPPING"
 
 
 # MIT License
