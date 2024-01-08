@@ -19,8 +19,8 @@ async def ping_message(ctx: arc.GatewayContext, message: hikari.Message) -> None
 
 
 def test_user_command():
-    assert len(client.user_commands) == 1
-    command = client.user_commands["Say Hi"]
+    assert len(client._user_commands) == 1
+    command = client._user_commands["Say Hi"]
 
     assert command.name == "Say Hi"
     assert command.command_type is hikari.CommandType.USER
@@ -32,8 +32,8 @@ def test_user_command():
 
 
 def test_message_command():
-    assert len(client.message_commands) == 1
-    command = client.message_commands["Say Hi"]
+    assert len(client._message_commands) == 1
+    command = client._message_commands["Say Hi"]
 
     assert command.name == "Say Hi"
     assert command.command_type is hikari.CommandType.MESSAGE

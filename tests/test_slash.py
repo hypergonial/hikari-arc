@@ -49,9 +49,9 @@ async def my_subsubcommand(
 
 
 def test_my_command() -> None:
-    assert len(client.slash_commands) == 2
+    assert len(client._slash_commands) == 2
 
-    command = client.slash_commands["test"]
+    command = client._slash_commands["test"]
 
     assert command.client is client
 
@@ -123,7 +123,7 @@ def test_my_command() -> None:
 
 
 def test_my_group() -> None:
-    group = client.slash_commands["my_group"]
+    group = client._slash_commands["my_group"]
     assert isinstance(group, arc.SlashGroup)
 
     assert len(group.children) == 2

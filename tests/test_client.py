@@ -14,7 +14,7 @@ subgroup = group.include_subgroup("my_subgroup", "My subgroup description")
 
 @client.include
 @arc.message_command("Message Command")
-async def among_us(ctx: arc.GatewayContext, message: hikari.Message) -> None:
+async def message_cmd(ctx: arc.GatewayContext, message: hikari.Message) -> None:
     pass
 
 
@@ -39,27 +39,24 @@ async def my_subsubcommand(
 
 
 def test_walk_commands() -> None:
-    cmds = list(client.walk_commands(callable_only=False))
+    cmds = list(client.walk_commands(hikari.CommandType.SLASH, callable_only=False))
 
-    assert len(cmds) == 5
+    assert len(cmds) == 4
 
-    assert among_us in cmds
     assert my_subcommand in cmds
     assert my_subsubcommand in cmds
     assert group in cmds
     assert subgroup in cmds
 
-    cmds = list(client.walk_commands(callable_only=True))
-
-    assert len(cmds) == 3
-
-    assert among_us in cmds
-    assert my_subcommand in cmds
-    assert my_subsubcommand in cmds
-
-    cmds = list(client.walk_commands(callable_only=True, types={hikari.CommandType.SLASH}))
+    cmds = list(client.walk_commands(hikari.CommandType.SLASH, callable_only=True))
 
     assert len(cmds) == 2
 
     assert my_subcommand in cmds
     assert my_subsubcommand in cmds
+
+    cmds = list(client.walk_commands(hikari.CommandType.MESSAGE))
+
+    assert len(cmds) == 1
+
+    assert message_cmd in cmds

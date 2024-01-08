@@ -458,6 +458,18 @@ class Context(t.Generic[ClientT]):
         -------
         ValueT | None
             The value of the option, or None if it does not exist, or is not of the correct type.
+
+        Usage
+        -----
+        ```py
+        value = ctx.get_option("name", arc.OptionType.STRING)
+        if value is None:
+            # Option does not exist or is not a string
+
+        # Do something with the value
+        print(value)
+        ```
+
         """
         if self._options is None:
             return None

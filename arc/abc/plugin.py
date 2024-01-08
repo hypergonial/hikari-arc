@@ -12,6 +12,7 @@ from arc.abc.command import _CommandSettings
 from arc.abc.error_handler import HasErrorHandler
 from arc.abc.hookable import Hookable
 from arc.command import MessageCommand, SlashCommand, SlashGroup, UserCommand
+from arc.command.slash import SlashSubCommand, SlashSubGroup
 from arc.context import AutodeferMode, Context
 from arc.internal.types import BuilderT, ClientT, ErrorHandlerCallbackT, HookT, PostHookT, SlashCommandLike
 
@@ -367,6 +368,97 @@ class PluginBase(HasErrorHandler[ClientT], Hookable[ClientT]):
             return decorator(func)
 
         return decorator
+
+    @t.overload
+    def walk_commands(
+        self, command_type: t.Literal[hikari.CommandType.USER], *, callable_only: bool = False
+    ) -> t.Iterator[UserCommand[ClientT]]:
+        ...
+
+    @t.overload
+    def walk_commands(
+        self, command_type: t.Literal[hikari.CommandType.MESSAGE], *, callable_only: bool = False
+    ) -> t.Iterator[MessageCommand[ClientT]]:
+        ...
+
+    @t.overload
+    def walk_commands(
+        self, command_type: t.Literal[hikari.CommandType.SLASH], *, callable_only: t.Literal[False]
+    ) -> t.Iterator[SlashCommand[ClientT] | SlashSubCommand[ClientT] | SlashGroup[ClientT] | SlashSubGroup[ClientT]]:
+        ...
+
+    @t.overload
+    def walk_commands(
+        self, command_type: t.Literal[hikari.CommandType.SLASH], *, callable_only: t.Literal[True]
+    ) -> t.Iterator[SlashCommand[ClientT] | SlashSubCommand[ClientT]]:
+        ...
+
+    def walk_commands(  # noqa: C901
+        self, command_type: hikari.CommandType, *, callable_only: bool = False
+    ) -> t.Iterator[t.Any]:
+        """Iterate over all commands of a certain type added to this plugin.
+
+        Parameters
+        ----------
+        command_type : hikari.CommandType
+            The type of commands to return.
+        callable_only : bool
+            Whether to only return commands that are directly callable.
+            If True, command groups and subgroups will be skipped.
+
+        Yields
+        ------
+        CommandT[ClientT]
+            The next command that matches the given criteria.
+
+        Usage
+        -----
+        ```py
+        for cmd in plugin.walk_commands(hikari.CommandType.SLASH):
+            print(cmd.name)
+        ```
+
+        !!! tip
+            To iterate over all types of commands, you may use [`itertools.chain()`][itertools.chain]:
+
+            ```py
+            import itertools
+
+            for cmd in itertools.chain(
+                plugin.walk_commands(hikari.CommandType.SLASH),
+                plugin.walk_commands(hikari.CommandType.MESSAGE),
+                plugin.walk_commands(hikari.CommandType.USER),
+            ):
+                print(cmd.name)
+            ```
+        """
+        if hikari.CommandType.SLASH is command_type:
+            for command in self._slash_commands.values():
+                if isinstance(command, SlashCommand):
+                    yield command
+                    continue
+
+                if not callable_only:
+                    yield command
+
+                for sub in command.children.values():
+                    if isinstance(sub, SlashSubCommand):
+                        yield sub
+                        continue
+
+                    if not callable_only:
+                        yield sub
+
+                    for subsub in sub.children.values():
+                        yield subsub
+
+        elif hikari.CommandType.MESSAGE is command_type:
+            for command in self._message_commands.values():
+                yield command
+
+        elif hikari.CommandType.USER is command_type:
+            for command in self._user_commands.values():
+                yield command
 
 
 # MIT License

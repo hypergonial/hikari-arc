@@ -155,7 +155,7 @@ def _get_all_commands(
     ] = defaultdict(lambda: defaultdict(lambda: defaultdict(dict)))  # type: ignore
 
     for command in itertools.chain(
-        client.slash_commands.values(), client.message_commands.values(), client.user_commands.values()
+        client._slash_commands.values(), client._message_commands.values(), client._user_commands.values()
     ):
         if command.guilds:
             for guild_id in command.guilds:

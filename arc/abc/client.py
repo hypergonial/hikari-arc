@@ -15,10 +15,10 @@ from contextlib import suppress
 import alluka
 import hikari
 
-from arc.abc.command import CallableCommandProto, CommandProto, _CommandSettings
+from arc.abc.command import _CommandSettings
 from arc.abc.plugin import PluginBase
 from arc.command.message import MessageCommand
-from arc.command.slash import SlashCommand, SlashGroup, SlashSubCommand
+from arc.command.slash import SlashCommand, SlashGroup, SlashSubCommand, SlashSubGroup
 from arc.command.user import UserCommand
 from arc.context import AutodeferMode, Context
 from arc.errors import ExtensionLoadError, ExtensionUnloadError
@@ -157,6 +157,20 @@ class Client(t.Generic[AppT], abc.ABC):
         """
 
     @property
+    def _commands(self) -> t.Mapping[hikari.CommandType, t.Mapping[str, CommandBase[te.Self, t.Any]]]:
+        """All top-level commands added to this client, categorized by command type.
+
+        !!! note
+            This does not include subcommands & subgroups due to implementation details, therefore
+            you should use [`Client.walk_commands()`][arc.abc.client.Client.walk_commands] instead.
+        """
+        return {
+            hikari.CommandType.SLASH: self._slash_commands,
+            hikari.CommandType.MESSAGE: self._message_commands,
+            hikari.CommandType.USER: self._user_commands,
+        }
+
+    @property
     def app(self) -> AppT:
         """The application this client is for."""
         return self._app
@@ -180,30 +194,6 @@ class Client(t.Generic[AppT], abc.ABC):
     def default_enabled_guilds(self) -> t.Sequence[hikari.Snowflake] | hikari.UndefinedType:
         """The guilds that slash commands will be registered in by default."""
         return self._default_enabled_guilds
-
-    @property
-    def commands(self) -> t.Mapping[hikari.CommandType, t.Mapping[str, CommandBase[te.Self, t.Any]]]:
-        """All commands added to this client, categorized by command type."""
-        return {
-            hikari.CommandType.SLASH: self.slash_commands,
-            hikari.CommandType.MESSAGE: self._message_commands,
-            hikari.CommandType.USER: self._user_commands,
-        }
-
-    @property
-    def slash_commands(self) -> t.Mapping[str, SlashCommandLike[te.Self]]:
-        """The slash commands added to this client. This only includes top-level commands and groups."""
-        return self._slash_commands
-
-    @property
-    def message_commands(self) -> t.Mapping[str, MessageCommand[te.Self]]:
-        """The message commands added to this client."""
-        return self._message_commands
-
-    @property
-    def user_commands(self) -> t.Mapping[str, UserCommand[te.Self]]:
-        """The user commands added to this client."""
-        return self._user_commands
 
     @property
     def plugins(self) -> t.Mapping[str, PluginBase[te.Self]]:
@@ -318,11 +308,11 @@ class Client(t.Generic[AppT], abc.ABC):
 
         match interaction.command_type:
             case hikari.CommandType.SLASH:
-                command = self.slash_commands.get(interaction.command_name)
+                command = self._slash_commands.get(interaction.command_name)
             case hikari.CommandType.MESSAGE:
-                command = self.message_commands.get(interaction.command_name)
+                command = self._message_commands.get(interaction.command_name)
             case hikari.CommandType.USER:
-                command = self.user_commands.get(interaction.command_name)
+                command = self._user_commands.get(interaction.command_name)
             case _:
                 pass
 
@@ -372,7 +362,7 @@ class Client(t.Generic[AppT], abc.ABC):
         hikari.api.InteractionAutocompleteBuilder | None
             The autocomplete builder to send back to Discord, if using a REST client.
         """
-        command = self.slash_commands.get(interaction.command_name)
+        command = self._slash_commands.get(interaction.command_name)
 
         if command is None:
             logger.warning(f"Received autocomplete interaction for unknown command '{interaction.command_name}'.")
@@ -382,57 +372,70 @@ class Client(t.Generic[AppT], abc.ABC):
 
     @t.overload
     def walk_commands(
-        self,
-        *,
-        callable_only: t.Literal[True] = True,
-        types: set[hikari.CommandType] = {
-            hikari.CommandType.SLASH,
-            hikari.CommandType.MESSAGE,
-            hikari.CommandType.USER,
-        },
-    ) -> t.Iterator[CallableCommandProto[te.Self]]:
+        self, command_type: t.Literal[hikari.CommandType.USER], *, callable_only: bool = False
+    ) -> t.Iterator[UserCommand[te.Self]]:
         ...
 
     @t.overload
     def walk_commands(
-        self,
-        *,
-        callable_only: t.Literal[False],
-        types: set[hikari.CommandType] = {
-            hikari.CommandType.SLASH,
-            hikari.CommandType.MESSAGE,
-            hikari.CommandType.USER,
-        },
-    ) -> t.Iterator[CommandProto]:
+        self, command_type: t.Literal[hikari.CommandType.MESSAGE], *, callable_only: bool = False
+    ) -> t.Iterator[MessageCommand[te.Self]]:
+        ...
+
+    @t.overload
+    def walk_commands(
+        self, command_type: t.Literal[hikari.CommandType.SLASH], *, callable_only: t.Literal[False] = False
+    ) -> t.Iterator[SlashCommand[te.Self] | SlashSubCommand[te.Self] | SlashGroup[te.Self] | SlashSubGroup[te.Self]]:
+        ...
+
+    @t.overload
+    def walk_commands(
+        self, command_type: t.Literal[hikari.CommandType.SLASH], *, callable_only: t.Literal[True] = True
+    ) -> t.Iterator[SlashCommand[te.Self] | SlashSubCommand[te.Self]]:
         ...
 
     def walk_commands(  # noqa: C901
-        self,
-        *,
-        callable_only: bool = True,
-        types: set[hikari.CommandType] = {
-            hikari.CommandType.SLASH,
-            hikari.CommandType.MESSAGE,
-            hikari.CommandType.USER,
-        },
-    ) -> t.Iterator[CommandProto | CallableCommandProto[te.Self]]:
-        """Iterate over all commands added to this client.
+        self, command_type: hikari.CommandType, *, callable_only: bool = False
+    ) -> t.Iterator[t.Any]:
+        """Iterate over all commands of a certain type added to this plugin.
 
         Parameters
         ----------
+        command_type : hikari.CommandType
+            The type of commands to return.
         callable_only : bool
             Whether to only return commands that are directly callable.
             If True, command groups and subgroups will be skipped.
-        types : set[hikari.CommandType]
-            The types of commands to return.
+            This is only applicable to slash commands.
 
         Yields
         ------
-        CommandBase[te.Self, t.Any]
+        CommandT[te.Self]
             The next command that matches the given criteria.
+
+        Usage
+        -----
+        ```py
+        for cmd in plugin.walk_commands(hikari.CommandType.SLASH):
+            print(cmd.name)
+        ```
+
+        !!! tip
+            To iterate over all types of commands, you may use [`itertools.chain()`][itertools.chain]:
+
+            ```py
+            import itertools
+
+            for cmd in itertools.chain(
+                plugin.walk_commands(hikari.CommandType.SLASH),
+                plugin.walk_commands(hikari.CommandType.MESSAGE),
+                plugin.walk_commands(hikari.CommandType.USER),
+            ):
+                print(cmd.name)
+            ```
         """
-        if hikari.CommandType.SLASH in types:
-            for command in self.slash_commands.values():
+        if hikari.CommandType.SLASH is command_type:
+            for command in self._slash_commands.values():
                 if isinstance(command, SlashCommand):
                     yield command
                     continue
@@ -451,12 +454,12 @@ class Client(t.Generic[AppT], abc.ABC):
                     for subsub in sub.children.values():
                         yield subsub
 
-        if hikari.CommandType.MESSAGE in types:
-            for command in self.message_commands.values():
+        elif hikari.CommandType.MESSAGE is command_type:
+            for command in self._message_commands.values():
                 yield command
 
-        if hikari.CommandType.USER in types:
-            for command in self.user_commands.values():
+        elif hikari.CommandType.USER is command_type:
+            for command in self._user_commands.values():
                 yield command
 
     @t.overload
@@ -502,7 +505,7 @@ class Client(t.Generic[AppT], abc.ABC):
                     f"\nYou should use '{type(self).__name__}.add_plugin()' to add the entire plugin to the client."
                 )
 
-            if existing := self.commands[command.command_type].get(command.name):
+            if existing := self._commands[command.command_type].get(command.name):
                 logger.warning(
                     f"Shadowing already registered command '{command.name}'. Did you define multiple commands with the same name?"
                 )
