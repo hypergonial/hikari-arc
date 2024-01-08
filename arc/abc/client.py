@@ -442,7 +442,6 @@ class Client(t.Generic[AppT], abc.ABC):
 
                 for sub in command.children.values():
                     if isinstance(sub, SlashSubCommand):
-                        print("Yielded slash subcommand")
                         yield sub
                         continue
 
@@ -454,12 +453,10 @@ class Client(t.Generic[AppT], abc.ABC):
 
         if hikari.CommandType.MESSAGE in types:
             for command in self.message_commands.values():
-                print("Yielded message command")
                 yield command
 
         if hikari.CommandType.USER in types:
             for command in self.user_commands.values():
-                print("Yielded user command")
                 yield command
 
     @t.overload
