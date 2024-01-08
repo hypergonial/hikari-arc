@@ -534,7 +534,7 @@ class CallableCommandBase(CommandBase[ClientT, BuilderT], CallableCommandProto[C
     callback: CommandCallbackT[ClientT]
     """The callback to invoke when this command is called."""
 
-    _invoke_task: asyncio.Task[t.Any] | None = attr.field(init=False, default=None)
+    _invoke_task: asyncio.Task[t.Any] | None = attr.field(init=False, default=None, repr=False)
 
     def reset_all_limiters(self, context: Context[ClientT]) -> None:
         """Reset all limiters for this command.

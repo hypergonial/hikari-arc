@@ -15,10 +15,10 @@ from contextlib import suppress
 import alluka
 import hikari
 
-from arc.abc.command import _CommandSettings
+from arc.abc.command import CallableCommandProto, CommandProto, _CommandSettings
 from arc.abc.plugin import PluginBase
 from arc.command.message import MessageCommand
-from arc.command.slash import SlashCommand, SlashGroup
+from arc.command.slash import SlashCommand, SlashGroup, SlashSubCommand
 from arc.command.user import UserCommand
 from arc.context import AutodeferMode, Context
 from arc.errors import ExtensionLoadError, ExtensionUnloadError
@@ -379,6 +379,88 @@ class Client(t.Generic[AppT], abc.ABC):
             return
 
         return await command._on_autocomplete(interaction)
+
+    @t.overload
+    def walk_commands(
+        self,
+        *,
+        callable_only: t.Literal[True] = True,
+        types: set[hikari.CommandType] = {
+            hikari.CommandType.SLASH,
+            hikari.CommandType.MESSAGE,
+            hikari.CommandType.USER,
+        },
+    ) -> t.Iterator[CallableCommandProto[te.Self]]:
+        ...
+
+    @t.overload
+    def walk_commands(
+        self,
+        *,
+        callable_only: t.Literal[False],
+        types: set[hikari.CommandType] = {
+            hikari.CommandType.SLASH,
+            hikari.CommandType.MESSAGE,
+            hikari.CommandType.USER,
+        },
+    ) -> t.Iterator[CommandProto]:
+        ...
+
+    def walk_commands(  # noqa: C901
+        self,
+        *,
+        callable_only: bool = True,
+        types: set[hikari.CommandType] = {
+            hikari.CommandType.SLASH,
+            hikari.CommandType.MESSAGE,
+            hikari.CommandType.USER,
+        },
+    ) -> t.Iterator[CommandProto | CallableCommandProto[te.Self]]:
+        """Iterate over all commands added to this client.
+
+        Parameters
+        ----------
+        callable_only : bool
+            Whether to only return commands that are directly callable.
+            If True, command groups and subgroups will be skipped.
+        types : set[hikari.CommandType]
+            The types of commands to return.
+
+        Yields
+        ------
+        CommandBase[te.Self, t.Any]
+            The next command that matches the given criteria.
+        """
+        if hikari.CommandType.SLASH in types:
+            for command in self.slash_commands.values():
+                if isinstance(command, SlashCommand):
+                    yield command
+                    continue
+
+                if not callable_only:
+                    yield command
+
+                for sub in command.children.values():
+                    if isinstance(sub, SlashSubCommand):
+                        print("Yielded slash subcommand")
+                        yield sub
+                        continue
+
+                    if not callable_only:
+                        yield sub
+
+                    for subsub in sub.children.values():
+                        yield subsub
+
+        if hikari.CommandType.MESSAGE in types:
+            for command in self.message_commands.values():
+                print("Yielded message command")
+                yield command
+
+        if hikari.CommandType.USER in types:
+            for command in self.user_commands.values():
+                print("Yielded user command")
+                yield command
 
     @t.overload
     def include(self) -> t.Callable[[CommandBase[te.Self, BuilderT]], CommandBase[te.Self, BuilderT]]:

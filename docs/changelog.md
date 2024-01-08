@@ -11,7 +11,8 @@ Here you can find all the changelogs for `hikari-arc`.
 
 ## Unreleased
 
-- Add `Command.display_name`, `SlashCommand.make_mention`, `SlashSubCommand.make_mention`.
+- Add `Client.walk_commands()`.
+- Add `Command.display_name`, `SlashCommand.make_mention()`, `SlashSubCommand.make_mention()`.
 
 ## v0.5.0
 

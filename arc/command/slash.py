@@ -662,7 +662,9 @@ class SlashSubCommand(
     @property
     def parent(self) -> SlashGroup[ClientT] | SlashSubGroup[ClientT]:
         """The parent of this subcommand."""
-        return self.parent
+        if self._parent is None:
+            raise ValueError("Cannot get parent of subcommand without parent.")
+        return self._parent
 
     @property
     def command_type(self) -> hikari.CommandType:
