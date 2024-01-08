@@ -444,8 +444,8 @@ class CommandBase(HasErrorHandler[ClientT], Hookable[ClientT], t.Generic[ClientT
 
     def _client_remove_hook(self, client: ClientT) -> None:
         """Called when the client requests the command be removed from it."""
-        self._client = None
         self.client._remove_command(self)
+        self._client = None
 
     def _plugin_include_hook(self, plugin: PluginBase[ClientT]) -> None:
         """Called when the plugin requests the command be added to it."""
