@@ -13,7 +13,7 @@ from arc.internal.types import ClientT, MessageCommandCallbackT, ResponseBuilder
 if t.TYPE_CHECKING:
     import asyncio
 
-    from ..abc import CallableCommandProto
+    from arc.abc import CallableCommandProto
 
 __all__ = ("MessageCommand", "message_command")
 
