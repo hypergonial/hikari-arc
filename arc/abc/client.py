@@ -663,6 +663,10 @@ class Client(t.Generic[AppT], abc.ABC):
             await ctx.respond(f"❌ Something went wrong: {exception}")
         ```
 
+        !!! warning
+            Errors that cannot be handled by the error handler should be re-raised.
+            Otherwise tracebacks will not be printed to stderr.
+
         Or, as a function:
 
         ```py

@@ -45,12 +45,20 @@ class HasErrorHandler(abc.ABC, t.Generic[ClientT]):
         @client.include
         @arc.slash_command("foo", "Foo command description")
         async def foo(ctx: arc.GatewayContext) -> None:
-            raise Exception("foo")
+            raise RuntimeError("foo")
 
         @foo.set_error_handler
         async def foo_error_handler(ctx: arc.GatewayContext, exc: Exception) -> None:
-            await ctx.respond("foo failed")
+            if isinstance(exc, RuntimeError):
+                await ctx.respond("foo failed")
+                return
+
+            raise exc
         ```
+
+        !!! warning
+            Errors that cannot be handled by the error handler should be re-raised.
+            Otherwise they will not propagate to the next error handler.
         """
 
         def decorator(func: ErrorHandlerCallbackT[ClientT]) -> ErrorHandlerCallbackT[ClientT]:
