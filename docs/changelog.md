@@ -11,9 +11,10 @@ Here you can find all the changelogs for `hikari-arc`.
 
 ## v0.6.0
 
-- Add `Context.get_option` to access options outside the command callback in a type-safe manner.
+- Add `Context.get_option()` to access options outside the command callback in a type-safe manner.
 - Add `Client.walk_commands()` and `Plugin.walk_commands()` to iterate over all commands & subcommands of a given type in a type-safe manner.
 - Add `CallableCommandProto.display_name`, `SlashCommand.make_mention()`, `SlashSubCommand.make_mention()`.
+- Change `Context.respond_with_builder()` to attempt a followup message when the interaction has an initial response and a message builder was passed.
 - Remove the `acquire()` method from `LimiterProto` to make it easier to implement custom limiters.
 - Split `arc.utils.hooks.RateLimiter` into `arc.utils.RateLimiter` and `arc.utils.hooks.LimiterHook`. This allows `arc.utils.RateLimiter` to be used independently of an arc context object.
 
