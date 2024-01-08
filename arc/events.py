@@ -17,7 +17,11 @@ class ArcEvent(hikari.Event):
 
 
 class CommandErrorEvent(ArcEvent, t.Generic[GatewayClientT]):
-    """Event dispatched when a command raises an exception that is not handled by any error handlers."""
+    """Event dispatched when a command raises an exception that is not handled by any error handlers.
+
+    !!! warning
+        Creating any listeners for this event will disable the client error handler completely.
+    """
 
     def __init__(self, client: GatewayClientT, context: Context[GatewayClientT], exception: Exception) -> None:
         self._context = context
