@@ -33,7 +33,7 @@ def pyright(session: nox.Session) -> None:
 
 @nox.session()
 def pytest(session: nox.Session) -> None:
-    session.install(".")
+    session.install(".[dev]")
     session.install("-U", "pytest")
     session.install("-U", "pytest-asyncio")
     session.run("pytest", "tests")

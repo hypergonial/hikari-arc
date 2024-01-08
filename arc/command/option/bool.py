@@ -3,9 +3,8 @@ from __future__ import annotations
 import typing as t
 
 import attr
-import hikari
 
-from arc.abc.option import CommandOptionBase, OptionParams
+from arc.abc.option import CommandOptionBase, OptionParams, OptionType
 from arc.internal.types import ClientT
 
 if t.TYPE_CHECKING:
@@ -46,8 +45,8 @@ class BoolOption(CommandOptionBase[bool, ClientT, BoolParams]):
     """
 
     @property
-    def option_type(self) -> hikari.OptionType:
-        return hikari.OptionType.BOOLEAN
+    def option_type(self) -> OptionType:
+        return OptionType.BOOLEAN
 
     @classmethod
     def _from_params(cls, *, name: str, is_required: bool, params: BoolParams, **kwargs: t.Any) -> te.Self:

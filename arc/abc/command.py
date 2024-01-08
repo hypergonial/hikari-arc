@@ -261,7 +261,7 @@ class CommandBase(HasErrorHandler[ClientT], Hookable[ClientT], t.Generic[ClientT
         """The client that is handling this command."""
         if self._client is None:
             raise RuntimeError(
-                f"Command '{self.qualified_name}' was not included in a client, '{type(self).__name__}.client' cannot be accessed until it is included in a client."
+                f"Command '{self.display_name}' was not included in a client, '{type(self).__name__}.client' cannot be accessed until it is included in a client."
             )
         return self._client
 

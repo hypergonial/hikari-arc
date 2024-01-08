@@ -5,7 +5,7 @@ import typing as t
 import attr
 import hikari
 
-from arc.abc.option import CommandOptionBase, OptionParams
+from arc.abc.option import CommandOptionBase, OptionParams, OptionType
 from arc.internal.types import ClientT
 
 if t.TYPE_CHECKING:
@@ -46,8 +46,8 @@ class RoleOption(CommandOptionBase[hikari.Role, ClientT, RoleParams]):
     """
 
     @property
-    def option_type(self) -> hikari.OptionType:
-        return hikari.OptionType.ROLE
+    def option_type(self) -> OptionType:
+        return OptionType.ROLE
 
     @classmethod
     def _from_params(cls, *, name: str, is_required: bool, params: RoleParams, **kwargs: t.Any) -> te.Self:

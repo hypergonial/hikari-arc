@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import abc
+import enum
 import typing as t
 from typing import Any
 
@@ -16,7 +17,15 @@ if t.TYPE_CHECKING:
     from arc.abc.client import Client
     from arc.abc.command import CommandProto
 
-__all__ = ("Option", "OptionParams", "OptionWithChoices", "OptionWithChoicesParams", "OptionBase", "CommandOptionBase")
+__all__ = (
+    "Option",
+    "OptionParams",
+    "OptionWithChoices",
+    "OptionWithChoicesParams",
+    "OptionBase",
+    "CommandOptionBase",
+    "OptionType",
+)
 
 T = t.TypeVar("T")
 
@@ -35,6 +44,65 @@ So for example, to create an `int` option, you would do:
 arc.Option[int, arc.IntParams(...)]
 ```
 """
+
+
+class OptionType(enum.IntEnum):
+    """The type of a command option.
+
+    This is practically identical to `hikari.OptionType` at the moment.
+    It may however be used in the future to define custom option types.
+    """
+
+    SUB_COMMAND = 1
+    """Denotes a command option where the value will be a sub command."""
+
+    SUB_COMMAND_GROUP = 2
+    """Denotes a command option where the value will be a sub command group."""
+
+    STRING = 3
+    """Denotes a command option where the value will be a string."""
+
+    INTEGER = 4
+    """Denotes a command option where the value will be a int.
+
+    This is range limited between -2^53 and 2^53.
+    """
+
+    BOOLEAN = 5
+    """Denotes a command option where the value will be a bool."""
+
+    USER = 6
+    """Denotes a command option where the value will be resolved to a user."""
+
+    CHANNEL = 7
+    """Denotes a command option where the value will be resolved to a channel."""
+
+    ROLE = 8
+    """Denotes a command option where the value will be resolved to a role."""
+
+    MENTIONABLE = 9
+    """Denotes a command option where the value will be a snowflake ID."""
+
+    FLOAT = 10
+    """Denotes a command option where the value will be a float.
+
+    This is range limited between -2^53 and 2^53.
+    """
+
+    ATTACHMENT = 11
+    """Denotes a command option where the value will be an attachment."""
+
+    @classmethod
+    def from_hikari(cls, option_type: hikari.OptionType) -> OptionType:
+        """Convert a hikari.OptionType to an OptionType."""
+        return cls(option_type.value)
+
+    def to_hikari(self) -> hikari.OptionType:
+        """Convert an OptionType to a hikari.OptionType."""
+        # TODO: Map custom option types to their respective hikari.OptionType
+        return hikari.OptionType(self.value)
+
+    # TODO: When adding custom convertible option types, add them with an offset of 1000 or so
 
 
 class OptionParams(t.Generic[T]):
@@ -153,13 +221,13 @@ class OptionBase(abc.ABC, t.Generic[T]):
 
     @property
     @abc.abstractmethod
-    def option_type(self) -> hikari.OptionType:
+    def option_type(self) -> OptionType:
         """The type of the option. Used to register the command."""
 
     def _to_dict(self) -> dict[str, t.Any]:
         """Convert the option to a dictionary of kwargs that can be passed to hikari.CommandOption."""
         return {
-            "type": self.option_type,
+            "type": self.option_type.to_hikari(),
             "name": self.name,
             "description": self.description,
             "autocomplete": False,

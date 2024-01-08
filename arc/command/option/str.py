@@ -3,12 +3,12 @@ from __future__ import annotations
 import typing as t
 
 import attr
-import hikari
 
-from arc.abc.option import OptionWithChoices, OptionWithChoicesParams
+from arc.abc.option import OptionType, OptionWithChoices, OptionWithChoicesParams
 from arc.internal.types import ClientT
 
 if t.TYPE_CHECKING:
+    import hikari
     import typing_extensions as te
 
     from arc.internal.types import AutocompleteCallbackT
@@ -98,8 +98,8 @@ class StrOption(OptionWithChoices[str, ClientT, StrParams[ClientT]]):
     """The maximum length of the option."""
 
     @property
-    def option_type(self) -> hikari.OptionType:
-        return hikari.OptionType.STRING
+    def option_type(self) -> OptionType:
+        return OptionType.STRING
 
     @classmethod
     def _from_params(cls, *, name: str, is_required: bool, params: StrParams[ClientT], **kwargs: t.Any) -> te.Self:

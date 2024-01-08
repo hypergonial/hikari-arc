@@ -10,7 +10,9 @@ from contextlib import suppress
 import attr
 import hikari
 
+from arc.abc.option import OptionType  # noqa: TCH001 Needed for tests
 from arc.errors import NoResponseIssuedError, ResponseAlreadyIssuedError
+from arc.internal.options import OPTIONTYPE_TO_TYPE, resolve_snowflake_value
 from arc.internal.types import ClientT, ResponseBuilderT
 from arc.locale import CustomLocaleRequest
 
@@ -252,6 +254,7 @@ class Context(t.Generic[ClientT]):
         "_created_at",
         "_autodefer_task",
         "_has_command_failed",
+        "_options",
     )
 
     def __init__(
@@ -260,6 +263,7 @@ class Context(t.Generic[ClientT]):
         self._client = client
         self._command = command
         self._interaction: hikari.CommandInteraction = interaction
+        self._options: t.Sequence[hikari.CommandInteractionOption] | None = None
         self._responses: t.MutableSequence[InteractionResponse] = []
         self._resp_builder: asyncio.Future[ResponseBuilderT] = asyncio.Future()
         self._issued_response: bool = False
@@ -403,6 +407,70 @@ class Context(t.Generic[ClientT]):
     def get_channel(self) -> hikari.TextableGuildChannel | None:
         """Gets the channel this context represents, None if in a DM. Requires application cache."""
         return self._interaction.get_channel()
+
+    @t.overload
+    def get_option(self, name: str, opt_type: t.Literal[OptionType.ATTACHMENT]) -> hikari.Attachment | None:
+        ...
+
+    @t.overload
+    def get_option(self, name: str, opt_type: t.Literal[OptionType.MENTIONABLE]) -> hikari.User | hikari.Role | None:
+        ...
+
+    @t.overload
+    def get_option(self, name: str, opt_type: t.Literal[OptionType.USER]) -> hikari.User | None:
+        ...
+
+    @t.overload
+    def get_option(self, name: str, opt_type: t.Literal[OptionType.ROLE]) -> hikari.Role | None:
+        ...
+
+    @t.overload
+    def get_option(self, name: str, opt_type: t.Literal[OptionType.CHANNEL]) -> hikari.PartialChannel | None:
+        ...
+
+    @t.overload
+    def get_option(self, name: str, opt_type: t.Literal[OptionType.STRING]) -> str | None:
+        ...
+
+    @t.overload
+    def get_option(self, name: str, opt_type: t.Literal[OptionType.BOOLEAN]) -> bool | None:
+        ...
+
+    @t.overload
+    def get_option(self, name: str, opt_type: t.Literal[OptionType.FLOAT]) -> float | None:
+        ...
+
+    @t.overload
+    def get_option(self, name: str, opt_type: t.Literal[OptionType.INTEGER]) -> int | None:
+        ...
+
+    def get_option(self, name: str, opt_type: OptionType) -> t.Any | None:
+        """Get the value of an option by name.
+
+        Parameters
+        ----------
+        name : str
+            The name of the option.
+        opt_type : hikari.OptionType
+            The type of the option.
+
+        Returns
+        -------
+        ValueT | None
+            The value of the option, or None if it does not exist, or is not of the correct type.
+        """
+        if self._options is None:
+            return None
+
+        value = next((x.value for x in self._options if x.name == name), None)
+
+        if value is hikari.Snowflake and self._interaction.resolved is not None:
+            value = resolve_snowflake_value(value, opt_type, self._interaction.resolved)
+
+        if not isinstance(value, OPTIONTYPE_TO_TYPE[opt_type]):
+            return None
+
+        return value
 
     def loc(self, key: str, use_guild: bool = True, force_locale: hikari.Locale | None = None, **kwargs: t.Any) -> str:
         """Get a localized string using the interaction's locale.

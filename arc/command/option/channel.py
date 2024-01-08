@@ -5,7 +5,7 @@ import typing as t
 import attr
 import hikari
 
-from arc.abc.option import CommandOptionBase, OptionParams
+from arc.abc.option import CommandOptionBase, OptionParams, OptionType
 from arc.internal.types import ClientT
 
 if t.TYPE_CHECKING:
@@ -57,8 +57,8 @@ class ChannelOption(CommandOptionBase[hikari.PartialChannel, ClientT, ChannelPar
     """The channel types that the option can be."""
 
     @property
-    def option_type(self) -> hikari.OptionType:
-        return hikari.OptionType.CHANNEL
+    def option_type(self) -> OptionType:
+        return OptionType.CHANNEL
 
     @classmethod
     def _from_params(cls, *, name: str, is_required: bool, params: ChannelParams, **kwargs: t.Any) -> te.Self:

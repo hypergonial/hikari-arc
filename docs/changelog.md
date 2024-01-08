@@ -11,8 +11,9 @@ Here you can find all the changelogs for `hikari-arc`.
 
 ## Unreleased
 
-- Add `Client.walk_commands()`.
-- Add `Command.display_name`, `SlashCommand.make_mention()`, `SlashSubCommand.make_mention()`.
+- Add `Context.get_option` to access options outside the command callback in a type-safe manner.
+- Add `Client.walk_commands()` to iterate over all commands & subcommands of the client.
+- Add `CallableCommandProto.display_name`, `SlashCommand.make_mention()`, `SlashSubCommand.make_mention()`.
 
 ## v0.5.0
 

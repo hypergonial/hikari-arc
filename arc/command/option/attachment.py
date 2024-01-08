@@ -5,7 +5,7 @@ import typing as t
 import attr
 import hikari
 
-from arc.abc.option import CommandOptionBase, OptionParams
+from arc.abc.option import CommandOptionBase, OptionParams, OptionType
 from arc.internal.types import ClientT
 
 if t.TYPE_CHECKING:
@@ -46,8 +46,8 @@ class AttachmentOption(CommandOptionBase[hikari.Attachment, ClientT, AttachmentP
     """
 
     @property
-    def option_type(self) -> hikari.OptionType:
-        return hikari.OptionType.ATTACHMENT
+    def option_type(self) -> OptionType:
+        return OptionType.ATTACHMENT
 
     @classmethod
     def _from_params(cls, *, name: str, is_required: bool, params: AttachmentParams, **kwargs: t.Any) -> te.Self:

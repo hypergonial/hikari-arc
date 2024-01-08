@@ -13,7 +13,7 @@ from alluka import inject
 
 from arc import abc, command
 
-from .abc import HookResult, Option, with_hook, with_post_hook
+from .abc import HookResult, Option, OptionType, with_hook, with_post_hook
 from .client import (
     Client,
     GatewayClient,
@@ -123,6 +123,7 @@ __all__ = (
     "RESTClientBase",
     "GatewayClient",
     "RESTClient",
+    "OptionType",
     "ArcError",
     "AutocompleteError",
     "UnderCooldownError",

@@ -7,9 +7,10 @@ import attr
 import hikari
 
 from arc.abc.command import CallableCommandBase, CallableCommandProto, CommandBase, SubCommandBase, _CommandSettings
-from arc.abc.option import OptionWithChoices
+from arc.abc.option import OptionType, OptionWithChoices
 from arc.context import AutocompleteData, AutodeferMode, Context
 from arc.errors import AutocompleteError, CommandInvokeError
+from arc.internal.options import resolve_options
 from arc.internal.sigparse import parse_command_signature
 from arc.internal.types import ClientT, CommandCallbackT, HookT, PostHookT, ResponseBuilderT, SlashCommandLike
 from arc.locale import CommandLocaleRequest, LocaleResponse
@@ -31,64 +32,6 @@ __all__ = (
     "slash_command",
     "slash_subcommand",
 )
-
-
-def _resolve_options(
-    local_options: t.MutableMapping[str, CommandOptionBase[ClientT, t.Any, t.Any]],
-    incoming_options: t.Sequence[hikari.CommandInteractionOption],
-    resolved: hikari.ResolvedOptionData | None,
-) -> dict[str, t.Any]:
-    """Resolve the options into kwargs for the callback.
-
-    Parameters
-    ----------
-    local_options : t.MutableMapping[str, Option[t.Any, t.Any]]
-        The options of the locally stored command.
-    incoming_options : t.Sequence[hikari.CommandInteractionOption]
-        The options of the interaction.
-    resolved : hikari.ResolvedOptionData
-        The resolved option data of the interaction.
-
-    Returns
-    -------
-    dict[str, Any]
-        The resolved options as kwargs, ready to be passed to the callback.
-    """
-    option_kwargs: dict[str, t.Any] = {}
-
-    for arg_name, opt in local_options.items():
-        inter_opt = next((o for o in incoming_options if o.name == opt.name), None)
-
-        if inter_opt is None:
-            continue
-
-        if isinstance(inter_opt.value, hikari.Snowflake) and resolved:
-            match inter_opt.type:
-                case hikari.OptionType.USER:
-                    value = resolved.members.get(inter_opt.value) or resolved.users[inter_opt.value]
-                case hikari.OptionType.ATTACHMENT:
-                    value = resolved.attachments[inter_opt.value]
-                case hikari.OptionType.CHANNEL:
-                    value = resolved.channels[inter_opt.value]
-                case hikari.OptionType.ROLE:
-                    value = resolved.roles[inter_opt.value]
-                case hikari.OptionType.MENTIONABLE:
-                    value = (
-                        resolved.members.get(inter_opt.value)
-                        or resolved.users.get(inter_opt.value)
-                        or resolved.roles[inter_opt.value]
-                    )
-                case _:
-                    raise ValueError(f"Unexpected option type '{inter_opt.type}.'")
-
-            option_kwargs[arg_name] = value
-
-        elif isinstance(inter_opt.value, hikari.Snowflake):
-            raise ValueError(f"Missing resolved option data for '{inter_opt.name}'.")
-        else:
-            option_kwargs[arg_name] = inter_opt.value
-
-    return option_kwargs
 
 
 def _choices_to_builders(
@@ -139,7 +82,9 @@ class SlashCommand(CallableCommandBase[ClientT, hikari.api.SlashCommandBuilder])
         if interaction.command_type is not hikari.CommandType.SLASH:
             raise ValueError(f"Expected slash command, got {interaction.command_type}")
 
-        return Context(self.client, command, interaction)
+        ctx = Context(self.client, command, interaction)
+        ctx._options = interaction.options
+        return ctx
 
     def _to_dict(self) -> dict[str, t.Any]:
         sorted_options = sorted(self.options.values(), key=lambda option: option.is_required, reverse=True)
@@ -169,7 +114,7 @@ class SlashCommand(CallableCommandBase[ClientT, hikari.api.SlashCommandBuilder])
             return await super().invoke(
                 interaction,
                 *args,
-                **{**kwargs, **_resolve_options(self.options, interaction.options, interaction.resolved)},
+                **{**kwargs, **resolve_options(self.options, interaction.options, interaction.resolved)},
             )
         else:
             return await super().invoke(interaction, *args, **kwargs)
@@ -195,7 +140,7 @@ class SlashCommand(CallableCommandBase[ClientT, hikari.api.SlashCommandBuilder])
         instance = self._instances.get(hikari.Snowflake(guild) if guild else None)
 
         if instance is None:
-            raise KeyError(f"Command '{self.qualified_name}' has not been published in the given scope.")
+            raise KeyError(f"Command '{self.display_name}' has not been published in the given scope.")
 
         return f"</{self.name}:{instance.id}>"
 
@@ -318,11 +263,13 @@ class SlashGroup(CommandBase[ClientT, hikari.api.SlashCommandBuilder]):
         self,
         subcommand: SlashSubCommand[ClientT],
         interaction: hikari.CommandInteraction,
+        options: t.Sequence[hikari.CommandInteractionOption] | None = None,
         *args: t.Any,
         **kwargs: t.Any,
     ) -> asyncio.Future[ResponseBuilderT] | None:
         """Invoke a subcommand."""
         ctx = self._get_context(interaction, subcommand)
+        ctx._options = options
 
         if (autodefer := subcommand.autodefer) and autodefer.should_autodefer:
             ctx._start_autodefer(autodefer)
@@ -349,12 +296,12 @@ class SlashGroup(CommandBase[ClientT, hikari.api.SlashCommandBuilder]):
         if sub.options is None:
             if not isinstance(subcmd, SlashSubCommand):
                 raise CommandInvokeError(f"Slash group got subgroup without options: '{subcmd.name}'.")
-            return await self._invoke_subcmd(subcmd, interaction, *args, **kwargs)
+            return await self._invoke_subcmd(subcmd, interaction, None, *args, **kwargs)
 
         # Resolve options and invoke if it does
         if isinstance(subcmd, SlashSubCommand):
-            res = _resolve_options(subcmd.options, sub.options, interaction.resolved)
-            return await self._invoke_subcmd(subcmd, interaction, *args, **{**kwargs, **res})
+            res = resolve_options(subcmd.options, sub.options, interaction.resolved)
+            return await self._invoke_subcmd(subcmd, interaction, sub.options, *args, **{**kwargs, **res})
 
         # Get second-order subcommand
         subsub = next((o for o in sub.options if o.name in subcmd.children), None)
@@ -366,11 +313,11 @@ class SlashGroup(CommandBase[ClientT, hikari.api.SlashCommandBuilder]):
 
         # Invoke it if it has no options
         if subsub.options is None:
-            return await self._invoke_subcmd(subsubcmd, interaction, *args, **kwargs)
+            return await self._invoke_subcmd(subsubcmd, interaction, None, *args, **kwargs)
 
         # Resolve options and invoke if it does
-        res = _resolve_options(subsubcmd.options, subsub.options, interaction.resolved)
-        return await self._invoke_subcmd(subsubcmd, interaction, *args, **{**kwargs, **res})
+        res = resolve_options(subsubcmd.options, subsub.options, interaction.resolved)
+        return await self._invoke_subcmd(subsubcmd, interaction, subsub.options, *args, **{**kwargs, **res})
 
     async def _on_autocomplete(
         self, interaction: hikari.AutocompleteInteraction
@@ -521,8 +468,8 @@ class SlashSubGroup(SubCommandBase[ClientT, SlashGroup[ClientT]]):
     """
 
     @property
-    def option_type(self) -> hikari.OptionType:
-        return hikari.OptionType.SUB_COMMAND_GROUP
+    def option_type(self) -> OptionType:
+        return OptionType.SUB_COMMAND_GROUP
 
     @property
     def command_type(self) -> hikari.CommandType:
@@ -671,8 +618,8 @@ class SlashSubCommand(
         return hikari.CommandType.SLASH
 
     @property
-    def option_type(self) -> hikari.OptionType:
-        return hikari.OptionType.SUB_COMMAND
+    def option_type(self) -> OptionType:
+        return OptionType.SUB_COMMAND
 
     @property
     def client(self) -> ClientT:
@@ -706,7 +653,7 @@ class SlashSubCommand(
         instance = self.root._instances.get(hikari.Snowflake(guild) if guild else None)
 
         if instance is None:
-            raise KeyError(f"Command '{self.qualified_name}' has not been published in the given scope.")
+            raise KeyError(f"Command '{self.display_name}' has not been published in the given scope.")
 
         return f"</{' '.join(self.qualified_name)}:{instance.id}>"
 

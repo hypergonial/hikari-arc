@@ -5,7 +5,7 @@ import typing as t
 import attr
 import hikari
 
-from arc.abc.option import CommandOptionBase, OptionParams
+from arc.abc.option import CommandOptionBase, OptionParams, OptionType
 from arc.internal.types import ClientT
 
 if t.TYPE_CHECKING:
@@ -47,8 +47,8 @@ class MentionableOption(CommandOptionBase[hikari.Role | hikari.User, ClientT, Me
     """
 
     @property
-    def option_type(self) -> hikari.OptionType:
-        return hikari.OptionType.MENTIONABLE
+    def option_type(self) -> OptionType:
+        return OptionType.MENTIONABLE
 
     @classmethod
     def _from_params(cls, *, name: str, is_required: bool, params: MentionableParams, **kwargs: t.Any) -> te.Self:
