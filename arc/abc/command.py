@@ -13,6 +13,7 @@ from arc.abc.hookable import Hookable, HookResult
 from arc.abc.limiter import LimiterProto
 from arc.abc.option import OptionBase
 from arc.context import AutodeferMode
+from arc.errors import CommandPublishFailedError
 from arc.internal.types import (
     BuilderT,
     ClientT,
@@ -292,6 +293,20 @@ class CommandBase(HasErrorHandler[ClientT], Hookable[ClientT], t.Generic[ClientT
         settings = self._resolve_settings()
         return settings.is_nsfw if settings.is_nsfw is not hikari.UNDEFINED else False
 
+    @property
+    def instances(self) -> t.Mapping[hikari.Snowflake | None, hikari.PartialCommand]:
+        """A mapping of guild IDs to command instances. None corresponds to the global instance, if any."""
+        return self._instances
+
+    @property
+    def display_name(self) -> str:
+        """The display name of this command. This is what is shown in the Discord client.
+
+        !!! note
+            Slash commands can also be mentioned, see [SlashCommand.make_mention][arc.command.SlashCommand.make_mention].
+        """
+        return self.name
+
     def _register_instance(
         self, instance: hikari.PartialCommand, guild: hikari.SnowflakeishOr[hikari.PartialGuild] | None = None
     ) -> None:
@@ -352,13 +367,15 @@ class CommandBase(HasErrorHandler[ClientT], Hookable[ClientT], t.Generic[ClientT
             raise RuntimeError("Cannot publish command without a client.")
 
         kwargs = self._to_dict()
-
-        if self.command_type is hikari.CommandType.SLASH:
-            created = await self.client.app.rest.create_slash_command(self.client.application, **kwargs)
-        else:
-            created = await self.client.app.rest.create_context_menu_command(
-                self.client.application, type=self.command_type, **kwargs
-            )
+        try:
+            if self.command_type is hikari.CommandType.SLASH:
+                created = await self.client.app.rest.create_slash_command(self.client.application, **kwargs)
+            else:
+                created = await self.client.app.rest.create_context_menu_command(
+                    self.client.application, type=self.command_type, **kwargs
+                )
+        except Exception as e:
+            raise CommandPublishFailedError(self, f"Failed to publish command '{self.display_name}'") from e
 
         self._instances[hikari.Snowflake(guild) if guild else None] = created
 
@@ -562,6 +579,15 @@ class SubCommandBase(OptionBase[ClientT], HasErrorHandler[ClientT], Hookable[Cli
 
     _parent: ParentT | None = attr.field(default=None, init=False, alias="parent")
     """The parent of this subcommand or subgroup."""
+
+    @property
+    @abc.abstractmethod
+    def display_name(self) -> str:
+        """The display name of this command. This is what is shown in the Discord client.
+
+        !!! note
+            Slash commands can also be mentioned, see [SlashCommand.make_mention][arc.command.SlashCommand.make_mention].
+        """
 
     @property
     def error_handler(self) -> ErrorHandlerCallbackT[ClientT] | None:

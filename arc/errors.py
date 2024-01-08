@@ -5,17 +5,8 @@ import typing as t
 if t.TYPE_CHECKING:
     import hikari
 
+    from arc.abc.command import CommandProto
     from arc.abc.limiter import LimiterProto
-
-__all__ = (
-    "ArcError",
-    "AutocompleteError",
-    "CommandInvokeError",
-    "ExtensionError",
-    "ExtensionLoadError",
-    "ExtensionUnloadError",
-    "NoResponseIssuedError",
-)
 
 
 class ArcError(Exception):
@@ -129,6 +120,34 @@ class UnderCooldownError(ArcError):
     def __init__(self, limiter: LimiterProto[t.Any], retry_after: float, *args: t.Any) -> None:
         self.retry_after = retry_after
         self.limiter = limiter
+        super().__init__(*args)
+
+
+class CommandPublishFailedError(ArcError):
+    """Raised when a command could not be published to Discord.
+
+    Attributes
+    ----------
+    command : arc.abc.command.CommandProto
+        The command that failed to publish.
+    """
+
+    def __init__(self, command: CommandProto, *args: t.Any) -> None:
+        self.command = command
+        super().__init__(*args)
+
+
+class GuildCommandPublishFailedError(ArcError):
+    """Raised when a set of commands could not be published to a guild.
+
+    Attributes
+    ----------
+    guild_id : hikari.Snowflake
+        The guild that commands could not be published to.
+    """
+
+    def __init__(self, guild_id: hikari.Snowflake, *args: t.Any) -> None:
+        self.guild_id = guild_id
         super().__init__(*args)
 
 

@@ -8,6 +8,8 @@ from contextlib import suppress
 
 import hikari
 
+from arc.errors import GuildCommandPublishFailedError
+
 if t.TYPE_CHECKING:
     from arc.abc.client import Client
     from arc.abc.command import CommandBase
@@ -293,7 +295,10 @@ async def _sync_commands_for_guild(
             builders.append(existing._build())
             created += 1
 
-    created = await client.app.rest.set_application_commands(client.application, builders, guild)
+    try:
+        created = await client.app.rest.set_application_commands(client.application, builders, guild)
+    except Exception as e:
+        raise GuildCommandPublishFailedError(guild_id, e, f"Failed to register commands in guild {guild_id}.") from e
 
     for existing in created:
         with suppress(KeyError):

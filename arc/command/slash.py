@@ -126,6 +126,11 @@ class SlashCommand(CallableCommandBase[ClientT, hikari.api.SlashCommandBuilder])
     def qualified_name(self) -> t.Sequence[str]:
         return (self.name,)
 
+    @property
+    def display_name(self) -> str:
+        """The display name of this command."""
+        return f"/{self.name}"
+
     def _get_context(
         self, interaction: hikari.CommandInteraction, command: CallableCommandProto[ClientT]
     ) -> Context[ClientT]:
@@ -168,6 +173,31 @@ class SlashCommand(CallableCommandBase[ClientT, hikari.api.SlashCommandBuilder])
             )
         else:
             return await super().invoke(interaction, *args, **kwargs)
+
+    def make_mention(self, *, guild: hikari.Snowflakeish | hikari.PartialGuild | None = None) -> str:
+        """Make a slash mention for this command.
+
+        Parameters
+        ----------
+        guild : hikari.SnowflakeishOr[hikari.PartialGuild] | None
+            The guild the command is registered in. If None, the global command's ID is used.
+
+        Returns
+        -------
+        str
+            The slash command mention.
+
+        Raises
+        ------
+        KeyError
+            If the command has not been published in the given guild or globally.
+        """
+        instance = self._instances.get(hikari.Snowflake(guild) if guild else None)
+
+        if instance is None:
+            raise KeyError(f"Command '{self.qualified_name}' has not been published in the given scope.")
+
+        return f"</{self.name}:{instance.id}>"
 
     async def _on_autocomplete(
         self, interaction: hikari.AutocompleteInteraction
@@ -248,6 +278,11 @@ class SlashGroup(CommandBase[ClientT, hikari.api.SlashCommandBuilder]):
     @property
     def qualified_name(self) -> t.Sequence[str]:
         return (self.name,)
+
+    @property
+    def display_name(self) -> str:
+        """The display name of this command."""
+        return f"/{self.name}"
 
     def _to_dict(self) -> dict[str, t.Any]:
         return {
@@ -498,6 +533,10 @@ class SlashSubGroup(SubCommandBase[ClientT, SlashGroup[ClientT]]):
         return (self.parent.name, self.name)
 
     @property
+    def display_name(self) -> str:
+        return "/" + " ".join(self.qualified_name)
+
+    @property
     def client(self) -> ClientT:
         """The client that includes this subgroup."""
         return self.parent.client
@@ -599,49 +638,6 @@ class SlashSubCommand(
 
     _invoke_task: asyncio.Task[t.Any] | None = attr.field(default=None, init=False)
 
-    def _resolve_settings(self) -> _CommandSettings:
-        settings = self._parent._resolve_settings() if self._parent else _CommandSettings.default()
-
-        return settings.apply(
-            _CommandSettings(
-                autodefer=self._autodefer,
-                default_permissions=hikari.UNDEFINED,
-                is_nsfw=hikari.UNDEFINED,
-                is_dm_enabled=hikari.UNDEFINED,
-            )
-        )
-
-    def _resolve_hooks(self) -> list[HookT[ClientT]]:
-        assert self._parent is not None
-        return self._parent._resolve_hooks() + self._hooks
-
-    def _resolve_post_hooks(self) -> list[PostHookT[ClientT]]:
-        assert self._parent is not None
-        return self._parent._resolve_post_hooks() + self._post_hooks
-
-    async def _handle_exception(self, ctx: Context[ClientT], exc: Exception) -> None:
-        try:
-            if self.error_handler:
-                await self.error_handler(ctx, exc)
-            else:
-                raise exc
-        except Exception as e:
-            assert self._parent is not None
-            await self._parent._handle_exception(ctx, e)
-
-    @property
-    def qualified_name(self) -> t.Sequence[str]:
-        if self._parent is None:
-            raise ValueError("Cannot get qualified name of subcommand without parent.")
-
-        if isinstance(self._parent, SlashSubGroup):
-            if self._parent._parent is None:
-                raise ValueError("Cannot get qualified name of subcommand without parent.")
-
-            return (self._parent._parent.name, self._parent.name, self.name)
-
-        return (self._parent.name, self.name)
-
     @property
     def root(self) -> SlashGroup[ClientT]:
         """The root group of this subcommand."""
@@ -655,6 +651,13 @@ class SlashSubCommand(
             return self._parent._parent
 
         return self._parent
+
+    @property
+    def qualified_name(self) -> t.Sequence[str]:
+        if isinstance(self._parent, SlashSubGroup):
+            return (self.root.name, self.parent.name, self.name)
+
+        return (self.parent.name, self.name)
 
     @property
     def parent(self) -> SlashGroup[ClientT] | SlashSubGroup[ClientT]:
@@ -685,6 +688,55 @@ class SlashSubCommand(
         autodefer = self._resolve_settings().autodefer
         assert autodefer is not hikari.UNDEFINED
         return autodefer
+
+    @property
+    def display_name(self) -> str:
+        return "/" + " ".join(self.qualified_name)
+
+    def make_mention(self, guild: hikari.Snowflakeish | hikari.PartialGuild | None = None) -> str:
+        """Make a slash mention for this command.
+
+        Returns
+        -------
+        str
+            The slash command mention.
+        """
+        instance = self.root._instances.get(hikari.Snowflake(guild) if guild else None)
+
+        if instance is None:
+            raise KeyError(f"Command '{self.qualified_name}' has not been published in the given scope.")
+
+        return f"</{' '.join(self.qualified_name)}:{instance.id}>"
+
+    def _resolve_settings(self) -> _CommandSettings:
+        settings = self._parent._resolve_settings() if self._parent else _CommandSettings.default()
+
+        return settings.apply(
+            _CommandSettings(
+                autodefer=self._autodefer,
+                default_permissions=hikari.UNDEFINED,
+                is_nsfw=hikari.UNDEFINED,
+                is_dm_enabled=hikari.UNDEFINED,
+            )
+        )
+
+    def _resolve_hooks(self) -> list[HookT[ClientT]]:
+        assert self._parent is not None
+        return self._parent._resolve_hooks() + self._hooks
+
+    def _resolve_post_hooks(self) -> list[PostHookT[ClientT]]:
+        assert self._parent is not None
+        return self._parent._resolve_post_hooks() + self._post_hooks
+
+    async def _handle_exception(self, ctx: Context[ClientT], exc: Exception) -> None:
+        try:
+            if self.error_handler:
+                await self.error_handler(ctx, exc)
+            else:
+                raise exc
+        except Exception as e:
+            assert self._parent is not None
+            await self._parent._handle_exception(ctx, e)
 
     def _request_option_locale(self, client: Client[t.Any], command: CommandProto) -> None:
         super()._request_option_locale(client, command)

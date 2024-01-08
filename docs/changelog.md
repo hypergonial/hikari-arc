@@ -9,6 +9,10 @@ hide:
 
 Here you can find all the changelogs for `hikari-arc`.
 
+## Unreleased
+
+- Add `Command.display_name`, `SlashCommand.make_mention`, `SlashSubCommand.make_mention`.
+
 ## v0.5.0
 
 - **Breaking:** Re-order OptionParams object parameters. `description=` is now the first & only positional argument. `name=` has been moved to the second parameter and is now keyword-only.
