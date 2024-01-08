@@ -145,4 +145,4 @@ This can be passed to the command decorator's `autodefer=` keyword argument:
         await context.respond("Finished!") # This will now be an ephemeral response!
     ```
 
-The `autodefer=` argument can be passed to commands and command groups. If you do not specify the setting for a specific subcommand or subgroup, it will be inherited from the parent group.
+The `autodefer=` argument can be passed to commands command groups, plugins, and the client. If you do not specify the setting for a given object, the setting will be inherited from the parent.
