@@ -50,6 +50,15 @@ class CommandProto(t.Protocol):
     def qualified_name(self) -> t.Sequence[str]:
         """The fully qualified name of this command."""
 
+    @property
+    @abc.abstractmethod
+    def display_name(self) -> str:
+        """The display name of this command. This is what is shown in the Discord client.
+
+        !!! note
+            Slash commands can also be mentioned, see [SlashCommand.make_mention][arc.command.SlashCommand.make_mention].
+        """
+
 
 class CallableCommandProto(CommandProto, t.Protocol[ClientT]):
     """A protocol for any command-like object that can be called directly.
@@ -74,6 +83,15 @@ class CallableCommandProto(CommandProto, t.Protocol[ClientT]):
     @abc.abstractmethod
     def qualified_name(self) -> t.Sequence[str]:
         """The fully qualified name of this command."""
+
+    @property
+    @abc.abstractmethod
+    def display_name(self) -> str:
+        """The display name of this command. This is what is shown in the Discord client.
+
+        !!! note
+            Slash commands can also be mentioned, see [SlashCommand.make_mention][arc.command.SlashCommand.make_mention].
+        """
 
     @property
     @abc.abstractmethod
