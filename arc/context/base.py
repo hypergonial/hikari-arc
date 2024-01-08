@@ -578,7 +578,8 @@ class Context(t.Generic[ClientT]):
         ...
 
     async def respond_with_builder(self, builder: ResponseBuilderT) -> InteractionResponse | None:
-        """Respond to the interaction with a builder.
+        """Respond to the interaction with a builder. This method will try to turn the builder into a valid
+        response or followup, depending on the builder type and interaction state.
 
         Parameters
         ----------
@@ -593,13 +594,13 @@ class Context(t.Generic[ClientT]):
         Raises
         ------
         RuntimeError
-            The interaction was already issued an initial response.
+            The interaction was already issued an initial response and the builder can only be used for initial responses.
         """
         async with self._response_lock:
-            if self._issued_response:
+            if self._issued_response and not isinstance(builder, hikari.api.InteractionMessageBuilder):
                 raise RuntimeError("This interaction was already issued an initial response.")
 
-            if self.client.is_rest:
+            if self.client.is_rest and not self._issued_response:
                 self._resp_builder.set_result(builder)
                 self._issued_response = True
                 if not isinstance(builder, hikari.api.InteractionModalBuilder):
@@ -608,25 +609,38 @@ class Context(t.Generic[ClientT]):
                 return
 
             if isinstance(builder, hikari.api.InteractionMessageBuilder):
-                await self.interaction.create_initial_response(
-                    response_type=hikari.ResponseType.MESSAGE_CREATE,
-                    content=builder.content,
-                    tts=builder.is_tts,
-                    components=builder.components,
-                    attachments=builder.attachments,
-                    embeds=builder.embeds,
-                    mentions_everyone=builder.mentions_everyone,
-                    user_mentions=builder.user_mentions,
-                    role_mentions=builder.role_mentions,
-                    flags=builder.flags,
-                )
+                if not self._issued_response:
+                    await self.interaction.create_initial_response(
+                        response_type=hikari.ResponseType.MESSAGE_CREATE,
+                        content=builder.content,
+                        tts=builder.is_tts,
+                        components=builder.components,
+                        attachments=builder.attachments,
+                        embeds=builder.embeds,
+                        mentions_everyone=builder.mentions_everyone,
+                        user_mentions=builder.user_mentions,
+                        role_mentions=builder.role_mentions,
+                        flags=builder.flags,
+                    )
+                else:
+                    await self.interaction.execute(
+                        content=builder.content,
+                        tts=builder.is_tts,
+                        components=builder.components or hikari.UNDEFINED,
+                        attachments=builder.attachments or hikari.UNDEFINED,
+                        embeds=builder.embeds or hikari.UNDEFINED,
+                        mentions_everyone=builder.mentions_everyone,
+                        user_mentions=builder.user_mentions,
+                        role_mentions=builder.role_mentions,
+                        flags=builder.flags,
+                    )
             elif isinstance(builder, hikari.api.InteractionDeferredBuilder):
                 await self.interaction.create_initial_response(
                     response_type=hikari.ResponseType.DEFERRED_MESSAGE_CREATE, flags=builder.flags
                 )
             else:
                 await self.interaction.create_modal_response(
-                    title=builder.title, custom_id=builder.custom_id, components=builder.components
+                    title=builder.title, custom_id=builder.custom_id, components=builder.components or hikari.UNDEFINED
                 )
 
             self._issued_response = True
