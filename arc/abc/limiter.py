@@ -33,20 +33,6 @@ class LimiterProto(t.Protocol, t.Generic[ClientT]):
         """
 
     @abc.abstractmethod
-    async def acquire(self, ctx: Context[ClientT], *, wait: bool = True) -> None:
-        """Acquire the limiter with the given context.
-        Implementations should raise an exception if the limiter is ratelimited
-        and wait is False.
-
-        Parameters
-        ----------
-        ctx : Context
-            The context to evaluate the ratelimit under.
-        wait : bool
-            Whether or not to block until the limiter is available.
-        """
-
-    @abc.abstractmethod
     def reset(self, ctx: Context[ClientT]) -> None:
         """Reset the limiter for the given context.
 
