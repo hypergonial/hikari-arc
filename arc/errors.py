@@ -111,10 +111,10 @@ class UnderCooldownError(ArcError):
 
     Attributes
     ----------
-    retry_after : float
-        The amount of time in seconds until the command is off cooldown.
     limiter : arc.abc.limiter.LimiterProto
         The limiter that was rate limited.
+    retry_after : float
+        The amount of time in seconds until the command is off cooldown.
     """
 
     def __init__(self, limiter: LimiterProto[t.Any], retry_after: float, *args: t.Any) -> None:

@@ -1,5 +1,5 @@
 from .hooks import (
-    RateLimiter,
+    LimiterHook,
     bot_has_permissions,
     channel_limiter,
     custom_limiter,
@@ -12,6 +12,7 @@ from .hooks import (
     owner_only,
     user_limiter,
 )
+from .ratelimiter import RateLimiter, RateLimiterExhaustedError
 
 __all__ = (
     "guild_only",
@@ -25,7 +26,9 @@ __all__ = (
     "member_limiter",
     "channel_limiter",
     "custom_limiter",
+    "LimiterHook",
     "RateLimiter",
+    "RateLimiterExhaustedError",
 )
 
 # MIT License

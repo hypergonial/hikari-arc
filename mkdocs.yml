@@ -89,6 +89,7 @@ nav:
             - Hooks:
                 - api_reference/utils/hooks/basic.md
                 - api_reference/utils/hooks/limiters.md
+            - api_reference/utils/ratelimiter.md
         - ABC:
             - api_reference/abc/index.md
             - api_reference/abc/client.md

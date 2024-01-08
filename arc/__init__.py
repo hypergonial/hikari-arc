@@ -11,7 +11,7 @@ https://arc.hypergonial.com
 from alluka import Client as Injector
 from alluka import inject
 
-from arc import abc, command
+from arc import abc, command, utils
 
 from .abc import HookResult, Option, OptionType, with_hook, with_post_hook
 from .client import (
@@ -154,6 +154,7 @@ __all__ = (
     "CommandLocaleRequest",
     "OptionLocaleRequest",
     "abc",
+    "utils",
     "command",
     "with_hook",
     "with_post_hook",

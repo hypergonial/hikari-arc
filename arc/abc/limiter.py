@@ -12,12 +12,15 @@ if t.TYPE_CHECKING:
 
 @t.runtime_checkable
 class LimiterProto(t.Protocol, t.Generic[ClientT]):
-    """A protocol that all ratelimiters should implement.
+    """A protocol that all limiter hooks should implement.
     A limiter is simply a special type of hook with added methods.
 
     If you're looking to integrate your own ratelimiter implementation,
     you should make sure to implement all methods defined here.
-    An easy (but not necessary) way to do this is to simply inherit from this class.
+
+    !!! tip
+        An easy (but not necessary) way to ensure you've implemented all methods
+        is to inherit from this protocol.
     """
 
     @abc.abstractmethod

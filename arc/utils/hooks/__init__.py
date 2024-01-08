@@ -1,6 +1,6 @@
 from .basic import bot_has_permissions, dm_only, guild_only, has_permissions, owner_only
 from .limiters import (
-    RateLimiter,
+    LimiterHook,
     channel_limiter,
     custom_limiter,
     global_limiter,
@@ -21,5 +21,5 @@ __all__ = (
     "user_limiter",
     "member_limiter",
     "custom_limiter",
-    "RateLimiter",
+    "LimiterHook",
 )
