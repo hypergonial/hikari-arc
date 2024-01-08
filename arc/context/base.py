@@ -276,11 +276,11 @@ class Context(t.Generic[ClientT]):
     def interaction(self) -> hikari.CommandInteraction:
         """The underlying interaction object.
 
-        .. warning::
+        !!! warning
             This should not be used directly in most cases, and is only exposed for advanced use cases.
 
-            If you use the interaction to create a response in a view,
-            you should disable the autodefer feature in your View.
+            If you use the interaction to create a response,
+            you should disable the autodefer feature in your command.
         """
         return self._interaction
 

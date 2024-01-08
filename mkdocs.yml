@@ -125,6 +125,10 @@ markdown_extensions:
       custom_checkbox: true
   - attr_list
   - md_in_html
+  - tables
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
 
 plugins:
   - autorefs
@@ -139,6 +143,7 @@ plugins:
             - https://docs.hikari-py.dev/en/latest/objects.inv
             - https://alluka.cursed.solutions/objects.inv
           options:
+            heading_level: 3
             annotations_path: source
             docstring_section_style: spacy
             docstring_style: numpy
@@ -148,6 +153,10 @@ plugins:
             show_signature_annotations: true
             show_source: false
             show_submodules: false
+            signature_crossrefs: true
+            show_symbol_type_heading: true
+            extensions:
+                - griffe_inherited_docstrings
 watch:
   - docs
   - README.md

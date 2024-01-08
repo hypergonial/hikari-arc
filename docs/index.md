@@ -15,7 +15,17 @@ hide:
 
 Welcome to the documentation for `hikari-arc`, a command handler built on [`hikari`](https://github.com/hikari-py/hikari) with a focus on type-safety & correctness, making the creation of commands on Discord easy!
 
-See [Getting Started](./getting_started.md) on how to get started, or the [Guides](./guides/index.md) for learning material on specific topics.
+<div class="grid cards" markdown>
+
+- [:octicons-arrow-right-24: Get Started](./getting_started.md)
+- [:octicons-book-24: Guides](./guides/index.md)
+
+</div>
+
+
+
+
+
 
 ## Helpful Resources
 
