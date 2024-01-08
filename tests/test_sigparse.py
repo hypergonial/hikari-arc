@@ -1,5 +1,4 @@
 import inspect
-import typing as t
 
 import hikari
 import pytest
@@ -172,11 +171,8 @@ def test_ensure_parse_channel_types_has_every_channel_class() -> None:
 
 def test_ensure_option_types_has_every_option() -> None:
     for _, attribute in inspect.getmembers(
-        arc, lambda a: isinstance(a, type) and issubclass(a, arc.abc.option.CommandOptionBase)
+        arc.command.option, lambda a: isinstance(a, type) and issubclass(a, arc.abc.option.CommandOptionBase)
     ):
-        if attribute is arc.abc.option.CommandOptionBase[t.Any, t.Any, t.Any]:
-            continue
-
         assert (
             attribute in TYPE_TO_OPTION_MAPPING.values()
         ), f"Missing option type for {attribute} in TYPE_TO_OPTION_MAPPING"
