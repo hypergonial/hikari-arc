@@ -24,7 +24,6 @@ EventT = t.TypeVar("EventT", bound="hikari.Event")
 BuilderT = t.TypeVar("BuilderT", bound="hikari.api.SlashCommandBuilder | hikari.api.ContextMenuCommandBuilder")
 ParamsT = t.TypeVar("ParamsT", bound="OptionParams[t.Any]")
 HookableT = t.TypeVar("HookableT", bound="Hookable[t.Any]")
-P = t.ParamSpec("P")
 
 # Type aliases
 EventCallbackT: t.TypeAlias = "t.Callable[[EventT], t.Awaitable[None]]"
