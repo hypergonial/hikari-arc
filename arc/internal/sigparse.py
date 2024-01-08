@@ -41,6 +41,7 @@ TYPE_TO_OPTION_MAPPING: dict[t.Type[t.Any], t.Type[CommandOptionBase[t.Any, t.An
     int: IntOption,
     str: StrOption,
     float: FloatOption,
+    hikari.Role: RoleOption,
     hikari.User | hikari.Role: MentionableOption,
     t.Union[hikari.User, hikari.Role]: MentionableOption,
     hikari.Attachment: AttachmentOption,

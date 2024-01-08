@@ -1,10 +1,16 @@
 import inspect
+import typing as t
 
 import hikari
 import pytest
 
 import arc
-from arc.internal.sigparse import CHANNEL_TYPES_MAPPING, TYPE_TO_OPTION_MAPPING, parse_command_signature
+from arc.internal.sigparse import (
+    CHANNEL_TYPES_MAPPING,
+    OPT_TO_PARAMS_MAPPING,
+    TYPE_TO_OPTION_MAPPING,
+    parse_command_signature,
+)
 
 
 async def correct_command(
@@ -162,6 +168,20 @@ def test_ensure_parse_channel_types_has_every_channel_class() -> None:
         result = attribute in TYPE_TO_OPTION_MAPPING
 
         assert result is True, f"Missing channel type for {attribute} in TYPE_TO_OPTION_MAPPING"
+
+
+def test_ensure_option_types_has_every_option() -> None:
+    for _, attribute in inspect.getmembers(
+        arc, lambda a: isinstance(a, type) and issubclass(a, arc.abc.option.CommandOptionBase)
+    ):
+        if attribute is arc.abc.option.CommandOptionBase[t.Any, t.Any, t.Any]:
+            continue
+
+        assert (
+            attribute in TYPE_TO_OPTION_MAPPING.values()
+        ), f"Missing option type for {attribute} in TYPE_TO_OPTION_MAPPING"
+
+        assert attribute in OPT_TO_PARAMS_MAPPING, f"Missing option type for {attribute} in OPT_TO_PARAMS_MAPPING"
 
 
 # MIT License
