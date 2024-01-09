@@ -13,6 +13,7 @@ Here you can find all the changelogs for `hikari-arc`.
 
 - Add [loops](./guides/loops.md). Loops can be used to repeatedly call a given coroutine function with a specific interval or cron set.
 - Add [concurrency limiters](./guides/concurrency_limiting.md). Concurrency limiters can be used to prevent users from invoking a command that already has a specific amount of instances running.
+- Fix command groups always being republished when command syncing.
 
 ## v0.6.0
 

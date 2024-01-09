@@ -25,32 +25,6 @@ logger = logging.getLogger(__name__)
 # https://github.com/tandemdude/hikari-lightbulb/blob/master/lightbulb/internal.py
 
 
-def _command_option_to_dict(option: hikari.CommandOption) -> dict[str, t.Any]:
-    """Convert a hikari.CommandOption to a dictionary for comparison.
-
-    Parameters
-    ----------
-    option : hikari.CommandOption
-        The option to convert.
-    """
-    return {
-        "type": option.type,
-        "name": option.name,
-        "description": option.description,
-        "required": option.is_required,
-        "choices": option.choices,
-        "options": sorted((_command_option_to_dict(suboption) for suboption in option.options), key=lambda o: o["name"])
-        if option.options is not None
-        else [],
-        "channel_types": sorted(option.channel_types) if option.channel_types is not None else [],
-        "min_value": option.min_value,
-        "max_value": option.max_value,
-        "autocomplete": option.autocomplete,
-        "min_length": option.min_length,
-        "max_length": option.max_length,
-    }
-
-
 def _rebuild_hikari_command(
     command: hikari.PartialCommand,
 ) -> hikari.api.SlashCommandBuilder | hikari.api.ContextMenuCommandBuilder:
@@ -113,7 +87,7 @@ def _compare_commands(arc_command: CommandBase[t.Any, t.Any], hk_command: hikari
         Whether the two commands are equal.
     """
     cmd_dict = arc_command._to_dict()
-    fl_options: list[hikari.CommandOption] = sorted(cmd_dict.get("options", None) or [], key=lambda o: o.name)
+    arc_options: list[hikari.CommandOption] = sorted(cmd_dict.get("options", None) or [], key=lambda o: o.name)
     hk_options: list[hikari.CommandOption] = sorted(getattr(hk_command, "options", None) or [], key=lambda o: o.name)
 
     return (
@@ -127,7 +101,7 @@ def _compare_commands(arc_command: CommandBase[t.Any, t.Any], hk_command: hikari
             if hk_command.guild_id is not None and arc_command.guilds is not hikari.UNDEFINED
             else True
         )
-        and fl_options == hk_options
+        and arc_options == hk_options
         and (arc_command.default_permissions or hikari.Permissions.NONE) == hk_command.default_member_permissions
         and arc_command.name_localizations == hk_command.name_localizations
         and cmd_dict.get("description_localizations", None) == getattr(hk_command, "description_localizations", None)

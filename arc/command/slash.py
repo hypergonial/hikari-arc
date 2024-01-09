@@ -89,12 +89,14 @@ class SlashCommand(CallableCommandBase[ClientT, hikari.api.SlashCommandBuilder])
 
     def _to_dict(self) -> dict[str, t.Any]:
         sorted_options = sorted(self.options.values(), key=lambda option: option.is_required, reverse=True)
-        return {
+        payload = {
             **super()._to_dict(),
             "description": self.description,
             "description_localizations": self.description_localizations,
-            "options": [option.to_command_option() for option in sorted_options],
         }
+        if sorted_options:
+            payload["options"] = [option.to_command_option() for option in sorted_options]
+        return payload
 
     def _build(self) -> hikari.api.SlashCommandBuilder:
         return hikari.impl.SlashCommandBuilder(
@@ -231,12 +233,14 @@ class SlashGroup(CommandBase[ClientT, hikari.api.SlashCommandBuilder]):
         return f"/{self.name}"
 
     def _to_dict(self) -> dict[str, t.Any]:
-        return {
+        payload = {
             **super()._to_dict(),
             "description": self.description,
             "description_localizations": self.description_localizations,
-            "options": [subcmd.to_command_option() for subcmd in self.children.values()],
         }
+        if self.children:
+            payload["options"] = [subcmd.to_command_option() for subcmd in self.children.values()]
+        return payload
 
     def _get_context(
         self, interaction: hikari.CommandInteraction, command: CallableCommandProto[ClientT]
@@ -502,10 +506,10 @@ class SlashSubGroup(SubCommandBase[ClientT, SlashGroup[ClientT]]):
         return autodefer
 
     def _to_dict(self) -> dict[str, t.Any]:
-        return {
-            **super()._to_dict(),
-            "options": [subcommand.to_command_option() for subcommand in self.children.values()],
-        }
+        payload = super()._to_dict()
+        if self.children:
+            payload["options"] = [subcmd.to_command_option() for subcmd in self.children.values()]
+        return payload
 
     def _resolve_settings(self) -> _CommandSettings:
         settings = self._parent._resolve_settings() if self._parent else _CommandSettings.default()
@@ -722,8 +726,11 @@ class SlashSubCommand(
         return await self.root._invoke_subcmd(self, interaction, *args, **kwargs)
 
     def _to_dict(self) -> dict[str, t.Any]:
+        payload = super()._to_dict()
         sorted_options = sorted(self.options.values(), key=lambda option: option.is_required, reverse=True)
-        return {**super()._to_dict(), "options": [option.to_command_option() for option in sorted_options]}
+        if sorted_options:
+            payload["options"] = [option.to_command_option() for option in sorted_options]
+        return payload
 
 
 def slash_command(
