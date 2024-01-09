@@ -24,8 +24,12 @@ To create a loop, you should decorate an async function with either [`@arc.utils
 async def loopy_loop(value: int) -> None:
     print(value)
 
-# Start the loop by passing all the parameters the function needs
-loopy_loop.start(value=10)
+# Somewhere else:
+
+@client.set_startup_hook
+async def startup(client: arc.GatewayClient) -> None:
+    # Start the loop by passing all the parameters it needs
+    loopy_loop.start(value=10)
 ```
 
 If a decorator doesn't suit your needs, you may also use the [`IntervalLoop`][arc.utils.loops.IntervalLoop] and [`CronLoop`][arc.utils.loops.CronLoop] classes directly:
@@ -34,11 +38,15 @@ If a decorator doesn't suit your needs, you may also use the [`IntervalLoop`][ar
 async def loopy_loop(value: int) -> None:
     print(value)
 
-# Create a loop out by passing the function in
+# Create a loop by passing the function in
 loop = arc.utils.IntervalLoop(loopy_loop, seconds=10.0)
 
-# Start the loop by passing all the parameters the function needs
-loop.start(value=10)
+# Somewhere else:
+
+@client.set_startup_hook
+async def startup(client: arc.GatewayClient) -> None:
+    # Start the loop by passing all the parameters it needs
+    loop.start(value=10)
 ```
 
 This is identical to using the decorator from above.
