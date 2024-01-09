@@ -11,7 +11,7 @@ description: A guide on interactions, what they are, and how they work.
 
 ## What is an "interaction" anyway?
 
-Before interactions, there was only one way to make a bot communicate with users on Discord. You could listen to events through the gateway, and if you so chose, respond to them. However this wasn't ideal, since for example, if you wanted to create a bot that listens for messages that start with `!` (as a common bot-prefix), you would have to scan every single message that is sent, just to find the ones that were meant for your bot. This also created issues with multiple bots potentially sharing the same common prefix, along with privacy concerns, since bots had the right (and practically the requirement) to read every single message.
+Before interactions, there was only one way to make a bot communicate with users on Discord. You could listen to [events](./events.md) through the gateway, and if you so chose, respond to them. However this wasn't ideal, since for example, if you wanted to create a bot that listens for messages that start with `!` (as a common bot-prefix), you would have to scan every single message that is sent, just to find the ones that were meant for your bot. This also created issues with multiple bots potentially sharing the same common prefix, along with privacy concerns, since bots had the right (and practically the requirement) to read every single message.
 
 **Interactions** were devised as a sort of "targeted event" by Discord to specifically prompt a bot to respond to user action. Instead of the bot having to listen to every single event through the gateway, it is simply "called to action" by Discord when the bot is requested to perform a specific action. These actions include:
 
