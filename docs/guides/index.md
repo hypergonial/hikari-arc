@@ -104,6 +104,15 @@ If you think something is missing or inaccurate, please [open an issue](https://
 
     [:octicons-arrow-right-24: Learn more](./loops.md)
 
+-   :material-wall:{ .lg .middle } **Limiting Concurrency**
+
+    ---
+
+    Prevent users from invoking your command while it is already running
+    with customizable concurrency limiters!
+
+    [:octicons-arrow-right-24: Learn more](./concurrency_limiting.md)
+
 -   :material-message-alert:{ .lg .middle } **Events**
 
     ---

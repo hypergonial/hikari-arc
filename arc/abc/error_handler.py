@@ -10,7 +10,7 @@ if t.TYPE_CHECKING:
 
 
 class HasErrorHandler(abc.ABC, t.Generic[ClientT]):
-    """An interface for objects that can have an error handler set on them."""
+    """A trait for objects that can have an error handler set on them."""
 
     @property
     @abc.abstractmethod

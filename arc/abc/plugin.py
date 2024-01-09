@@ -9,6 +9,7 @@ import typing as t
 import hikari
 
 from arc.abc.command import _CommandSettings
+from arc.abc.concurrency_limiting import ConcurrencyLimiterProto, HasConcurrencyLimiter
 from arc.abc.error_handler import HasErrorHandler
 from arc.abc.hookable import Hookable
 from arc.command import MessageCommand, SlashCommand, SlashGroup, UserCommand
@@ -25,7 +26,7 @@ P = t.ParamSpec("P")
 T = t.TypeVar("T")
 
 
-class PluginBase(HasErrorHandler[ClientT], Hookable[ClientT]):
+class PluginBase(HasErrorHandler[ClientT], Hookable[ClientT], HasConcurrencyLimiter[ClientT]):
     """An abstract base class for plugins.
 
     Parameters
@@ -81,6 +82,7 @@ class PluginBase(HasErrorHandler[ClientT], Hookable[ClientT]):
         self._error_handler: ErrorHandlerCallbackT[ClientT] | None = None
         self._hooks: list[HookT[ClientT]] = []
         self._post_hooks: list[PostHookT[ClientT]] = []
+        self._concurrency_limiter: ConcurrencyLimiterProto[ClientT] | None = None
 
     @property
     def error_handler(self) -> ErrorHandlerCallbackT[ClientT] | None:
@@ -91,6 +93,16 @@ class PluginBase(HasErrorHandler[ClientT], Hookable[ClientT]):
     def error_handler(self, callback: ErrorHandlerCallbackT[ClientT] | None) -> None:
         """Set the error handler for this plugin."""
         self._error_handler = callback
+
+    @property
+    def concurrency_limiter(self) -> ConcurrencyLimiterProto[ClientT] | None:
+        """The concurrency limiter for this plugin."""
+        return self._concurrency_limiter
+
+    @concurrency_limiter.setter
+    def concurrency_limiter(self, limiter: ConcurrencyLimiterProto[ClientT] | None) -> None:
+        """Set the concurrency limiter for this plugin."""
+        self._concurrency_limiter = limiter
 
     @property
     def hooks(self) -> t.MutableSequence[HookT[ClientT]]:
@@ -140,10 +152,13 @@ class PluginBase(HasErrorHandler[ClientT], Hookable[ClientT]):
         return settings.apply(self._cmd_settings)
 
     def _resolve_hooks(self) -> list[HookT[ClientT]]:
-        return self._hooks
+        return self.client._hooks + self._hooks
 
     def _resolve_post_hooks(self) -> list[PostHookT[ClientT]]:
-        return self._post_hooks
+        return self.client._post_hooks + self._post_hooks
+
+    def _resolve_concurrency_limiter(self) -> ConcurrencyLimiterProto[ClientT] | None:
+        return self._concurrency_limiter or self.client._concurrency_limiter
 
     def _client_include_hook(self, client: ClientT) -> None:
         if client._plugins.get(self.name) is not None:

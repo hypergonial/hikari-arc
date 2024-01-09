@@ -13,7 +13,7 @@ from alluka import inject
 
 from arc import abc, command, utils
 
-from .abc import HookResult, Option, OptionType, with_hook, with_post_hook
+from .abc import HookResult, Option, OptionType, with_concurrency_limit, with_hook, with_post_hook
 from .client import (
     Client,
     GatewayClient,
@@ -56,6 +56,7 @@ from .errors import (
     GuildCommandPublishFailedError,
     GuildOnlyError,
     InvokerMissingPermissionsError,
+    MaxConcurrencyReachedError,
     NotOwnerError,
     UnderCooldownError,
 )
@@ -73,15 +74,21 @@ from .locale import (
 from .plugin import GatewayPluginBase, PluginBase, RESTPluginBase
 from .utils import (
     bot_has_permissions,
+    channel_concurrency,
     channel_limiter,
+    custom_concurrency,
     custom_limiter,
     dm_only,
+    global_concurrency,
     global_limiter,
+    guild_concurrency,
     guild_limiter,
     guild_only,
     has_permissions,
+    member_concurrency,
     member_limiter,
     owner_only,
+    user_concurrency,
     user_limiter,
 )
 
@@ -134,6 +141,7 @@ __all__ = (
     "CommandInvokeError",
     "GuildCommandPublishFailedError",
     "CommandPublishFailedError",
+    "MaxConcurrencyReachedError",
     "PluginBase",
     "RESTPluginBase",
     "GatewayPluginBase",
@@ -165,10 +173,17 @@ __all__ = (
     "owner_only",
     "global_limiter",
     "guild_limiter",
+    "with_concurrency_limit",
     "channel_limiter",
     "user_limiter",
     "member_limiter",
     "custom_limiter",
+    "global_concurrency",
+    "user_concurrency",
+    "guild_concurrency",
+    "channel_concurrency",
+    "member_concurrency",
+    "custom_concurrency",
 )
 
 # MIT License

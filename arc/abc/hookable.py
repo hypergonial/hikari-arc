@@ -26,7 +26,7 @@ class HookResult:
 
 
 class Hookable(abc.ABC, t.Generic[ClientT]):
-    """An interface for objects that can have hooks set on them."""
+    """A trait for objects that can have hooks added to them."""
 
     @property
     @abc.abstractmethod

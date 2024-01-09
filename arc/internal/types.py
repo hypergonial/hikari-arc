@@ -6,6 +6,7 @@ if t.TYPE_CHECKING:
     import hikari
 
     from arc.abc import Client, Hookable, HookResult, OptionParams
+    from arc.abc.concurrency_limiting import HasConcurrencyLimiter
     from arc.client import GatewayClientBase, RESTClientBase
     from arc.command import SlashCommand, SlashGroup
     from arc.context import AutocompleteData, Context
@@ -24,6 +25,7 @@ EventT = t.TypeVar("EventT", bound="hikari.Event")
 BuilderT = t.TypeVar("BuilderT", bound="hikari.api.SlashCommandBuilder | hikari.api.ContextMenuCommandBuilder")
 ParamsT = t.TypeVar("ParamsT", bound="OptionParams[t.Any]")
 HookableT = t.TypeVar("HookableT", bound="Hookable[t.Any]")
+HasConcurrencyLimiterT = t.TypeVar("HasConcurrencyLimiterT", bound="HasConcurrencyLimiter[t.Any]")
 
 # Type aliases
 EventCallbackT: t.TypeAlias = "t.Callable[[EventT], t.Awaitable[None]]"

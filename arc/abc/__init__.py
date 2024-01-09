@@ -1,7 +1,9 @@
 from .client import Client
 from .command import CallableCommandBase, CallableCommandProto, CommandBase, CommandProto
+from .concurrency_limiting import ConcurrencyLimiterProto, HasConcurrencyLimiter, with_concurrency_limit
 from .error_handler import HasErrorHandler
 from .hookable import Hookable, HookResult, with_hook, with_post_hook
+from .limiter import LimiterProto
 from .option import (
     CommandOptionBase,
     Option,
@@ -15,6 +17,7 @@ from .plugin import PluginBase
 
 __all__ = (
     "HasErrorHandler",
+    "HasConcurrencyLimiter",
     "CommandBase",
     "CommandProto",
     "CallableCommandProto",
@@ -30,8 +33,11 @@ __all__ = (
     "PluginBase",
     "Hookable",
     "HookResult",
+    "LimiterProto",
+    "ConcurrencyLimiterProto",
     "with_hook",
     "with_post_hook",
+    "with_concurrency_limit",
 )
 
 # MIT License

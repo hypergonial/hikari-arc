@@ -41,7 +41,7 @@ class LimiterHook(RateLimiter[Context[ClientT]], LimiterProto[ClientT]):
     - [`custom_limiter`][arc.utils.hooks.limiters.custom_limiter]
     """
 
-    async def acquire(self, ctx: Context[ClientT], *, wait: bool = True) -> None:
+    async def acquire(self, ctx: Context[ClientT], /, *, wait: bool = True) -> None:
         """Acquire a bucket, block execution if ratelimited and wait is True.
 
         Parameters
@@ -188,6 +188,7 @@ def custom_limiter(period: float, limit: int, get_key_with: t.Callable[[Context[
     Examples
     --------
     ```py
+    # This is identical to 'arc.guild_limiter(5.0, 1)'
     @arc.with_hook(arc.custom_limiter(5.0, 1, lambda ctx: str(ctx.guild_id)))
     ```
     """

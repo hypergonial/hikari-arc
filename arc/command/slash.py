@@ -20,6 +20,7 @@ if t.TYPE_CHECKING:
 
     from arc.abc.client import Client
     from arc.abc.command import CommandProto
+    from arc.abc.concurrency_limiting import ConcurrencyLimiterProto
     from arc.abc.option import CommandOptionBase
     from arc.abc.plugin import PluginBase
 
@@ -526,6 +527,10 @@ class SlashSubGroup(SubCommandBase[ClientT, SlashGroup[ClientT]]):
         assert self._parent is not None
         return self._parent._resolve_post_hooks() + self._post_hooks
 
+    def _resolve_concurrency_limiter(self) -> ConcurrencyLimiterProto[ClientT] | None:
+        assert self._parent is not None
+        return self._parent._resolve_concurrency_limiter()
+
     async def _handle_exception(self, ctx: Context[ClientT], exc: Exception) -> None:
         try:
             if self.error_handler:
@@ -676,6 +681,10 @@ class SlashSubCommand(
     def _resolve_post_hooks(self) -> list[PostHookT[ClientT]]:
         assert self._parent is not None
         return self._parent._resolve_post_hooks() + self._post_hooks
+
+    def _resolve_concurrency_limiter(self) -> ConcurrencyLimiterProto[ClientT] | None:
+        assert self._parent is not None
+        return self._parent._resolve_concurrency_limiter()
 
     async def _handle_exception(self, ctx: Context[ClientT], exc: Exception) -> None:
         try:

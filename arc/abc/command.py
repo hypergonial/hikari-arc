@@ -8,12 +8,13 @@ import typing as t
 import attr
 import hikari
 
+from arc.abc.concurrency_limiting import ConcurrencyLimiterProto, HasConcurrencyLimiter
 from arc.abc.error_handler import HasErrorHandler
 from arc.abc.hookable import Hookable, HookResult
 from arc.abc.limiter import LimiterProto
 from arc.abc.option import OptionBase
 from arc.context import AutodeferMode
-from arc.errors import CommandPublishFailedError
+from arc.errors import CommandPublishFailedError, MaxConcurrencyReachedError
 from arc.internal.types import (
     BuilderT,
     ClientT,
@@ -105,7 +106,7 @@ class CallableCommandProto(CommandProto, t.Protocol[ClientT]):
 
     @abc.abstractmethod
     def reset_all_limiters(self, context: Context[ClientT]) -> None:
-        """Reset all limiters for this command.
+        """Reset all limiter hooks for this command.
 
         Parameters
         ----------
@@ -155,17 +156,27 @@ class CallableCommandProto(CommandProto, t.Protocol[ClientT]):
 
     @abc.abstractmethod
     async def _handle_exception(self, ctx: Context[ClientT], exc: Exception) -> None:
-        ...
+        """Handle an exception that occurred while invoking this command.
+
+        Parameters
+        ----------
+        ctx : Context
+            The context that the exception occurred in.
+        exc : Exception
+            The exception that occurred.
+        """
 
     @abc.abstractmethod
     def _resolve_hooks(self) -> t.Sequence[HookT[ClientT]]:
         """Resolve all pre-execution hooks that apply to this object."""
-        ...
 
     @abc.abstractmethod
     def _resolve_post_hooks(self) -> t.Sequence[PostHookT[ClientT]]:
         """Resolve all post-execution hooks that apply to this object."""
-        ...
+
+    @abc.abstractmethod
+    def _resolve_concurrency_limiter(self) -> ConcurrencyLimiterProto[ClientT] | None:
+        """Resolve the concurrency limiter for this object."""
 
 
 @t.final
@@ -196,7 +207,9 @@ class _CommandSettings:
 
 
 @attr.define(slots=True, kw_only=True)
-class CommandBase(HasErrorHandler[ClientT], Hookable[ClientT], t.Generic[ClientT, BuilderT]):
+class CommandBase(
+    HasErrorHandler[ClientT], Hookable[ClientT], HasConcurrencyLimiter[ClientT], t.Generic[ClientT, BuilderT]
+):
     """An abstract base class for all application commands.
 
     This notably does not include subcommands & subgroups as those are in reality options.
@@ -238,6 +251,9 @@ class CommandBase(HasErrorHandler[ClientT], Hookable[ClientT], t.Generic[ClientT
     _error_handler: ErrorHandlerCallbackT[ClientT] | None = attr.field(init=False, default=None)
     """The error handler for this command."""
 
+    _concurrency_limiter: ConcurrencyLimiterProto[ClientT] | None = attr.field(init=False, default=None)
+    """The concurrency limiter for this command."""
+
     _hooks: list[HookT[ClientT]] = attr.field(init=False, factory=list)
     """The pre-execution hooks for this command."""
 
@@ -253,6 +269,16 @@ class CommandBase(HasErrorHandler[ClientT], Hookable[ClientT], t.Generic[ClientT
     def error_handler(self, callback: ErrorHandlerCallbackT[ClientT] | None) -> None:
         """Set the error handler for this command."""
         self._error_handler = callback
+
+    @property
+    def concurrency_limiter(self) -> ConcurrencyLimiterProto[ClientT] | None:
+        """The concurrency limiter for this command."""
+        return self._concurrency_limiter
+
+    @concurrency_limiter.setter
+    def concurrency_limiter(self, limiter: ConcurrencyLimiterProto[ClientT] | None) -> None:
+        """Set the concurrency limiter for this command."""
+        self._concurrency_limiter = limiter
 
     @property
     def hooks(self) -> t.MutableSequence[HookT[ClientT]]:
@@ -359,6 +385,19 @@ class CommandBase(HasErrorHandler[ClientT], Hookable[ClientT], t.Generic[ClientT
                 is_dm_enabled=self._is_dm_enabled,
             )
         )
+
+    def _resolve_concurrency_limiter(self) -> ConcurrencyLimiterProto[ClientT] | None:
+        """Resolve the concurrency limiter for this command."""
+        if self._concurrency_limiter is not None:
+            return self._concurrency_limiter
+
+        if self._plugin:
+            return self._plugin._resolve_concurrency_limiter()
+
+        if self._client:
+            return self._client._concurrency_limiter
+
+        return None
 
     def _resolve_hooks(self) -> list[HookT[ClientT]]:
         plugin_hooks = self.plugin._resolve_hooks() if self.plugin else []
@@ -517,7 +556,7 @@ class CommandBase(HasErrorHandler[ClientT], Hookable[ClientT], t.Generic[ClientT
         return aborted
 
     async def _handle_post_hooks(self, command: CallableCommandProto[ClientT], ctx: Context[ClientT]) -> None:
-        """Handle all post-execution hooks for a command."""
+        """Handle all post-execution hooks for a command, and release the concurrency limiter if applicable."""
         try:
             post_hooks = command._resolve_post_hooks()
             for hook in post_hooks:
@@ -527,21 +566,37 @@ class CommandBase(HasErrorHandler[ClientT], Hookable[ClientT], t.Generic[ClientT
                     hook(ctx)
         except Exception as e:
             await command._handle_exception(ctx, e)
+        finally:
+            if (limiter := command._resolve_concurrency_limiter()) is not None:
+                limiter.release(ctx)
 
     async def _handle_callback(
         self, command: CallableCommandProto[ClientT], ctx: Context[ClientT], *args: t.Any, **kwargs: t.Any
     ) -> None:
         """Handle the callback of a command. Invoke all hooks and the callback, and handle any exceptions."""
         # If hook aborted, stop invocation
-        if await self._handle_pre_hooks(command, ctx):
-            return
+
+        max_concurrency = command._resolve_concurrency_limiter()
+
+        if max_concurrency is not None and max_concurrency.is_exhausted(ctx):
+            return await command._handle_exception(
+                ctx, MaxConcurrencyReachedError(max_concurrency, max_concurrency.limit)
+            )
 
         try:
+            if max_concurrency is not None:
+                await max_concurrency.acquire(ctx)
+
+            if await self._handle_pre_hooks(command, ctx):
+                return
+
             await self.client.injector.call_with_async_di(command.callback, ctx, *args, **kwargs)
+
         except Exception as e:
             ctx._has_command_failed = True
             await command._handle_exception(ctx, e)
         finally:
+            # This also releases the concurrency limiter
             await self._handle_post_hooks(command, ctx)
 
 
@@ -555,7 +610,7 @@ class CallableCommandBase(CommandBase[ClientT, BuilderT], CallableCommandProto[C
     _invoke_task: asyncio.Task[t.Any] | None = attr.field(init=False, default=None, repr=False)
 
     def reset_all_limiters(self, context: Context[ClientT]) -> None:
-        """Reset all limiters for this command.
+        """Reset all limiter hooks for this command.
 
         Parameters
         ----------
@@ -586,10 +641,18 @@ ParentT = t.TypeVar("ParentT")
 
 
 @attr.define(slots=True, kw_only=True)
-class SubCommandBase(OptionBase[ClientT], HasErrorHandler[ClientT], Hookable[ClientT], t.Generic[ClientT, ParentT]):
+class SubCommandBase(
+    OptionBase[ClientT],
+    HasErrorHandler[ClientT],
+    Hookable[ClientT],
+    HasConcurrencyLimiter[ClientT],
+    t.Generic[ClientT, ParentT],
+):
     """An abstract base class for all slash subcommands and subgroups."""
 
     _error_handler: ErrorHandlerCallbackT[ClientT] | None = attr.field(default=None, init=False)
+
+    _concurrency_limiter: ConcurrencyLimiterProto[ClientT] | None = attr.field(default=None, init=False)
 
     _hooks: list[HookT[ClientT]] = attr.field(factory=list, init=False)
 
@@ -618,6 +681,16 @@ class SubCommandBase(OptionBase[ClientT], HasErrorHandler[ClientT], Hookable[Cli
         self._error_handler = callback
 
     @property
+    def concurrency_limiter(self) -> ConcurrencyLimiterProto[ClientT] | None:
+        """The concurrency limiter for this object."""
+        return self._concurrency_limiter
+
+    @concurrency_limiter.setter
+    def concurrency_limiter(self, limiter: ConcurrencyLimiterProto[ClientT] | None) -> None:
+        """Set the concurrency limiter for this object."""
+        self._concurrency_limiter = limiter
+
+    @property
     def hooks(self) -> t.MutableSequence[HookT[ClientT]]:
         """The pre-execution hooks for this object."""
         return self._hooks
@@ -637,7 +710,7 @@ class SubCommandBase(OptionBase[ClientT], HasErrorHandler[ClientT], Hookable[Cli
         return self._parent
 
     def reset_all_limiters(self, context: Context[ClientT]) -> None:
-        """Reset all limiters for this command.
+        """Reset all limiter hooks for this command.
 
         Parameters
         ----------

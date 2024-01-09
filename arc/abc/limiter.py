@@ -24,7 +24,7 @@ class LimiterProto(t.Protocol, t.Generic[ClientT]):
     """
 
     @abc.abstractmethod
-    async def __call__(self, ctx: Context[ClientT]) -> HookResult:
+    async def __call__(self, ctx: Context[ClientT], /) -> HookResult:
         """Call the limiter with the given context.
         Implementations should raise an exception if the limiter is ratelimited
         or abort via [`HookResult`][arc.abc.hookable.HookResult].
@@ -36,7 +36,7 @@ class LimiterProto(t.Protocol, t.Generic[ClientT]):
         """
 
     @abc.abstractmethod
-    def reset(self, ctx: Context[ClientT]) -> None:
+    def reset(self, ctx: Context[ClientT], /) -> None:
         """Reset the limiter for the given context.
 
         Parameters
@@ -46,7 +46,7 @@ class LimiterProto(t.Protocol, t.Generic[ClientT]):
         """
 
     @abc.abstractmethod
-    def is_rate_limited(self, ctx: Context[ClientT]) -> bool:
+    def is_rate_limited(self, ctx: Context[ClientT], /) -> bool:
         """Check if the limiter is rate limited for the given context.
 
         Parameters

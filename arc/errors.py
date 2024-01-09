@@ -6,6 +6,7 @@ if t.TYPE_CHECKING:
     import hikari
 
     from arc.abc.command import CommandProto
+    from arc.abc.concurrency_limiting import ConcurrencyLimiterProto
     from arc.abc.limiter import LimiterProto
 
 
@@ -119,6 +120,23 @@ class UnderCooldownError(ArcError):
 
     def __init__(self, limiter: LimiterProto[t.Any], retry_after: float, *args: t.Any) -> None:
         self.retry_after = retry_after
+        self.limiter = limiter
+        super().__init__(*args)
+
+
+class MaxConcurrencyReachedError(ArcError):
+    """Raised when a built-in concurrency limiter is acquired while it is exhausted.
+
+    Attributes
+    ----------
+    limiter : arc.abc.concurrency_limiting.ConcurrencyLimiterProto
+        The limiter that was exhausted.
+    max_concurrency : int
+        The maximum amount of concurrent instances of the command that reached max concurrency.
+    """
+
+    def __init__(self, limiter: ConcurrencyLimiterProto[t.Any], max_concurrency: int, *args: t.Any) -> None:
+        self.max_concurrency = max_concurrency
         self.limiter = limiter
         super().__init__(*args)
 

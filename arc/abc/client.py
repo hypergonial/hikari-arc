@@ -41,6 +41,7 @@ if t.TYPE_CHECKING:
     import typing_extensions as te
 
     from arc.abc.command import CommandBase
+    from arc.abc.concurrency_limiting import ConcurrencyLimiterProto
     from arc.command import SlashCommandLike
 
 __all__ = ("Client",)
@@ -100,6 +101,7 @@ class Client(t.Generic[AppT], abc.ABC):
         "_option_locale_provider",
         "_custom_locale_provider",
         "_cmd_settings",
+        "_concurrency_limiter",
     )
 
     def __init__(
@@ -141,6 +143,7 @@ class Client(t.Generic[AppT], abc.ABC):
         self._post_hooks: list[PostHookT[te.Self]] = []
         self._owner_ids: list[hikari.Snowflake] = []
         self._error_handler: ErrorHandlerCallbackT[te.Self] | None = None
+        self._concurrency_limiter: ConcurrencyLimiterProto[te.Self] | None = None
         self._startup_hook: LifeCycleHookT[te.Self] | None = None
         self._shutdown_hook: LifeCycleHookT[te.Self] | None = None
         self._command_locale_provider: CommandLocaleRequestT | None = None
@@ -219,6 +222,11 @@ class Client(t.Generic[AppT], abc.ABC):
     def error_handler(self) -> ErrorHandlerCallbackT[te.Self] | None:
         """The error handler for this client."""
         return self._error_handler
+
+    @property
+    def concurrency_limiter(self) -> ConcurrencyLimiterProto[te.Self] | None:
+        """The concurrency limiter for this client."""
+        return self._concurrency_limiter
 
     def _add_command(self, command: CommandBase[te.Self, t.Any]) -> None:
         """Add a command to this client. Called by include hooks."""
@@ -639,6 +647,22 @@ class Client(t.Generic[AppT], abc.ABC):
         pg._client_remove_hook()
         return self
 
+    def set_concurrency_limit(self, limiter: ConcurrencyLimiterProto[te.Self]) -> te.Self:
+        """Set the concurrency limiter for this client.
+
+        Parameters
+        ----------
+        limiter : ConcurrencyLimiterProto[te.Self]
+            The concurrency limiter to set.
+
+        Returns
+        -------
+        te.Self
+            The client for chaining calls.
+        """
+        self._concurrency_limiter = limiter
+        return self
+
     @t.overload
     def add_hook(self, hook: HookT[te.Self]) -> te.Self:
         ...
@@ -717,16 +741,16 @@ class Client(t.Generic[AppT], abc.ABC):
         return decorator
 
     @t.overload
-    def set_error_handler(self, handler: ErrorHandlerCallbackT[te.Self]) -> None:
+    def set_error_handler(self, handler: ErrorHandlerCallbackT[te.Self]) -> te.Self:
         ...
 
     @t.overload
-    def set_error_handler(self) -> t.Callable[[ErrorHandlerCallbackT[te.Self]], None]:
+    def set_error_handler(self) -> t.Callable[[ErrorHandlerCallbackT[te.Self]], te.Self]:
         ...
 
     def set_error_handler(
         self, handler: ErrorHandlerCallbackT[te.Self] | None = None
-    ) -> None | t.Callable[[ErrorHandlerCallbackT[te.Self]], None]:
+    ) -> te.Self | t.Callable[[ErrorHandlerCallbackT[te.Self]], te.Self]:
         """Decorator to set the error handler for this client.
 
         This will be called when a command callback raises an exception
@@ -736,6 +760,11 @@ class Client(t.Generic[AppT], abc.ABC):
         ----------
         handler : ErrorHandlerCallbackT[te.Self]
             The error handler to set.
+
+        Returns
+        -------
+        te.Self
+            The client for chaining calls.
 
         Examples
         --------
@@ -755,26 +784,27 @@ class Client(t.Generic[AppT], abc.ABC):
         client.set_error_handler(error_handler_func)
         ```
         """
-        if handler is not None:
-            self._error_handler = handler
-            return
 
-        def decorator(handler: ErrorHandlerCallbackT[te.Self]) -> None:
+        def decorator(handler: ErrorHandlerCallbackT[te.Self]) -> te.Self:
             self._error_handler = handler
+            return self
+
+        if handler is not None:
+            return decorator(handler)
 
         return decorator
 
     @t.overload
-    def set_startup_hook(self, hook: LifeCycleHookT[te.Self]) -> None:
+    def set_startup_hook(self, hook: LifeCycleHookT[te.Self]) -> te.Self:
         ...
 
     @t.overload
-    def set_startup_hook(self) -> t.Callable[[LifeCycleHookT[te.Self]], None]:
+    def set_startup_hook(self) -> t.Callable[[LifeCycleHookT[te.Self]], te.Self]:
         ...
 
     def set_startup_hook(
         self, hook: LifeCycleHookT[te.Self] | None = None
-    ) -> None | t.Callable[[LifeCycleHookT[te.Self]], None]:
+    ) -> te.Self | t.Callable[[LifeCycleHookT[te.Self]], te.Self]:
         """Decorator to set the startup hook for this client.
 
         This will be called when the client starts up.
@@ -783,6 +813,11 @@ class Client(t.Generic[AppT], abc.ABC):
         ----------
         hook : LifeCycleHookT[te.Self]
             The startup hook to set.
+
+        Returns
+        -------
+        te.Self
+            The client for chaining calls.
 
         Examples
         --------
@@ -798,26 +833,27 @@ class Client(t.Generic[AppT], abc.ABC):
         client.set_startup_hook(startup_hook)
         ```
         """
-        if hook is not None:
-            self._startup_hook = hook
-            return
 
-        def decorator(handler: LifeCycleHookT[te.Self]) -> None:
+        def decorator(handler: LifeCycleHookT[te.Self]) -> te.Self:
             self._startup_hook = handler
+            return self
+
+        if hook is not None:
+            return decorator(hook)
 
         return decorator
 
     @t.overload
-    def set_shutdown_hook(self, hook: LifeCycleHookT[te.Self]) -> None:
+    def set_shutdown_hook(self, hook: LifeCycleHookT[te.Self]) -> te.Self:
         ...
 
     @t.overload
-    def set_shutdown_hook(self) -> t.Callable[[LifeCycleHookT[te.Self]], None]:
+    def set_shutdown_hook(self) -> t.Callable[[LifeCycleHookT[te.Self]], te.Self]:
         ...
 
     def set_shutdown_hook(
         self, hook: LifeCycleHookT[te.Self] | None = None
-    ) -> None | t.Callable[[LifeCycleHookT[te.Self]], None]:
+    ) -> te.Self | t.Callable[[LifeCycleHookT[te.Self]], te.Self]:
         """Decorator to set the shutdown hook for this client.
 
         This will be called when the client shuts down.
@@ -826,6 +862,11 @@ class Client(t.Generic[AppT], abc.ABC):
         ----------
         hook : LifeCycleHookT[te.Self]
             The shutdown hook to set.
+
+        Returns
+        -------
+        te.Self
+            The client for chaining calls.
 
         Examples
         --------
@@ -841,26 +882,27 @@ class Client(t.Generic[AppT], abc.ABC):
         client.set_shutdown_hook(shutdown_hook)
         ```
         """
-        if hook is not None:
-            self._shutdown_hook = hook
-            return
 
-        def decorator(handler: LifeCycleHookT[te.Self]) -> None:
+        def decorator(handler: LifeCycleHookT[te.Self]) -> te.Self:
             self._shutdown_hook = handler
+            return self
+
+        if hook is not None:
+            return decorator(hook)
 
         return decorator
 
     @t.overload
-    def set_command_locale_provider(self, provider: CommandLocaleRequestT) -> None:
+    def set_command_locale_provider(self, provider: CommandLocaleRequestT) -> te.Self:
         ...
 
     @t.overload
-    def set_command_locale_provider(self) -> t.Callable[[CommandLocaleRequestT], None]:
+    def set_command_locale_provider(self) -> t.Callable[[CommandLocaleRequestT], te.Self]:
         ...
 
     def set_command_locale_provider(
         self, provider: CommandLocaleRequestT | None = None
-    ) -> None | t.Callable[[CommandLocaleRequestT], None]:
+    ) -> te.Self | t.Callable[[CommandLocaleRequestT], te.Self]:
         """Decorator to set the command locale provider for this client.
 
         This will be called for each command for each locale.
@@ -869,6 +911,11 @@ class Client(t.Generic[AppT], abc.ABC):
         ----------
         provider : CommandLocaleRequestT
             The command locale provider to set.
+
+        Returns
+        -------
+        te.Self
+            The client for chaining calls.
 
         Examples
         --------
@@ -884,26 +931,27 @@ class Client(t.Generic[AppT], abc.ABC):
         client.set_command_locale_provider(command_locale_provider)
         ```
         """
-        if provider is not None:
-            self._command_locale_provider = provider
-            return
 
-        def decorator(provider: CommandLocaleRequestT) -> None:
+        def decorator(provider: CommandLocaleRequestT) -> te.Self:
             self._command_locale_provider = provider
+            return self
+
+        if provider is not None:
+            return decorator(provider)
 
         return decorator
 
     @t.overload
-    def set_option_locale_provider(self, provider: OptionLocaleRequestT) -> None:
+    def set_option_locale_provider(self, provider: OptionLocaleRequestT) -> te.Self:
         ...
 
     @t.overload
-    def set_option_locale_provider(self) -> t.Callable[[OptionLocaleRequestT], None]:
+    def set_option_locale_provider(self) -> t.Callable[[OptionLocaleRequestT], te.Self]:
         ...
 
     def set_option_locale_provider(
         self, provider: OptionLocaleRequestT | None = None
-    ) -> None | t.Callable[[OptionLocaleRequestT], None]:
+    ) -> te.Self | t.Callable[[OptionLocaleRequestT], te.Self]:
         """Decorator to set the option locale provider for this client.
 
         This will be called for each option of each command for each locale.
@@ -912,6 +960,11 @@ class Client(t.Generic[AppT], abc.ABC):
         ----------
         provider : OptionLocaleRequestT
             The option locale provider to set.
+
+        Returns
+        -------
+        te.Self
+            The client for chaining calls.
 
         Examples
         --------
@@ -927,26 +980,27 @@ class Client(t.Generic[AppT], abc.ABC):
         client.set_option_locale_provider(option_locale_provider)
         ```
         """
-        if provider is not None:
-            self._option_locale_provider = provider
-            return
 
-        def decorator(provider: OptionLocaleRequestT) -> None:
+        def decorator(provider: OptionLocaleRequestT) -> te.Self:
             self._option_locale_provider = provider
+            return self
+
+        if provider is not None:
+            return decorator(provider)
 
         return decorator
 
     @t.overload
-    def set_custom_locale_provider(self, provider: CustomLocaleRequestT) -> None:
+    def set_custom_locale_provider(self, provider: CustomLocaleRequestT) -> te.Self:
         ...
 
     @t.overload
-    def set_custom_locale_provider(self) -> t.Callable[[CustomLocaleRequestT], None]:
+    def set_custom_locale_provider(self) -> t.Callable[[CustomLocaleRequestT], te.Self]:
         ...
 
     def set_custom_locale_provider(
         self, provider: CustomLocaleRequestT | None = None
-    ) -> None | t.Callable[[CustomLocaleRequestT], None]:
+    ) -> te.Self | t.Callable[[CustomLocaleRequestT], te.Self]:
         """Decorator to set the custom locale provider for this client.
 
         This will be called for each custom locale request performed via [`Context.loc()`][arc.context.base.Context.loc].
@@ -970,12 +1024,13 @@ class Client(t.Generic[AppT], abc.ABC):
         client.set_custom_locale_provider(custom_locale_provider)
         ```
         """
-        if provider is not None:
-            self._custom_locale_provider = provider
-            return
 
-        def decorator(provider: CustomLocaleRequestT) -> None:
+        def decorator(provider: CustomLocaleRequestT) -> te.Self:
             self._custom_locale_provider = provider
+            return self
+
+        if provider is not None:
+            return decorator(provider)
 
         return decorator
 

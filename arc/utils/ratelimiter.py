@@ -122,20 +122,20 @@ class RateLimiter(t.Generic[KeyT]):
     def __init__(self, period: float, limit: int, *, get_key_with: t.Callable[[KeyT], str]) -> None:
         self.period: float = period
         self.limit: int = limit
-        self._buckets: t.Dict[str, _Bucket[KeyT]] = {}
+        self._buckets: dict[str, _Bucket[KeyT]] = {}
         self._get_key: t.Callable[[KeyT], str] = get_key_with
         self._gc_task: asyncio.Task[None] | None = None
 
-    def get_key(self, ctx: KeyT) -> str:
+    def get_key(self, item: KeyT) -> str:
         """Get key for ratelimiter bucket."""
-        return self._get_key(ctx)
+        return self._get_key(item)
 
-    def is_rate_limited(self, ctx: KeyT) -> bool:
+    def is_rate_limited(self, item: KeyT) -> bool:
         """Returns a boolean determining if the ratelimiter is ratelimited or not.
 
         Parameters
         ----------
-        ctx : Context[t.Any]
+        item : Context[t.Any]
             The context to evaluate the ratelimit under.
 
         Returns
@@ -145,7 +145,7 @@ class RateLimiter(t.Generic[KeyT]):
         """
         now = time.monotonic()
 
-        if data := self._buckets.get(self.get_key(ctx)):
+        if data := self._buckets.get(self.get_key(item)):
             if data.reset_at <= now:
                 return False
             return data._remaining <= 0
@@ -164,13 +164,13 @@ class RateLimiter(t.Generic[KeyT]):
                 if bucket.is_stale:
                     del self._buckets[bucket.key]
 
-    async def acquire(self, ctx: KeyT, *, wait: bool = True) -> None:
+    async def acquire(self, item: KeyT, /, *, wait: bool = True) -> None:
         """Acquire a bucket, block execution if ratelimited and wait is True.
 
         Parameters
         ----------
-        ctx : Context[t.Any]
-            The context to evaluate the ratelimit under.
+        item : KeyT
+            The item to evaluate the ratelimit under.
         wait : bool
             Determines if this call should block in
             case of hitting a ratelimit.
@@ -182,7 +182,7 @@ class RateLimiter(t.Generic[KeyT]):
         """
         event = asyncio.Event()
 
-        key = self.get_key(ctx)
+        key = self.get_key(item)
         # Get existing or insert new bucket
         bucket = self._buckets.setdefault(key, _Bucket.for_limiter(key, self))
 
@@ -200,12 +200,12 @@ class RateLimiter(t.Generic[KeyT]):
         if wait:
             await event.wait()
 
-    async def __call__(self, ctx: KeyT) -> HookResult:
+    async def __call__(self, item: KeyT) -> HookResult:
         """Acquire a ratelimit, fail if ratelimited.
 
         Parameters
         ----------
-        ctx : Context[t.Any]
+        item : KeyT
             The context to evaluate the ratelimit under.
 
         Returns
@@ -218,7 +218,7 @@ class RateLimiter(t.Generic[KeyT]):
         UnderCooldownError
             If the ratelimiter is ratelimited.
         """
-        await self.acquire(ctx, wait=False)
+        await self.acquire(item, wait=False)
         return HookResult()
 
     def reset(self, ctx: KeyT) -> None:

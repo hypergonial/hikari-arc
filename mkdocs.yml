@@ -70,6 +70,7 @@ nav:
         - guides/plugins_extensions.md
         - guides/dependency_injection.md
         - guides/loops.md
+        - guides/concurrency_limiting.md
         - guides/events.md
     - API Reference:
         - api_reference/index.md
@@ -92,6 +93,7 @@ nav:
                 - api_reference/utils/hooks/limiters.md
             - api_reference/utils/loops.md
             - api_reference/utils/ratelimiter.md
+            - api_reference/utils/concurrency_limiter.md
         - ABC:
             - api_reference/abc/index.md
             - api_reference/abc/client.md
@@ -100,6 +102,7 @@ nav:
             - api_reference/abc/plugin.md
             - api_reference/abc/hooks.md
             - api_reference/abc/limiter.md
+            - api_reference/abc/concurrency_limiting.md
             - api_reference/abc/error_handler.md
     - Changelog: changelog.md
 

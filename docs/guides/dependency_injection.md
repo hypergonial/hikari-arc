@@ -107,6 +107,8 @@ def compare_counter(value: int, db: MyDatabase = arc.inject()) -> None:
 
 If you're trying to inject a function that already has decorators on it, the [`@Client.inject_dependencies`][arc.abc.client.Client.inject_dependencies] decorator should be the first in the chain (at the bottom).
 
+This means you can inject dependencies into [hooks](./hooks.md), [error handlers](./error_handling.md), [loops](./loops.md), or literally any ordinary Python function. The sky is the limit!
+
 ## The benefits of dependency injection
 
 Dependency injection **separates the concern** of constructing an object from using them, therefore it is possible to **loosely couple** the logic and state of your program. One benefit of this approach is that we can separate the actual implementations from the abstract types that functions may consume.
