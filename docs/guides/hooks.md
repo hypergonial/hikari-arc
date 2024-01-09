@@ -111,7 +111,7 @@ These hooks will be run after the command executes, but notably, they will **not
 You can also add hooks to other objects:
 
 - Slash groups & subgroups
-- Plugins
+- [Plugins](./plugins_extensions.md)
 - The client
 
 This can be done via the [`add_hook()`][arc.abc.hookable.Hookable.add_hook] and [`add_post_hook()`][arc.abc.hookable.Hookable.add_post_hook] methods.

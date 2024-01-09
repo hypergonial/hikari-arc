@@ -1,6 +1,8 @@
 ---
 title: Plugins & Extensions
 description: A guide on plugins & extensions in arc
+hide:
+  - toc
 ---
 
 # Plugins & Extensions
@@ -12,7 +14,7 @@ Plugins are a way to group commands and related functionality together. This can
 === "Gateway"
 
     ```py
-    plugin = GatewayPlugin("plugin name")
+    plugin = arc.GatewayPlugin("plugin name")
 
     @plugin.include
     @arc.slash_command("name", "description")
@@ -30,7 +32,7 @@ Plugins are a way to group commands and related functionality together. This can
 === "REST"
 
     ```py
-    plugin = RESTPlugin("plugin name")
+    plugin = arc.RESTPlugin("plugin name")
 
     @plugin.include
     @arc.slash_command("name", "description")
@@ -45,10 +47,26 @@ Plugins are a way to group commands and related functionality together. This can
     client.add_plugin(plugin)
     ```
 
-In the snippet above, we define a new plugin, add two commands to it, then add the plugin to the client. This in turn adds all commands added to the plugin to the client as well. Plugins can also have [hooks](./hooks.md) added to them, which will be used for every command added to the plugin. Additionally, it is possible to set an [error handler](./error_handling.md) on a plugin.
+In the snippet above, we define a new plugin, add two commands to it, then add the plugin to the client. This in turn adds all commands added to the plugin to the client as well.
 
-!!! note
-    Anything that can be used with `@client.include` can also be used with `@plugin.include` as well.
+!!! tip
+    Anything that can be used with `@client.include` can also be used with `@plugin.include` as well. Plugins also define methods commonly found on the client such as [.include_slash_group()][arc.abc.PluginBase.include_slash_group] or [.walk_commands()][arc.abc.PluginBase.walk_commands].
+
+The benefit of grouping commands together into a plugin is that you can define custom behaviour at the plugin level which applies to all commands added to the plugin. [Hooks](./hooks.md), [error handling](./error_handling.md) can all be added to the plugin itself, additionally, you can also set attributes such as `autodefer=` or `default_permissions=`, and they will be applied to all commands that belong to the plugin.
+
+For example, to make all commands in a plugin require `MANAGE_GUILD` permissions by default, you may use the following snippet:
+
+=== "Gateway"
+
+    ```py
+    plugin = arc.GatewayPlugin("plugin name", default_permissions=hikari.Permissions.MANAGE_GUILD)
+    ```
+
+=== "REST"
+
+    ```py
+    plugin = arc.RESTPlugin("plugin name", default_permissions=hikari.Permissions.MANAGE_GUILD)
+    ```
 
 ## Extensions
 
@@ -68,9 +86,7 @@ extensions
 
 === "Gateway"
 
-    `foo.py`:
-
-    ```py
+    ```py title="extensions/foo.py"
     import arc
 
     plugin = arc.GatewayPlugin("foo")
@@ -95,9 +111,7 @@ extensions
         client.remove_plugin(plugin)
     ```
 
-    `bar.py`:
-
-    ```py
+    ```py title="extensions/bar.py"
     import arc
 
     plugin = arc.GatewayPlugin("bar")
@@ -121,9 +135,7 @@ extensions
 
 === "REST"
 
-    `foo.py`:
-
-    ```py
+    ```py title="extensions/foo.py"
     import arc
 
     plugin = arc.RESTPlugin("foo")
@@ -148,9 +160,7 @@ extensions
         client.remove_plugin(plugin)
     ```
 
-    `bar.py`:
-
-    ```py
+    ```py title="extensions/bar.py"
     import arc
 
     plugin = arc.RESTPlugin("bar")
@@ -176,7 +186,7 @@ To load `foo.py` into the client before execution, you can use [`Client.load_ext
 
 === "Gateway"
 
-    ```py
+    ```py title="bot.py" hl_lines="7 8"
     import hikari
     import arc
 
@@ -192,7 +202,7 @@ To load `foo.py` into the client before execution, you can use [`Client.load_ext
 
 === "REST"
 
-    ```py
+    ```py title="bot.py" hl_lines="7 8"
     import hikari
     import arc
 
@@ -210,7 +220,7 @@ Or to load all extensions from the `extensions` folder, you can use [`Client.loa
 
 === "Gateway"
 
-    ```py
+    ```py title="bot.py" hl_lines="7 8"
     import hikari
     import arc
 
@@ -226,7 +236,7 @@ Or to load all extensions from the `extensions` folder, you can use [`Client.loa
 
 === "REST"
 
-    ```py
+    ```py title="bot.py" hl_lines="7 8"
     import hikari
     import arc
 
