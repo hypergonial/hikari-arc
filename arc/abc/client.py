@@ -413,8 +413,8 @@ class Client(t.Generic[AppT], abc.ABC):
         CommandT[te.Self]
             The next command that matches the given criteria.
 
-        Usage
-        -----
+        Examples
+        --------
         ```py
         for cmd in plugin.walk_commands(hikari.CommandType.SLASH):
             print(cmd.name)
@@ -488,8 +488,8 @@ class Client(t.Generic[AppT], abc.ABC):
         RuntimeError
             If the command is already added to a plugin.
 
-        Usage
-        -----
+        Examples
+        --------
         ```py
         @client.include # Add the command to the client.
         @arc.slash_command("cmd", "A command.")
@@ -564,8 +564,8 @@ class Client(t.Generic[AppT], abc.ABC):
         !!! note
             Parameters left as `hikari.UNDEFINED` will be inherited from the parent client.
 
-        Usage
-        -----
+        Examples
+        --------
         ```py
         group = client.include_slash_group("Group", "A group of commands.")
 
@@ -737,8 +737,8 @@ class Client(t.Generic[AppT], abc.ABC):
         handler : ErrorHandlerCallbackT[te.Self]
             The error handler to set.
 
-        Usage
-        -----
+        Examples
+        --------
         ```py
         @client.set_error_handler
         async def error_handler_func(ctx: arc.GatewayContext, exception: Exception) -> None:
@@ -784,8 +784,8 @@ class Client(t.Generic[AppT], abc.ABC):
         hook : LifeCycleHookT[te.Self]
             The startup hook to set.
 
-        Usage
-        -----
+        Examples
+        --------
         ```py
         @client.set_startup_hook
         async def startup_hook(client: arc.GatewayClient) -> None:
@@ -827,8 +827,8 @@ class Client(t.Generic[AppT], abc.ABC):
         hook : LifeCycleHookT[te.Self]
             The shutdown hook to set.
 
-        Usage
-        -----
+        Examples
+        --------
         ```py
         @client.set_shutdown_hook
         async def shutdown_hook(client: arc.GatewayClient) -> None:
@@ -870,8 +870,8 @@ class Client(t.Generic[AppT], abc.ABC):
         provider : CommandLocaleRequestT
             The command locale provider to set.
 
-        Usage
-        -----
+        Examples
+        --------
         ```py
         @client.set_command_locale_provider
         def command_locale_provider(request: arc.CommandLocaleRequest) -> arc.LocaleResponse:
@@ -913,8 +913,8 @@ class Client(t.Generic[AppT], abc.ABC):
         provider : OptionLocaleRequestT
             The option locale provider to set.
 
-        Usage
-        -----
+        Examples
+        --------
         ```py
         @client.set_option_locale_provider
         def option_locale_provider(request: arc.OptionLocaleRequest) -> arc.LocaleResponse:
@@ -956,8 +956,8 @@ class Client(t.Generic[AppT], abc.ABC):
         provider : CustomLocaleRequestT
             The custom locale provider to set.
 
-        Usage
-        -----
+        Examples
+        --------
         ```py
         @client.set_custom_locale_provider
         def custom_locale_provider(request: arc.CustomLocaleRequest) -> str:
@@ -998,8 +998,8 @@ class Client(t.Generic[AppT], abc.ABC):
         ValueError
             If the module does not have a loader.
 
-        Usage
-        -----
+        Examples
+        --------
         ```py
         client = arc.GatewayClient(...)
         client.load_extension("extension")
@@ -1063,8 +1063,8 @@ class Client(t.Generic[AppT], abc.ABC):
         ExtensionLoadError
             If a module does not have a loader defined.
 
-        Usage
-        -----
+        Examples
+        --------
         ```py
         client = arc.GatewayClient(...)
         client.load_extensions_from("extensions/foo")
@@ -1164,9 +1164,8 @@ class Client(t.Generic[AppT], abc.ABC):
         te.Self
             The client for chaining calls.
 
-        Usage
-        -----
-
+        Examples
+        --------
         ```py
         class MyDependency:
             def __init__(self, value: str):
@@ -1223,8 +1222,8 @@ class Client(t.Generic[AppT], abc.ABC):
             Command callbacks are automatically injected with dependencies,
             thus this decorator is not needed for them.
 
-        Usage
-        -----
+        Examples
+        --------
         ```py
         class MyDependency:
             def __init__(self, value: str):

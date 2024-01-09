@@ -96,8 +96,8 @@ def user_command(
     !!! note
         Parameters left as `hikari.UNDEFINED` will be inherited from the parent plugin or client.
 
-    Usage
-    -----
+    Examples
+    --------
     ```py
     @client.include
     @arc.user_command(name="Say Hi", description="Say hi!")

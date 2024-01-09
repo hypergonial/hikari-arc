@@ -93,8 +93,8 @@ def with_hook(hook: HookT[ClientT]) -> t.Callable[[HookableT], HookableT]:
     and returns either a [`HookResult`][arc.abc.hookable.HookResult] or
     `None` can be used as a hook.
 
-    Usage
-    -----
+    Examples
+    --------
     ```py
     @client.include
     @arc.with_hook(arc.guild_only) # Add a pre-execution hook to a command
@@ -123,8 +123,8 @@ def with_post_hook(hook: PostHookT[ClientT]) -> t.Callable[[HookableT], Hookable
         Post-execution hooks **are** called even if the command callback raises an exception.
         You can see if the command callback failed by checking [`Context.has_command_failed`][arc.context.base.Context.has_command_failed].
 
-    Usage
-    -----
+    Examples
+    --------
     ```py
     @client.include
     @arc.with_post_hook(arc.guild_only) # Add a post-execution hook to a command

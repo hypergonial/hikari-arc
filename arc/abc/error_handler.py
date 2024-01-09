@@ -39,8 +39,8 @@ class HasErrorHandler(abc.ABC, t.Generic[ClientT]):
 
         This function will be called when an exception is raised during the invocation of a command.
 
-        Usage
-        -----
+        Examples
+        --------
         ```py
         @client.include
         @arc.slash_command("foo", "Foo command description")

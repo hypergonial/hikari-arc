@@ -22,8 +22,8 @@ def loader(
 ) -> t.Callable[[ClientT], None] | t.Callable[[t.Callable[[ClientT], None]], t.Callable[[ClientT], None]]:
     """Decorator to set the load callback for this module.
 
-    Usage
-    -----
+    Examples
+    --------
     ```py
     client.load_extension("my_extension")
 
@@ -65,8 +65,8 @@ def unloader(
 ) -> t.Callable[[ClientT], None] | t.Callable[[t.Callable[[ClientT], None]], t.Callable[[ClientT], None]]:
     """Decorator to set the unload callback for this module.
 
-    Usage
-    -----
+    Examples
+    --------
     ```py
     client.unload_extension("my_extension")
 

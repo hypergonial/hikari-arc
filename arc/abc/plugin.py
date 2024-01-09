@@ -263,8 +263,8 @@ class PluginBase(HasErrorHandler[ClientT], Hookable[ClientT]):
         !!! note
             Parameters left as `hikari.UNDEFINED` will be inherited from the parent plugin or client.
 
-        Usage
-        -----
+        Examples
+        --------
         ```py
         group = client.include_slash_group("Group", "A group of commands.")
 
@@ -310,8 +310,8 @@ class PluginBase(HasErrorHandler[ClientT], Hookable[ClientT]):
             Command callbacks are automatically injected with dependencies,
             thus this decorator is not needed for them.
 
-        Usage
-        -----
+        Examples
+        --------
         ```py
         class MyDependency:
             def __init__(self, value: str):
@@ -411,8 +411,8 @@ class PluginBase(HasErrorHandler[ClientT], Hookable[ClientT]):
         CommandT[ClientT]
             The next command that matches the given criteria.
 
-        Usage
-        -----
+        Examples
+        --------
         ```py
         for cmd in plugin.walk_commands(hikari.CommandType.SLASH):
             print(cmd.name)

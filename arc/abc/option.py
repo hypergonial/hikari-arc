@@ -32,8 +32,8 @@ T = t.TypeVar("T")
 Option = t.Annotated
 """Alias for typing.Annotated.
 
-Usage
------
+Examples
+--------
 ```py
 arc.Option[type, arc.TypeParams(...)]
 ```

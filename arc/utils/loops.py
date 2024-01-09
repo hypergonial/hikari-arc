@@ -143,8 +143,8 @@ class IntervalLoop(_LoopBase[P]):
     TypeError
         If the passed function is not a coroutine function.
 
-    Usage
-    -----
+    Examples
+    --------
     ```py
     loop = IntervalLoop(my_coro, seconds=5)
     loop.start()
@@ -206,8 +206,8 @@ class CronLoop(_LoopBase[P]):
     TypeError
         If the passed function is not a coroutine function.
 
-    Usage
-    -----
+    Examples
+    --------
     ```py
     loop = CronLoop(my_coro, "*/5 * * * *")
     loop.start()

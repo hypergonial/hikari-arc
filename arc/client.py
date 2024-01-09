@@ -66,8 +66,8 @@ class GatewayClientBase(Client[GatewayBotT]):
     provided_locales : t.Sequence[hikari.Locale] | None
         The locales that will be provided to the client by locale provider callbacks
 
-    Usage
-    -----
+    Examples
+    --------
     ```py
     import hikari
     import arc
@@ -224,8 +224,8 @@ class RESTClientBase(Client[RESTBotT]):
         The locales that will be provided to the client by locale provider callbacks
 
 
-    Usage
-    -----
+    Examples
+    --------
     ```py
     import hikari
     import arc

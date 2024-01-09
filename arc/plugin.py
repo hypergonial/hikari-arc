@@ -42,8 +42,8 @@ class RESTPluginBase(PluginBase[RESTClientT]):
     !!! note
         Parameters left as `hikari.UNDEFINED` will be inherited from the parent client.
 
-    Usage
-    -----
+    Examples
+    --------
     ```py
     plugin = arc.RESTPlugin("MyPlugin")
 
@@ -88,8 +88,8 @@ class GatewayPluginBase(PluginBase[GatewayClientT]):
     !!! note
         Parameters left as `hikari.UNDEFINED` will be inherited from the parent client.
 
-    Usage
-    -----
+    Examples
+    --------
     ```py
     plugin = arc.GatewayPlugin("MyPlugin")
 
