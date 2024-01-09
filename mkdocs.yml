@@ -69,6 +69,7 @@ nav:
         - guides/error_handling.md
         - guides/plugins_extensions.md
         - guides/dependency_injection.md
+        - guides/loops.md
         - guides/events.md
     - API Reference:
         - api_reference/index.md
@@ -89,6 +90,7 @@ nav:
             - Hooks:
                 - api_reference/utils/hooks/basic.md
                 - api_reference/utils/hooks/limiters.md
+            - api_reference/utils/loops.md
             - api_reference/utils/ratelimiter.md
         - ABC:
             - api_reference/abc/index.md

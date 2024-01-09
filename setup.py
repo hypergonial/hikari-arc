@@ -59,6 +59,7 @@ setup(
         "docs": parse_requirements_file("doc_requirements.txt"),
         "dev": parse_requirements_file("dev_requirements.txt"),
         "rest": parse_requirements_file("rest_requirements.txt"),
+        "cron": parse_requirements_file("cron_requirements.txt"),
     },
     python_requires=">=3.10.0,<3.13",
     classifiers=[

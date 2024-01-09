@@ -9,6 +9,10 @@ hide:
 
 Here you can find all the changelogs for `hikari-arc`.
 
+## Unreleased
+
+- Add loops. Loops can be used to repeatedly call a given coroutine function with a specific interval or cron set.
+
 ## v0.6.0
 
 - Add `Context.get_option()` to access options outside the command callback in a type-safe manner.

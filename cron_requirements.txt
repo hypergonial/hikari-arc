@@ -1,0 +1,2 @@
+croniter==2.0.1
+types-croniter==2.0.0.20240106

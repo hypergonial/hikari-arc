@@ -26,14 +26,14 @@ def format(session: nox.Session) -> None:
 
 @nox.session()
 def pyright(session: nox.Session) -> None:
-    session.install(".")
+    session.install(".[cron]")
     session.install("-U", "pyright", "-c", "dev_requirements.txt")
     session.run("pyright", PATH_TO_PROJECT, EXAMPLES_PATH)
 
 
 @nox.session()
 def pytest(session: nox.Session) -> None:
-    session.install(".[dev]")
+    session.install(".[dev, cron]")
     session.run("pytest", "tests")
 
 
