@@ -11,7 +11,7 @@ Here you can find all the changelogs for `hikari-arc`.
 
 ## Unreleased
 
-- Add loops. Loops can be used to repeatedly call a given coroutine function with a specific interval or cron set.
+- Add [loops](./guides/loops.md). Loops can be used to repeatedly call a given coroutine function with a specific interval or cron set.
 
 ## v0.6.0
 
