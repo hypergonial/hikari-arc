@@ -9,11 +9,11 @@ hide:
 # Home
 
 <figure markdown>
-  ![App Commands](./assets/app_commands.png)
+  ![App Commands](./assets/app_commands.webp){ .no-lightbox }
   <figcaption></figcaption>
 </figure>
 
-Welcome to the documentation for `hikari-arc`, a command handler built on [`hikari`](https://github.com/hikari-py/hikari) with a focus on type-safety & correctness, making the creation of commands on Discord easy!
+Welcome to the documentation for `hikari-arc`, an extensible command handler built on [`hikari`](https://github.com/hikari-py/hikari) with a focus on type-safety & correctness, making the creation of commands on Discord easy!
 
 <div class="grid cards" markdown>
 

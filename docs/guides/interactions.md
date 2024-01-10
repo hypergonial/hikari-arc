@@ -25,8 +25,8 @@ Whenever a user enters a slash command, or presses a button, Discord sends an in
 ## Interaction Response Flow
 
 <figure markdown>
-  ![Interaction Response Flow](../assets/inter_flow_dark.png#only-dark){ width="800" }
-  ![Interaction Response Flow](../assets/inter_flow_light.png#only-light){ width="800" }
+  ![Interaction Response Flow](../assets/inter_flow_dark.png#only-dark){ width="800" .no-lightbox }
+  ![Interaction Response Flow](../assets/inter_flow_light.png#only-light){ width="800" .no-lightbox }
   <figcaption>The interaction response flow</figcaption>
 </figure>
 

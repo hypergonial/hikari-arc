@@ -8,7 +8,7 @@ hide:
 # Context Menu Commands
 
 <figure markdown>
-  ![Context Menu Commands](../assets/context_menu.png){ width="600" }
+  ![Context Menu Commands](../assets/context_menu.png){ width="600" .no-lightbox }
   <figcaption>An example context menu command</figcaption>
 </figure>
 
