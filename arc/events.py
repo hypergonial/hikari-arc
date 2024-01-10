@@ -9,7 +9,7 @@ from arc.internal.types import GatewayClientT
 if t.TYPE_CHECKING:
     from arc.context import Context
 
-__all__ = ("ArcEvent", "CommandErrorEvent", "StartedEvent")
+__all__ = ("ArcEvent", "CommandErrorEvent", "StartedEvent", "StoppingEvent")
 
 
 class ArcEvent(hikari.Event):
@@ -29,6 +29,26 @@ class StartedEvent(ArcEvent, t.Generic[GatewayClientT]):
     @property
     def client(self) -> GatewayClientT:
         """The client instance that started."""
+        return self._client
+
+    @property
+    def app(self) -> hikari.RESTAware:
+        """App instance for this application."""
+        return self._client.app
+
+
+class StoppingEvent(ArcEvent, t.Generic[GatewayClientT]):
+    """Event dispatched when the client is stopping.
+
+    This event is fired after the shutdown hook has been processed.
+    """
+
+    def __init__(self, client: GatewayClientT) -> None:
+        self._client = client
+
+    @property
+    def client(self) -> GatewayClientT:
+        """The client instance that is stopping."""
         return self._client
 
     @property

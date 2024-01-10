@@ -8,7 +8,7 @@ import hikari
 from arc.abc.client import Client
 from arc.context import Context
 from arc.errors import NoResponseIssuedError
-from arc.events import CommandErrorEvent, StartedEvent
+from arc.events import CommandErrorEvent, StartedEvent, StoppingEvent
 from arc.internal.sigparse import parse_event_signature
 from arc.internal.types import GatewayBotT, RESTBotT
 from arc.plugin import GatewayPluginBase, RESTPluginBase
@@ -125,6 +125,7 @@ class GatewayClientBase(Client[GatewayBotT]):
 
     async def _on_gatewaybot_shutdown(self, event: hikari.StoppingEvent) -> None:
         await self._on_shutdown()
+        await self.app.event_manager.dispatch(StoppingEvent(self))
 
     async def _on_gatewaybot_interaction_create(self, event: hikari.InteractionCreateEvent) -> None:
         if isinstance(event.interaction, hikari.CommandInteraction):

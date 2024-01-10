@@ -44,3 +44,19 @@ The **startup hook** is a great place to initialize resources that require an as
     ```
 
 The **shutdown hook** is where you can clean up any remaining resources, close connections, etc. It is called when the bot has started to shut down.
+
+## Lifecycle Events
+
+!!! info "Gateway only"
+    This section is only relevant to those using a **Gateway** client, as REST bots **cannot receive events**.
+
+If you prefer handling your client's lifecycle via [events](./events.md), you may listen for [`arc.StartedEvent`][arc.events.StartedEvent] or [`arc.StoppingEvent`][arc.events.StoppingEvent] respectively. These are dispatched immediately after the lifecycle hooks were processed, guaranteeing that the client is in the right state.
+
+```py
+@client.listen()
+async def on_startup(event: arc.StartedEvent) -> None:
+    print("Client started up!")
+```
+
+!!! question "What is the difference between `arc.StartedEvent` and `hikari.StartedEvent`?"
+    `arc.StartedEvent` fires after the client has already synced all commands and initialized internally, which happens *after* `hikari.StartedEvent` fires, therefore it is the recommended to use `arc.StartedEvent` over `hikari.StartedEvent`.

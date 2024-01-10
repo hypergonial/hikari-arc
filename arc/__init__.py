@@ -60,7 +60,7 @@ from .errors import (
     NotOwnerError,
     UnderCooldownError,
 )
-from .events import ArcEvent, CommandErrorEvent, StartedEvent
+from .events import ArcEvent, CommandErrorEvent, StartedEvent, StoppingEvent
 from .extension import loader, unloader
 from .internal.about import __author__, __author_email__, __license__, __maintainer__, __url__, __version__
 from .locale import (
@@ -150,6 +150,7 @@ __all__ = (
     "ArcEvent",
     "CommandErrorEvent",
     "StartedEvent",
+    "StoppingEvent",
     "InteractionResponse",
     "GatewayContext",
     "RESTContext",
