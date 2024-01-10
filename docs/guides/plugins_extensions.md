@@ -13,7 +13,7 @@ Plugins are a way to group commands and related functionality together. This can
 
 === "Gateway"
 
-    ```py
+    ```py hl_lines="1 3 8"
     plugin = arc.GatewayPlugin("plugin name")
 
     @plugin.include
@@ -31,7 +31,7 @@ Plugins are a way to group commands and related functionality together. This can
 
 === "REST"
 
-    ```py
+    ```py hl_lines="1 3 8"
     plugin = arc.RESTPlugin("plugin name")
 
     @plugin.include
@@ -52,7 +52,7 @@ In the snippet above, we define a new plugin, add two commands to it, then add t
 !!! tip
     Anything that can be used with `@client.include` can also be used with `@plugin.include` as well. Plugins also define methods commonly found on the client such as [.include_slash_group()][arc.abc.PluginBase.include_slash_group] or [.walk_commands()][arc.abc.PluginBase.walk_commands].
 
-The benefit of grouping commands together into a plugin is that you can define custom behaviour at the plugin level which applies to all commands added to the plugin. [Hooks](./hooks.md), [error handling](./error_handling.md) can all be added to the plugin itself, additionally, you can also set attributes such as `autodefer=` or `default_permissions=`, and they will be applied to all commands that belong to the plugin.
+The benefit of grouping commands together into a plugin is that you can define custom behaviour at the plugin level which applies to all commands added to the plugin. [Hooks](./hooks.md), [error handling](./error_handling.md), [concurrency limiting](./concurrency_limiting.md) and more can all be added to the plugin itself, additionally, you can also set attributes such as `autodefer=` or `default_permissions=`, and they will be applied to all commands that belong to the plugin.
 
 For example, to make all commands in a plugin require `MANAGE_GUILD` permissions by default, you may use the following snippet:
 

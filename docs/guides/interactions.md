@@ -79,7 +79,7 @@ await context.respond("I'm secret!", flags=hikari.MessageFlag.EPHEMERAL)
 
 === "Gateway"
 
-    ```py
+    ```py hl_lines="9"
     import arc
     import asyncio
 
@@ -94,7 +94,7 @@ await context.respond("I'm secret!", flags=hikari.MessageFlag.EPHEMERAL)
 
 === "REST"
 
-    ```py
+    ```py hl_lines="9"
     import arc
     import asyncio
 
@@ -117,7 +117,7 @@ This can be passed to the command decorator's `autodefer=` keyword argument:
 
 === "Gateway"
 
-    ```py
+    ```py hl_lines="7"
     import arc
     import asyncio
 
@@ -132,7 +132,7 @@ This can be passed to the command decorator's `autodefer=` keyword argument:
 
 === "REST"
 
-    ```py
+    ```py hl_lines="7"
     import arc
     import asyncio
 

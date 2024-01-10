@@ -13,7 +13,7 @@ description: A guide on dependency injection & arc
 
 === "Gateway"
 
-    ```py
+    ```py hl_lines="18"
     import typing
 
     import hikari
@@ -36,7 +36,7 @@ description: A guide on dependency injection & arc
 
 === "REST"
 
-    ```py
+    ```py hl_lines="18"
     import typing
 
     import hikari
@@ -63,7 +63,7 @@ In the above example, we asked `arc` that every time we ask for a dependency of 
 
 === "Gateway"
 
-    ```py
+    ```py hl_lines="5"
     @client.include
     @arc.slash_command("increment", "Increment a counter!")
     # We inject a dependency of type 'MyDatabase' here.
@@ -76,7 +76,7 @@ In the above example, we asked `arc` that every time we ask for a dependency of 
 
 === "REST"
 
-    ```py
+    ```py hl_lines="5"
     @client.include
     @arc.slash_command("increment", "Increment a counter!")
     # We inject a dependency of type 'MyDatabase' here.
@@ -93,7 +93,7 @@ And here we request that `arc` injects the dependency we declared earlier into o
 
 By default, only command callbacks are injected with dependencies, but you might want to inject other functions too. This can be done via the [`@Client.inject_dependencies`][arc.abc.client.Client.inject_dependencies] decorator (or [`@Plugin.inject_dependencies`][arc.abc.plugin.PluginBase.inject_dependencies] if working in a plugin).
 
-```py
+```py hl_lines="1"
 @client.inject_dependencies
 def compare_counter(value: int, db: MyDatabase = arc.inject()) -> None:
     if value > db.value:
@@ -145,7 +145,7 @@ Let's say our app has two configurations, a "testing mode" where we want our "da
 
 === "Gateway"
 
-    ```py
+    ```py  hl_lines="1 5-8 15"
     is_testing = True # Change me!
 
     client = arc.GatewayClient(...)
@@ -168,7 +168,7 @@ Let's say our app has two configurations, a "testing mode" where we want our "da
 
 === "REST"
 
-    ```py
+    ```py hl_lines="1 5-8 15"
     is_testing = True # Change me!
 
     client = arc.RESTClient(...)

@@ -31,7 +31,7 @@ To register a **pre-execution** hook, simply use the [`@arc.with_hook`][arc.abc.
 
 === "Gateway"
 
-    ```py
+    ```py hl_lines="2"
     @client.include
     @arc.with_hook(my_hook)
     @arc.slash_command("name", "description")
@@ -41,7 +41,7 @@ To register a **pre-execution** hook, simply use the [`@arc.with_hook`][arc.abc.
 
 === "REST"
 
-    ```py
+    ```py hl_lines="2"
     @client.include
     @arc.with_hook(my_hook)
     @arc.slash_command("name", "description")
@@ -83,7 +83,7 @@ To register a **post-execution** hook, use the [`@arc.with_post_hook`][arc.abc.h
 
 === "Gateway"
 
-    ```py
+    ```py hl_lines="2"
     @client.include
     @arc.with_post_hook(my_hook)
     @arc.slash_command("name", "description")
@@ -93,7 +93,7 @@ To register a **post-execution** hook, use the [`@arc.with_post_hook`][arc.abc.h
 
 === "REST"
 
-    ```py
+    ```py hl_lines="2"
     @client.include
     @arc.with_post_hook(my_hook)
     @arc.slash_command("name", "description")
@@ -198,27 +198,53 @@ Limiters (or cooldowns, as known in some libraries) are a special type of pre-ex
 
 For a list of all built-in limiters, see [here](../api_reference/utils/hooks/limiters.md).
 
-```py
-@client.include
-# Limit the command to 2 uses every 10 seconds per channel.
-@arc.with_hook(arc.channel_limiter(10.0, 2))
-@arc.slash_command("ping", "Pong!")
-async def ping(ctx: arc.GatewayContext) -> None:
-    await ctx.respond("Pong!")
+=== "Gateway"
+
+    ```py hl_lines="3 13"
+    @client.include
+    # Limit the command to 2 uses every 10 seconds per channel.
+    @arc.with_hook(arc.channel_limiter(10.0, 2))
+    @arc.slash_command("ping", "Pong!")
+    async def ping(ctx: arc.GatewayContext) -> None:
+        await ctx.respond("Pong!")
 
 
-@ping.set_error_handler
-async def ping_error_handler(
-    ctx: arc.GatewayContext, error: Exception
-) -> None:
-    if isinstance(error, arc.UnderCooldownError):
-        await ctx.respond(
-            "Command is on cooldown!"
-            f"\nTry again in `{error.retry_after}` seconds."
-        )
-    else:
-        raise error
-```
+    @ping.set_error_handler
+    async def ping_error_handler(
+        ctx: arc.GatewayContext, error: Exception
+    ) -> None:
+        if isinstance(error, arc.UnderCooldownError):
+            await ctx.respond(
+                "Command is on cooldown!"
+                f"\nTry again in `{error.retry_after}` seconds."
+            )
+        else:
+            raise error
+    ```
+
+=== "REST"
+
+    ```py hl_lines="3 13"
+    @client.include
+    # Limit the command to 2 uses every 10 seconds per channel.
+    @arc.with_hook(arc.channel_limiter(10.0, 2))
+    @arc.slash_command("ping", "Pong!")
+    async def ping(ctx: arc.RESTContext) -> None:
+        await ctx.respond("Pong!")
+
+
+    @ping.set_error_handler
+    async def ping_error_handler(
+        ctx: arc.RESTContext, error: Exception
+    ) -> None:
+        if isinstance(error, arc.UnderCooldownError):
+            await ctx.respond(
+                "Command is on cooldown!"
+                f"\nTry again in `{error.retry_after}` seconds."
+            )
+        else:
+            raise error
+    ```
 
 !!! warning
     You should be prepared to handle [`UnderCooldownError`][arc.errors.UnderCooldownError], it gets raised by built-in limiters when a ratelimit is exceeded. For more about error handling, see the [error handling](./error_handling.md) section.

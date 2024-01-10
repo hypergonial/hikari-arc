@@ -11,7 +11,7 @@ In certain cases it may be useful to ensure that only a specific amount of insta
 
 === "Gateway"
 
-    ```py
+    ```py hl_lines="3 12"
     @client.include
     # Limit the command to 1 instance per channel
     @arc.with_concurrency_limit(arc.channel_concurrency(1))
@@ -34,7 +34,7 @@ In certain cases it may be useful to ensure that only a specific amount of insta
 
 === "REST"
 
-    ```py
+    ```py hl_lines="3 12"
     @client.include
     # Limit the command to 1 instance per channel
     @arc.with_concurrency_limit(arc.channel_concurrency(1))

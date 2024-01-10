@@ -26,7 +26,7 @@ The most common use for interacting with the REST API directly is if you want to
 
 === "Gateway"
 
-    ```py
+    ```py hl_lines="7"
     @client.include
     @arc.slash_command("make_channel", "Make a new channel!")
     async def make_channel(
@@ -39,7 +39,7 @@ The most common use for interacting with the REST API directly is if you want to
 
 === "REST"
 
-    ```py
+    ```py hl_lines="7"
     @client.include
     @arc.slash_command("make_channel", "Make a new channel!")
     async def make_channel(
@@ -62,7 +62,7 @@ In this snippet, we use [rest.create_guild_text_channel()](https://docs.hikari-p
 
 While the REST API [can be used](https://docs.hikari-py.dev/en/latest/reference/hikari/api/rest/#hikari.api.rest.RESTClient.fetch_channel) to fetch data from Discord directly, this is generally **not recommended**, as it is very slow, consumes [ratelimits](https://discord.com/developers/docs/topics/rate-limits) and is generally inefficient. Instead, you should use your client's cache implementation. To access objects stored in the cache, you need to access your gateway client's [`cache`][arc.client.GatewayClientBase.cache] module.
 
-```py
+```py hl_lines="5"
 @client.include
 @arc.slash_command("roles", "List all the roles in this guild!")
 async def channel_info(ctx: arc.GatewayContext) -> None:

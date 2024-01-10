@@ -15,7 +15,7 @@ To register a **local error handler** on a command, group, plugin, or the client
 
 === "Gateway"
 
-    ```py
+    ```py hl_lines="6"
     @client.include
     @arc.slash_command("name", "description")
     async def error_command_func(ctx: arc.GatewayContext) -> None:
@@ -31,7 +31,7 @@ To register a **local error handler** on a command, group, plugin, or the client
 
 === "REST"
 
-    ```py
+    ```py hl_lines="6"
     @client.include
     @arc.slash_command("name", "description")
     async def error_command_func(ctx: arc.RESTContext) -> None:
