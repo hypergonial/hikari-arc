@@ -51,7 +51,8 @@ async def ping(
 
 bot.run()
 ```
-For more examples see [examples](https://github.com/hypergonial/hikari-arc/tree/main/examples), or refer to the [documentation](https://arc.hypergonial.com).
+
+To get started with `arc`, see the [documentation](https://arc.hypergonial.com), or the [examples](https://github.com/hypergonial/hikari-arc/tree/main/examples), if you prefer to learn that way.
 
 ## Issues and support
 
@@ -59,7 +60,7 @@ For general usage help or questions, see the [hikari discord](https://discord.gg
 
 ## Contributing
 
-See [Contributing](./CONTRIBUTING.md)
+See [Contributing](./CONTRIBUTING.md).
 
 ## Acknowledgements
 
