@@ -11,7 +11,7 @@ https://arc.hypergonial.com
 from alluka import Client as Injector
 from alluka import inject
 
-from arc import abc, command, utils
+from arc import abc, command, ext, utils
 
 from .abc import HookResult, Option, OptionType, with_concurrency_limit, with_hook, with_post_hook
 from .client import (
@@ -166,6 +166,7 @@ __all__ = (
     "abc",
     "utils",
     "command",
+    "ext",
     "with_hook",
     "with_post_hook",
     "bot_has_permissions",
