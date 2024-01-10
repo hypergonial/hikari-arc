@@ -7,7 +7,7 @@ edit_uri: edit/main/docs/
 theme:
   name: material
   icon:
-    logo: fontawesome/solid/book
+    logo: material/lightning-bolt
     repo: fontawesome/brands/github
     edit: material/pencil
     view: material/eye
@@ -60,6 +60,8 @@ nav:
     - Getting Started: getting_started.md
     - Guides:
         - guides/index.md
+        - guides/typing.md
+        - guides/hikari_fundamentals.md
         - guides/interactions.md
         - guides/options.md
         - guides/command_groups.md

@@ -13,6 +13,24 @@ If you think something is missing or inaccurate, please [open an issue](https://
 
 <div class="grid cards" markdown>
 
+-   :material-language-python:{ .lg .middle } **Typing & Type Hints**
+
+    ---
+
+    `arc` uses type-hints & typing extensively, so if you need
+    a refresher on what they are, and how to use them, start here!
+
+    [:octicons-arrow-right-24: Learn more](./typing.md)
+
+-   :material-white-balance-sunny:{ .lg .middle } **Hikari Fundamentals**
+
+    ---
+
+    Learn the basics of how to use `hikari`, the foundation upon
+    which `arc` builds.
+
+    [:octicons-arrow-right-24: Learn more](./hikari_fundamentals.md)
+
 -   :material-api:{ .lg .middle } **Interactions**
 
     ---

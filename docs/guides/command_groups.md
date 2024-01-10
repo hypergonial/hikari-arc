@@ -77,7 +77,7 @@ hide:
         └─ subgroup
     ```
 
-!!! failure ""
+!!! failure "Caution"
     Using subcommands or subcommand groups will make your top-level group **unusable**. You can't send the base `/permissions` as a valid command if you also have `/permissions add | remove` as subcommands or subcommand groups.
 
 For example, if you're developing a moderation bot, you may want to create a `/permissions` command that can:
@@ -97,9 +97,8 @@ permissions = client.include_slash_group("permissions", "Get or edit permissions
 Next, we can define subgroups that this group will contain via [`SlashGroup.include_subgroup`][arc.command.slash.SlashGroup.include_subgroup]:
 
 ```py
-user = group.include_subgroup("user", "Get or edit permissions for a user")
-
-role = group.include_subgroup("role", "Get or edit permissions for a role")
+user = permissions.include_subgroup("user", "Get or edit permissions for a user")
+role = permissions.include_subgroup("role", "Get or edit permissions for a role")
 ```
 
 Finally, we can simply `@include` the commands in the group:

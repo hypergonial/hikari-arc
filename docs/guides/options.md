@@ -9,21 +9,24 @@ hide:
 
 Options can be used to ask for user input in slash commands. They come in a variety of types and support various features, depending on the type.
 
+!!! tip
+    If you're not familiar with type-hinting in Python, you should read [this chapter](./typing.md) first.
+
 ## Declaring options
 
 An **option** can be declared as parameters in the command callback using the following general syntax:
 
 ```py
-var_name: arc.Option[type, arc.TypeParams(...)]
+var_name: arc.Option[something, arc.SomethingParams(...)]
 ```
 
-Where `type` is a substitute for the type of the option.
+Where `something` is a substitute for the type of the option.
 
 This is what that looks like in action:
 
 === "Gateway"
 
-    ```py
+    ```py hl_lines="5"
     @client.include
     @arc.slash_command("name", "description")
     async def options_cmd(
@@ -35,7 +38,7 @@ This is what that looks like in action:
 
 === "REST"
 
-    ```py
+    ```py hl_lines="5"
     @client.include
     @arc.slash_command("name", "description")
     async def options_cmd(
@@ -49,7 +52,7 @@ To make an option **not required**, you should set a default value:
 
 === "Gateway"
 
-    ```py
+    ```py hl_lines="5 6"
     @client.include
     @arc.slash_command("name", "description")
     async def options_cmd(
@@ -62,7 +65,7 @@ To make an option **not required**, you should set a default value:
 
 === "REST"
 
-    ```py
+    ```py hl_lines="5 6"
     @client.include
     @arc.slash_command("name", "description")
     async def options_cmd(
@@ -119,7 +122,7 @@ Choices can be added to an option to define tell the user what values are valid.
 
 === "Gateway"
 
-    ```py
+    ```py hl_lines="6"
     @client.include
     @arc.slash_command("choices", "I can't choose!")
     async def choices_command(
@@ -132,7 +135,7 @@ Choices can be added to an option to define tell the user what values are valid.
 
 === "REST"
 
-    ```py
+    ```py hl_lines="6"
     @client.include
     @arc.slash_command("choices", "I can't choose!")
     async def choices_command(
@@ -147,7 +150,7 @@ You can also pass a mapping if you want to name your choices. Your command will 
 
 === "Gateway"
 
-    ```py
+    ```py hl_lines="6"
     @client.include
     @arc.slash_command("choices", "I can't choose!")
     async def choices_command(
@@ -160,7 +163,7 @@ You can also pass a mapping if you want to name your choices. Your command will 
 
 === "REST"
 
-    ```py
+    ```py hl_lines="6"
     @client.include
     @arc.slash_command("choices", "I can't choose!")
     async def choices_command(
@@ -207,7 +210,7 @@ Then, to add autocomplete to an option, specify the `autocomplete_with=` argumen
 
 === "Gateway"
 
-    ```py
+    ```py hl_lines="6"
     @client.include
     @arc.slash_command("autocomplete", "Autocomplete options!")
     async def autocomplete_command(
@@ -220,7 +223,7 @@ Then, to add autocomplete to an option, specify the `autocomplete_with=` argumen
 
 === "REST"
 
-    ```py
+    ```py hl_lines="6"
     @client.include
     @arc.slash_command("autocomplete", "Autocomplete options!")
     async def autocomplete_command(

@@ -11,10 +11,14 @@ Here you can find all the changelogs for `hikari-arc`.
 
 ## v1.0.0
 
+This marks the **first stable release** of `arc`, meaning that from this point on, the project follows [semantic versioning](https://semver.org/), and no breaking changes will happen (until an eventual 2.0).
+
 - Add [loops](./guides/loops.md). Loops can be used to repeatedly call a given coroutine function with a specific interval or cron set.
 - Add [concurrency limiters](./guides/concurrency_limiting.md). Concurrency limiters can be used to prevent users from invoking a command that already has a specific amount of instances running.
 - Add `arc.StartedEvent` and `arc.StoppingEvent` to gateway clients to enable managing lifecycle via events.
 - Fix command groups always being republished when command syncing.
+
+In additon to these changes, the [documentation](https://arc.hypergonial.com) got a major refresh, adding & extending guides where needed.
 
 ## v0.6.0
 

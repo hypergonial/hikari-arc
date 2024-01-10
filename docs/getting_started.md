@@ -8,7 +8,7 @@ hide:
 
 # Getting Started
 
-This document assumes basic familiarity with **Python**, **async/await** and **type-hints**. If you need a refresher on any of these topics, here's a few helpful resources:
+This documentation assumes basic familiarity with **Python** and **async/await**. If you need a refresher on any of these topics, here's a few helpful resources:
 
 ??? abstract "Resources for learning more"
 
@@ -24,11 +24,6 @@ This document assumes basic familiarity with **Python**, **async/await** and **t
     - [Real Python asyncio walkthrough](https://realpython.com/async-io-python/#setting-up-your-environment)
     - [FastAPI async/await guide](https://fastapi.tiangolo.com/async/#asynchronous-code)
     - [Python `asyncio` module reference](https://docs.python.org/3/library/asyncio.html)
-
-    **Typing and type-hints**
-
-    - [FastAPI Python Types Intro](https://fastapi.tiangolo.com/python-types/)
-    - [Type hints cheat sheet](https://mypy.readthedocs.io/en/latest/cheat_sheet_py3.html)
 
 No prior experience with making Discord bots is required.
 
@@ -254,7 +249,7 @@ and rely only on users invoking the bot via slash commands. Setting up a RESTBot
 
 ## Recommended tooling
 
-`arc` works best when you use a **static type-checker**. It can ensure your code is correct and detect type errors without you even running your code! It's not required to use one, but is highly recommended, as `arc` was made with type-safety in mind.
+`arc` works best when you use a **static type-checker**. It can ensure your code is correct and **detect type errors** without you even running your code! It's not required to use one, but is highly recommended, as `arc` was made with type-safety in mind. For more information on types and type-checking, see the [types guide](./guides/typing.md).
 
 ### Install pyright (optional)
 
