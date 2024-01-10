@@ -15,7 +15,6 @@ from arc import abc, command, ext, utils
 
 from .abc import HookResult, Option, OptionType, with_concurrency_limit, with_hook, with_post_hook
 from .client import (
-    Client,
     GatewayClient,
     GatewayClientBase,
     GatewayContext,
@@ -53,11 +52,18 @@ from .errors import (
     CommandInvokeError,
     CommandPublishFailedError,
     DMOnlyError,
+    ExtensionError,
+    ExtensionLoadError,
+    ExtensionUnloadError,
     GuildCommandPublishFailedError,
     GuildOnlyError,
+    HookAbortError,
+    InteractionResponseError,
     InvokerMissingPermissionsError,
     MaxConcurrencyReachedError,
+    NoResponseIssuedError,
     NotOwnerError,
+    ResponseAlreadyIssuedError,
     UnderCooldownError,
 )
 from .events import ArcEvent, CommandErrorEvent, StartedEvent, StoppingEvent
@@ -125,7 +131,6 @@ __all__ = (
     "user_command",
     "slash_command",
     "slash_subcommand",
-    "Client",
     "GatewayClientBase",
     "RESTClientBase",
     "GatewayClient",
@@ -142,6 +147,13 @@ __all__ = (
     "GuildCommandPublishFailedError",
     "CommandPublishFailedError",
     "MaxConcurrencyReachedError",
+    "NoResponseIssuedError",
+    "ResponseAlreadyIssuedError",
+    "ExtensionError",
+    "ExtensionLoadError",
+    "ExtensionUnloadError",
+    "HookAbortError",
+    "InteractionResponseError",
     "PluginBase",
     "RESTPluginBase",
     "GatewayPluginBase",
