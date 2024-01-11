@@ -2,12 +2,16 @@
     "editor.tabCompletion": "onlySnippets",
     "python.analysis.autoImportCompletions": true,
     "python.analysis.typeCheckingMode": "strict",
+    "python.analysis.diagnosticMode": "workspace",
+    "python.analysis.exclude": [
+        "build*",
+        ".nox*",
+    ],
     "editor.formatOnSave": true,
     "[python]": {
         "editor.defaultFormatter": "charliermarsh.ruff"
     },
     "autoDocstring.docstringFormat": "numpy",
-    "mypy.runUsingActiveInterpreter": true,
     "python.testing.pytestArgs": [
         "tests"
     ],
