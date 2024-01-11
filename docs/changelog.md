@@ -9,6 +9,10 @@ hide:
 
 Here you can find all the changelogs for `hikari-arc`.
 
+## Unreleased
+
+- Make usage of `__slots__` consistent across the library.
+
 ## v1.0.0
 
 This marks the **first stable release** of `arc`, meaning that from this point on, the project follows [semantic versioning](https://semver.org/), and no breaking changes will happen (until an eventual 2.0).
