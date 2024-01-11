@@ -6,6 +6,8 @@ copyright: Copyright &copy; 2023 hypergonial
 edit_uri: edit/main/docs/
 theme:
   name: material
+  font:
+    code: JetBrains Mono
   icon:
     logo: material/lightning-bolt
     repo: fontawesome/brands/github
@@ -141,6 +143,7 @@ plugins:
   - autorefs
   - search
   - social
+  - privacy
   - glightbox:
       touchNavigation: true
       loop: false

@@ -23,7 +23,7 @@ python_details = f"{platform.python_implementation()} {platform.python_version()
 
 sys.stderr.write(
     f"""{TEAL}hikari-arc - package information
-{WHITE}----------------------------------
+{WHITE}--------------------------------
 {TEAL}Arc version: {WHITE}{arc.__version__}
 {TEAL}Install path: {WHITE}{os.path.abspath(os.path.dirname(__file__))}
 {TEAL}Hikari version: {WHITE}{hikari.__version__}
