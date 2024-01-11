@@ -10,7 +10,7 @@ To run and test the examples, simply insert your token in into the constructor o
 python example_name.py
 ```
 
-If you have any questions, or found an issue with one of the examples, feel free to [open an issue](https://github.com/hypergonial/hikari-arc/issues/new), or join the [hikari discord](https://discord.gg/hikari)!
+If you have any questions, or found an issue with one of the examples, feel free to [open an issue](https://github.com/hypergonial/hikari-arc/issues/new/choose), or join the [hikari discord](https://discord.gg/hikari)!
 
 ## Gateway or REST?
 

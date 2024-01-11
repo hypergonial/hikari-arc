@@ -9,7 +9,7 @@ hide:
 
 In this section you can find various in-depth guides that explain specific topics in detail. There's also fully functional [examples](https://github.com/hypergonial/hikari-arc/tree/main/examples) in the repository, if you prefer to learn that way.
 
-If you think something is missing or inaccurate, please [open an issue](https://github.com/hypergonial/hikari-arc/issues/new)!
+If you think something is missing or inaccurate, please [open an issue](https://github.com/hypergonial/hikari-arc/issues/new/choose)!
 
 <div class="grid cards" markdown>
 

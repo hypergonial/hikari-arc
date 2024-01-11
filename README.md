@@ -56,7 +56,7 @@ To get started with `arc`, see the [documentation](https://arc.hypergonial.com),
 
 ## Issues and support
 
-For general usage help or questions, see the [hikari discord](https://discord.gg/hikari), if you have found a bug or have a feature request, feel free to [open an issue](https://github.com/hypergonial/hikari-arc/issues/new)!
+For general usage help or questions, see the [hikari discord](https://discord.gg/hikari), if you have found a bug or have a feature request, feel free to [open an issue](https://github.com/hypergonial/hikari-arc/issues/new/choose)!
 
 ## Contributing
 
