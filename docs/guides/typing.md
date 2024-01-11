@@ -186,7 +186,7 @@ def process_items(items: list[str]) -> None:
 !!! info
     Those internal types in the square brackets are called "type parameters".
 
-    In this case, `str` is the type parameter passed to `List` (or `list` in Python 3.9 and above).
+    In this case, `str` is the type parameter passed to `list`.
 
 That means: "the variable `items` is a `list`, and each of the items in this list is a `str`".
 
