@@ -32,6 +32,8 @@ class BoolParams(OptionParams[bool]):
         The localizations for the description of the option
     """
 
+    __slots__: t.Sequence[str] = ()
+
 
 @attr.define(slots=True, kw_only=True)
 class BoolOption(CommandOptionBase[bool, ClientT, BoolParams]):

@@ -38,6 +38,13 @@ def pytest(session: nox.Session) -> None:
 
 
 @nox.session()
+def slotscheck(session: nox.Session) -> None:
+    session.install("-U", "slotscheck", "-c", "dev_requirements.txt")
+    session.install(".[cron]")
+    session.run("slotscheck", "-m", "arc", "-v")
+
+
+@nox.session()
 def docs(session: nox.Session) -> None:
     session.install("-r", "doc_requirements.txt", "-r", "requirements.txt")
     session.run("python", "-m", "mkdocs", "-q", "build")

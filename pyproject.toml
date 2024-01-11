@@ -33,6 +33,12 @@ split-on-trailing-comma = false
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"
 
+[tool.slotscheck]
+strict-imports = true
+require-superclass = false
+require-subclass = true
+exclude-classes = ":.*(Exception|Error|Proto|AutocompleteData)"
+
 [tool.mypy]
 ignore_errors = true
 

@@ -122,7 +122,7 @@ class ConcurrencyLimiter(t.Generic[KeyT]):
     - [`custom_concurrency()`][arc.utils.concurrency_limiter.custom_concurrency]
     """
 
-    __slots__ = ("_capacity", "_buckets", "_get_key")
+    __slots__: t.Sequence[str] = ("_capacity", "_buckets", "_get_key")
 
     def __init__(self, capacity: int, *, get_key_with: t.Callable[[KeyT], str]) -> None:
         self._capacity = capacity

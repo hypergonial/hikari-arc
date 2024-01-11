@@ -33,6 +33,8 @@ class RoleParams(OptionParams[hikari.Role]):
         The localizations for the description of the option
     """
 
+    __slots__: t.Sequence[str] = ()
+
 
 @attr.define(slots=True, kw_only=True)
 class RoleOption(CommandOptionBase[hikari.Role, ClientT, RoleParams]):

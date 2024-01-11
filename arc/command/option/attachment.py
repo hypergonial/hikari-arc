@@ -33,6 +33,8 @@ class AttachmentParams(OptionParams[hikari.Attachment]):
         The description of the option in different locales
     """
 
+    __slots__: t.Sequence[str] = ()
+
 
 @attr.define(slots=True)
 class AttachmentOption(CommandOptionBase[hikari.Attachment, ClientT, AttachmentParams]):

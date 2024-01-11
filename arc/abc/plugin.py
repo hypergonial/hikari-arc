@@ -51,6 +51,20 @@ class PluginBase(HasErrorHandler[ClientT], Hookable[ClientT], HasConcurrencyLimi
         Parameters left as `hikari.UNDEFINED` will be inherited from the parent client.
     """
 
+    __slots__: t.Sequence[str] = (
+        "_client",
+        "_name",
+        "_default_enabled_guilds",
+        "_cmd_settings",
+        "_slash_commands",
+        "_user_commands",
+        "_message_commands",
+        "_error_handler",
+        "_hooks",
+        "_post_hooks",
+        "_concurrency_limiter",
+    )
+
     def __init__(
         self,
         name: str,

@@ -526,7 +526,7 @@ class CommandBase(
             if resp.name is not None:
                 name_locales[locale] = resp.name
 
-        self._name_localizations = name_locales
+        self.name_localizations = name_locales
 
     async def _handle_pre_hooks(self, command: CallableCommandProto[ClientT], ctx: Context[ClientT]) -> bool:
         """Handle all pre-execution hooks for a command.

@@ -252,7 +252,6 @@ class Context(t.Generic[ClientT]):
         "_response_lock",
         "_autodefer_task",
         "_created_at",
-        "_autodefer_task",
         "_has_command_failed",
         "_options",
     )

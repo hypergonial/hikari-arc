@@ -46,6 +46,8 @@ class IntParams(OptionWithChoicesParams[int, ClientT]):
         You cannot provide both `choices` and `autocomplete_with` at the same time.
     """
 
+    __slots__: t.Sequence[str] = ("_min", "_max")
+
     def __init__(
         self,
         description: str = "No description provided.",

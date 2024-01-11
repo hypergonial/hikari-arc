@@ -34,6 +34,8 @@ class UserParams(OptionParams[hikari.User]):
         The description of the option in different locales
     """
 
+    __slots__ = ()
+
 
 @attr.define(slots=True, kw_only=True)
 class UserOption(CommandOptionBase[hikari.User, ClientT, UserParams]):

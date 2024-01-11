@@ -39,6 +39,8 @@ class ChannelParams(OptionParams[hikari.PartialChannel]):
         The description of the option in different locales
     """
 
+    __slots__: t.Sequence[str] = ()
+
 
 @attr.define(slots=True, kw_only=True)
 class ChannelOption(CommandOptionBase[hikari.PartialChannel, ClientT, ChannelParams]):

@@ -16,7 +16,7 @@ __all__ = ("Version", "CURRENT_VERSION")
 class Version:
     """A version object representing a semantic version."""
 
-    __all__ = ("major", "minor", "patch")
+    __slots__: t.Sequence[str] = ("major", "minor", "patch")
 
     def __init__(self, major: int, minor: int, patch: int) -> None:
         self.major = major

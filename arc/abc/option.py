@@ -120,6 +120,8 @@ class OptionParams(t.Generic[T]):
         The description of the option in different locales
     """
 
+    __slots__: t.Sequence[str] = ("_name", "_description", "_name_localizations", "_description_localizations")
+
     def __init__(
         self,
         description: str = "No description provided.",
@@ -175,6 +177,8 @@ class OptionWithChoicesParams(OptionParams[ChoiceT], t.Generic[ChoiceT, ClientT]
     !!! warning
         You cannot provide both `choices` and `autocomplete_with` at the same time.
     """
+
+    __slots__: t.Sequence[str] = ("_choices", "_autocomplete_with")
 
     def __init__(
         self,

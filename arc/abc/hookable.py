@@ -21,12 +21,16 @@ class HookResult:
         If this is undesired, you should raise an exception instead.
     """
 
+    __slots__: t.Sequence[str] = ("_abort",)
+
     def __init__(self, abort: bool = False) -> None:
         self._abort = abort
 
 
 class Hookable(abc.ABC, t.Generic[ClientT]):
     """A trait for objects that can have hooks added to them."""
+
+    __slots__: t.Sequence[str] = ()
 
     @property
     @abc.abstractmethod

@@ -12,6 +12,8 @@ if t.TYPE_CHECKING:
 class HasErrorHandler(abc.ABC, t.Generic[ClientT]):
     """A trait for objects that can have an error handler set on them."""
 
+    __slots__: t.Sequence[str] = ()
+
     @property
     @abc.abstractmethod
     def error_handler(self) -> ErrorHandlerCallbackT[ClientT] | None:

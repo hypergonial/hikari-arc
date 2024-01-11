@@ -15,6 +15,8 @@ __all__ = ("ArcEvent", "CommandErrorEvent", "StartedEvent", "StoppingEvent")
 class ArcEvent(hikari.Event):
     """Base class for all Arc events."""
 
+    __slots__: t.Sequence[str] = ()
+
 
 class StartedEvent(ArcEvent, t.Generic[GatewayClientT]):
     """Event dispatched when the client has started.
@@ -22,6 +24,8 @@ class StartedEvent(ArcEvent, t.Generic[GatewayClientT]):
     This is notably different from hikari's `StartedEvent`
     because it fires after all command syncing was completed and the client has finished its startup process.
     """
+
+    __slots__: t.Sequence[str] = ("_client",)
 
     def __init__(self, client: GatewayClientT) -> None:
         self._client = client
@@ -43,6 +47,8 @@ class StoppingEvent(ArcEvent, t.Generic[GatewayClientT]):
     This event is fired after the shutdown hook has been processed.
     """
 
+    __slots__: t.Sequence[str] = ("_client",)
+
     def __init__(self, client: GatewayClientT) -> None:
         self._client = client
 
@@ -63,6 +69,8 @@ class CommandErrorEvent(ArcEvent, t.Generic[GatewayClientT]):
     !!! warning
         Creating any listeners for this event will disable the client error handler completely.
     """
+
+    __slots__: t.Sequence[str] = ("_client", "_context", "_exception")
 
     def __init__(self, client: GatewayClientT, context: Context[GatewayClientT], exception: Exception) -> None:
         self._context = context

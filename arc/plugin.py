@@ -58,6 +58,8 @@ class RESTPluginBase(PluginBase[RESTClientT]):
     ```
     """
 
+    __slots__: t.Sequence[str] = ()
+
     @property
     def is_rest(self) -> bool:
         return True
@@ -103,6 +105,8 @@ class GatewayPluginBase(PluginBase[GatewayClientT]):
     client.add_plugin(plugin)
     ```
     """
+
+    __slots__: t.Sequence[str] = ("_listeners",)
 
     def __init__(
         self,

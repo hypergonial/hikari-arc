@@ -34,6 +34,8 @@ class MentionableParams(OptionParams[hikari.Role | hikari.User]):
         The description of the option in different locales
     """
 
+    __slots__: t.Sequence[str] = ()
+
 
 @attr.define(slots=True, kw_only=True)
 class MentionableOption(CommandOptionBase[hikari.Role | hikari.User, ClientT, MentionableParams]):

@@ -41,6 +41,8 @@ class ConcurrencyLimiterProto(t.Protocol[ClientT]):
 class HasConcurrencyLimiter(abc.ABC, t.Generic[ClientT]):
     """A trait for objects that can have a concurrency limiter."""
 
+    __slots__: t.Sequence[str] = ()
+
     @property
     @abc.abstractmethod
     def concurrency_limiter(self) -> ConcurrencyLimiterProto[ClientT] | None:
