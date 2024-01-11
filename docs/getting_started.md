@@ -228,6 +228,10 @@ Paste the code above into a file and run it. The bot should start, register the 
 
     Ensure that the invite link you invited the bot with has the `bot` and `application.commands` scopes ticked. If unsure, refer to the fourth step of [setting up a bot](#setting-up-a-discord-bot) and reinvite the bot.
 
+    **Everything seems fine but I hit `/` and the command isn't there!**
+
+    The Discord client is sometimes a little *too* aggressive when it comes to caching commands. You should try reloading the app via `Ctrl` + `R`.
+
 ## Difference between GatewayBot & RESTBot
 
 !!! tip
