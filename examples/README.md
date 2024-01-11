@@ -26,7 +26,7 @@ This model is ideal for bots that need to do things other than just responding t
 
 A **RESTBot** however, isn't constantly connected to Discord, instead, you're expected to host a small HTTP server, and Discord will send [interactions](https://arc.hypergonial.com/guides/interactions/) to your server
 by making HTTP `POST` requests to it. RESTBots **only receive [interactions](https://arc.hypergonial.com/guides/interactions/)** from Discord, they **do not receive events** or other types of data. They are ideal for bots that manage little to no state,
-and rely only on users invoking the bot via slash commands. Setting up a RESTBot however is slightly more complicated compared to a GatewayBot, as it requires a [domain](https://en.wikipedia.org/wiki/Domain_name) with [TLS](https://en.wikipedia.org/wiki/Transport_Layer_Security) for Discord to be able to send interactions to your webserver.
+and rely only on users invoking the bot via slash commands. Setting up a RESTBot however is slightly more complicated compared to a GatewayBot, as it requires a publically accessible [domain](https://en.wikipedia.org/wiki/Domain_name) with [TLS](https://en.wikipedia.org/wiki/Transport_Layer_Security) for Discord to be able to send interactions to your webserver.
 
 > **Does this mean a Gateway bot cannot use the REST API?**
 >
