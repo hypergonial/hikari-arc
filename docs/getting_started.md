@@ -245,7 +245,7 @@ by making HTTP `POST` requests to it. RESTBots **only receive [interactions](./g
 and rely only on users invoking the bot via slash commands. Setting up a RESTBot however is slightly more complicated compared to a GatewayBot, as it requires a publically accessible [domain](https://en.wikipedia.org/wiki/Domain_name "A domain name, like 'www.example.com'") with [TLS](https://en.wikipedia.org/wiki/Transport_Layer_Security "Transport Layer Security (site with https://)") for Discord to be able to send interactions to your webserver.
 
 !!! question "Does this mean a Gateway bot cannot use the REST API?"
-    **No.** Both Gateway & REST bots have access to the HTTP REST API Discord provides (see [`Client.rest`][arc.abc.client.Client.rest]), the primary difference between the two bot types is how Discord communicates with **your bot**, and what information it sends to it.
+    **No.** Both Gateway & REST bots have access to the HTTP REST API Discord provides ([see how](./guides/hikari_fundamentals.md#using-discords-rest-api)), the primary difference between the two bot types is how Discord communicates with **your bot**, and what information it sends to it.
 
 ## Recommended tooling
 
