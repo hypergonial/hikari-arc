@@ -28,7 +28,7 @@ async def startup(client: arc.RESTClient) -> None:
     # Start the loop by passing all the parameters it needs
     loopy_loop.start(value=10)
 
-    # The other loop has no parameters, so we can just start it
+    # The other loop has no parameters, so you can just start it
     loop.start()
 
 

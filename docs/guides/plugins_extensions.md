@@ -75,7 +75,7 @@ Extensions allow `arc` to load additional modules and pass your client instance 
 !!! note
     It is **not** required to use plugins in conjunction with extensions, the two features can be used seperately, however it is *recommended* for simplicity's sake to make one extension contain one plugin.
 
-Let's suppose we have the following folder structure:
+Let's suppose you have the following folder structure:
 
 ```
 bot.py

@@ -94,14 +94,14 @@ callback, and acts as a sort of "folder" to add other commands to. A slash group
 permissions = client.include_slash_group("permissions", "Get or edit permissions for a user or role")
 ```
 
-Next, we can define subgroups that this group will contain via [`SlashGroup.include_subgroup`][arc.command.slash.SlashGroup.include_subgroup]:
+Next, you can define subgroups that this group will contain via [`SlashGroup.include_subgroup`][arc.command.slash.SlashGroup.include_subgroup]:
 
 ```py
 user = permissions.include_subgroup("user", "Get or edit permissions for a user")
 role = permissions.include_subgroup("role", "Get or edit permissions for a role")
 ```
 
-Finally, we can simply `@include` the commands in the group:
+Finally, you can simply `@include` the commands in the group:
 
 === "Gateway"
 

@@ -296,9 +296,9 @@ Notice that this means "`one_person` is an **instance** of the class `Person`". 
 
 ## Type aliases
 
-Complex types can quickly get very verbose to type hint. For example, let's imagine we have a `list` of `dict`s that each contain a `set` of `int`s.
+Complex types can quickly get very verbose to type hint. For example, let's imagine you have a `list` of `dict`s that each contain a `set` of `int`s.
 
-The type for that would be `list[dict[str, set[int]]]`. Let's say we want to define a function that performs operations on this data:
+The type for that would be `list[dict[str, set[int]]]`. Let's say you want to define a function that performs operations on this data:
 
 ```py
 def do_stuff(data: list[dict[str, set[int]]]) -> list[dict[str, set[int]]]:
@@ -307,7 +307,7 @@ def do_stuff(data: list[dict[str, set[int]]]) -> list[dict[str, set[int]]]:
 
 If you have lots of such functions, it can quickly get cumbersome to type `list[dict[str, set[int]]]` over and over again.
 
-Instead, we can alias `list[dict[str, set[int]]]` to a nicer name we can actually remember:
+Instead, you can alias `list[dict[str, set[int]]]` to a nicer name you can actually remember:
 
 === "Python 3.12+"
 

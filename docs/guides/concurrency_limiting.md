@@ -55,7 +55,7 @@ In certain cases it may be useful to ensure that only a specific amount of insta
             raise error
     ```
 
-Try invoking the above command while it is still running, in the same channel! It should fail and the exception will be caught by our [error handler](./error_handling.md).
+Try invoking the above command while it is still running, in the same channel! It should fail and the exception will be caught by the [error handler](./error_handling.md).
 
 There's also other types of concurrency limiters, these are:
 

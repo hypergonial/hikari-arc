@@ -212,7 +212,7 @@ bot:
 !!! warning
     For the purposes of this example, the token is inserted directly into the source file. You should try to **avoid doing this**, and instead store the token in a [.env](https://pypi.org/project/python-dotenv/) file or similar.
 
-Paste the code above into a file and run it. The bot should start, register the command we defined, which should now be invokable via `/hi` in any server the bot is present in.
+Paste the code above into a file and run it. The bot should start, register the command you defined, which should now be invokable via `/hi` in any server the bot is present in.
 
 ??? bug "Troubleshooting common setup mistakes"
 
@@ -231,7 +231,7 @@ Paste the code above into a file and run it. The bot should start, register the 
 ## Difference between GatewayBot & RESTBot
 
 !!! tip
-    If you're unsure which one to choose, we recommend getting started with a **Gateway bot**.
+    If you're unsure which one to choose, it is recommended to get started with a **Gateway bot**.
 
 There are two main ways for a bot to connect to Discord & receive [interactions](./guides/interactions.md), via either a **GatewayBot** or a **RESTBot**.
 
