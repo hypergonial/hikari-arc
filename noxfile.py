@@ -7,7 +7,7 @@ PATH_TO_PROJECT = os.path.join(".", "arc")
 EXAMPLES_PATH = os.path.join(".", "examples")
 SCRIPT_PATHS = [PATH_TO_PROJECT, EXAMPLES_PATH, "noxfile.py", os.path.join(".", "tests")]
 
-options.sessions = ["format_fix", "pyright", "pytest", "docs"]
+options.sessions = ["format_fix", "slotscheck", "pyright", "pytest", "docs"]
 
 
 @nox.session()
