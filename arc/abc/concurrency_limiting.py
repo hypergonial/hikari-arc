@@ -15,7 +15,12 @@ KeyT = t.TypeVar("KeyT", contravariant=True)
 
 @t.runtime_checkable
 class ConcurrencyLimiterProto(t.Protocol[ClientT]):
-    """A protocol for valid concurrency limiters that `arc` can use."""
+    """A protocol for valid concurrency limiters that `arc` can use.
+
+    !!! tip
+        An easy (but not necessary) way to ensure you've implemented all methods
+        is to inherit from this protocol.
+    """
 
     @property
     @abc.abstractmethod

@@ -168,6 +168,8 @@ plugins:
           options:
             heading_level: 3
             annotations_path: source
+            members_order: source
+            group_by_category: true
             docstring_section_style: spacy
             docstring_style: numpy
             inherited_members: true
@@ -178,6 +180,7 @@ plugins:
             show_submodules: false
             signature_crossrefs: true
             show_symbol_type_heading: true
+            show_symbol_type_toc: true
             extensions:
                 - griffe_inherited_docstrings
 watch:
