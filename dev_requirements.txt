@@ -1,4 +1,4 @@
-ruff==0.1.11
+ruff==0.1.13
 pyright==1.1.345
 nox==2023.4.22
 typing_extensions==4.9.0
