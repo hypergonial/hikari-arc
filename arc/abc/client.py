@@ -102,6 +102,8 @@ class Client(t.Generic[AppT], abc.ABC):
         "_custom_locale_provider",
         "_cmd_settings",
         "_concurrency_limiter",
+        "_tasks",
+        "_started",
     )
 
     def __init__(
@@ -132,7 +134,6 @@ class Client(t.Generic[AppT], abc.ABC):
             is_dm_enabled=is_dm_enabled,
         )
 
-        self._application: hikari.Application | None = None
         self._slash_commands: dict[str, SlashCommandLike[te.Self]] = {}
         self._message_commands: dict[str, MessageCommand[te.Self]] = {}
         self._user_commands: dict[str, UserCommand[te.Self]] = {}
@@ -142,6 +143,9 @@ class Client(t.Generic[AppT], abc.ABC):
         self._hooks: list[HookT[te.Self]] = []
         self._post_hooks: list[PostHookT[te.Self]] = []
         self._owner_ids: list[hikari.Snowflake] = []
+        self._tasks: set[asyncio.Task[t.Any]] = set()
+        self._started: asyncio.Event = asyncio.Event()
+        self._application: hikari.Application | None = None
         self._error_handler: ErrorHandlerCallbackT[te.Self] | None = None
         self._concurrency_limiter: ConcurrencyLimiterProto[te.Self] | None = None
         self._startup_hook: LifeCycleHookT[te.Self] | None = None
@@ -228,14 +232,19 @@ class Client(t.Generic[AppT], abc.ABC):
         """The concurrency limiter for this client."""
         return self._concurrency_limiter
 
+    @property
+    def is_started(self) -> bool:
+        """Whether the client has started up."""
+        return self._started.is_set()
+
     def _add_command(self, command: CommandBase[te.Self, t.Any]) -> None:
         """Add a command to this client. Called by include hooks."""
         if isinstance(command, (SlashCommand, SlashGroup)):
-            self._add_slash_command(command)
+            self._slash_commands[command.name] = command
         elif isinstance(command, MessageCommand):
-            self._add_message_command(command)
+            self._message_commands[command.name] = command
         elif isinstance(command, UserCommand):
-            self._add_user_command(command)
+            self._user_commands[command.name] = command
 
     def _remove_command(self, command: CommandBase[te.Self, t.Any]) -> None:
         """Remove a command from this client. Called by remove hooks."""
@@ -245,18 +254,6 @@ class Client(t.Generic[AppT], abc.ABC):
             self._message_commands.pop(command.name, None)
         elif isinstance(command, UserCommand):
             self._user_commands.pop(command.name, None)
-
-    def _add_slash_command(self, command: SlashCommandLike[te.Self]) -> None:
-        """Add a slash command to this client."""
-        self._slash_commands[command.name] = command
-
-    def _add_message_command(self, command: MessageCommand[te.Self]) -> None:
-        """Add a message command to this client."""
-        self._message_commands[command.name] = command
-
-    def _add_user_command(self, command: UserCommand[te.Self]) -> None:
-        """Add a user command to this client."""
-        self._user_commands[command.name] = command
 
     async def _on_startup(self) -> None:
         """Called when the client is starting up.
@@ -272,11 +269,15 @@ class Client(t.Generic[AppT], abc.ABC):
         self._owner_ids = owner_ids
 
         logger.debug(f"Fetched application: '{self.application}'")
+
         if self._autosync:
             await _sync_commands(self)
 
-        if self._startup_hook:
-            await self._startup_hook(self)
+        try:
+            if self._startup_hook:
+                await self._startup_hook(self)
+        finally:
+            self._started.set()
 
     async def _on_shutdown(self) -> None:
         """Called when the client is shutting down.
@@ -296,8 +297,46 @@ class Client(t.Generic[AppT], abc.ABC):
         traceback.print_exception(type(exception), exception, exception.__traceback__, file=sys.stderr)
         with suppress(Exception):
             # Try to respond to make autodefer less jarring when a command fails.
-            if not ctx._issued_response and ctx.is_valid:
+            if ctx.is_valid:
                 await ctx.respond("❌ Something went wrong. Please contact the bot developer.")
+
+    def _provide_command_locale(self, request: CommandLocaleRequest) -> LocaleResponse:
+        """Provide a locale for a command."""
+        if self._command_locale_provider is None:
+            return LocaleResponse(name=request.command.name, description=getattr(request.command, "description", None))
+
+        return self._command_locale_provider(request)
+
+    def _provide_option_locale(self, request: OptionLocaleRequest) -> LocaleResponse:
+        """Provide a locale for an option."""
+        if self._option_locale_provider is None:
+            return LocaleResponse(name=request.option.name, description=request.option.description)
+
+        return self._option_locale_provider(request)
+
+    def create_task(self, coro: t.Coroutine[t.Any, t.Any, T]) -> asyncio.Task[T]:
+        """Create a task and add it to the client's internal task set.
+
+        This can be used for "fire and forget" task creation.
+
+        Parameters
+        ----------
+        coro : t.Coroutine[t.Any, t.Any, T]
+            The coroutine to create a task for.
+
+        Returns
+        -------
+        asyncio.Task[T]
+            The created task.
+        """
+        task = asyncio.create_task(coro)
+        self._tasks.add(task)
+        task.add_done_callback(self._tasks.discard)
+        return task
+
+    async def wait_until_started(self) -> None:
+        """Wait until the client has started up."""
+        await self._started.wait()
 
     async def on_command_interaction(self, interaction: hikari.CommandInteraction) -> ResponseBuilderT | None:
         """Should be called when a command interaction is sent by Discord.
@@ -340,20 +379,6 @@ class Client(t.Generic[AppT], abc.ABC):
                 f"Timed out waiting for response from command: '{interaction.command_name} ({interaction.command_type})'"
                 f" Did you forget to respond?"
             )
-
-    def _provide_command_locale(self, request: CommandLocaleRequest) -> LocaleResponse:
-        """Provide a locale for a command."""
-        if self._command_locale_provider is None:
-            return LocaleResponse(name=request.command.name, description=getattr(request.command, "description", None))
-
-        return self._command_locale_provider(request)
-
-    def _provide_option_locale(self, request: OptionLocaleRequest) -> LocaleResponse:
-        """Provide a locale for an option."""
-        if self._option_locale_provider is None:
-            return LocaleResponse(name=request.option.name, description=request.option.description)
-
-        return self._option_locale_provider(request)
 
     async def on_autocomplete_interaction(
         self, interaction: hikari.AutocompleteInteraction

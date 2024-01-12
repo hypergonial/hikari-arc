@@ -11,6 +11,8 @@ Here you can find all the changelogs for `hikari-arc`.
 
 ## Unreleased
 
+- Add `Client.create_task` to make it easier to create "fire and forget" tasks.
+- Add `Client.is_started` and `Client.wait_until_started` for more convenient lifecycle management.
 - Make usage of `__slots__` consistent across the library.
 
 ## v1.0.0
