@@ -80,7 +80,7 @@ If you think something is missing or inaccurate, please [open an issue](https://
 
     ---
 
-    Execute arbitrary logic before, or after a command was run,
+    Execute arbitrary logic before or after a command was run,
     perform checks, add cooldowns & more!
 
     [:octicons-arrow-right-24: Learn more](./hooks.md)
