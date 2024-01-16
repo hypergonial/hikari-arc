@@ -351,6 +351,11 @@ class Context(t.Generic[ClientT]):
             return datetime.datetime.now() - self._created_at <= datetime.timedelta(seconds=3)
 
     @property
+    def issued_response(self) -> bool:
+        """Whether this interaction was already issued an initial response."""
+        return self._issued_response
+
+    @property
     def has_command_failed(self) -> bool:
         """Returns if the command callback failed to execute or not."""
         return self._has_command_failed
