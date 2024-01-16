@@ -1,3 +1,5 @@
+from alluka.abc import Client as Injector
+
 from .client import Client
 from .command import CallableCommandBase, CallableCommandProto, CommandBase, CommandProto
 from .concurrency_limiting import ConcurrencyLimiterProto, HasConcurrencyLimiter, with_concurrency_limit
@@ -16,6 +18,7 @@ from .option import (
 from .plugin import PluginBase
 
 __all__ = (
+    "Injector",
     "HasErrorHandler",
     "HasConcurrencyLimiter",
     "CommandBase",

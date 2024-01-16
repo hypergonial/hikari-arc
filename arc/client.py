@@ -86,7 +86,7 @@ class GatewayClientBase(Client[GatewayBotT]):
         is_nsfw: bool = False,
         is_dm_enabled: bool = True,
         provided_locales: t.Sequence[hikari.Locale] | None = None,
-        injector: alluka.Client | None = None,
+        injector: alluka.abc.Client | None = None,
     ) -> None:
         super().__init__(
             app,
@@ -219,7 +219,7 @@ class RESTClientBase(Client[RESTBotT]):
         This applies to all commands, and can be overridden on a per-command basis.
     provided_locales : t.Sequence[hikari.Locale] | None
         The locales that will be provided to the client by locale provider callbacks
-    injector : alluka.Client | None
+    injector : alluka.abc.Client | None
         If you already have an injector instance, you may pass it here.
         Otherwise, a new one will be created by default.
 
@@ -241,7 +241,7 @@ class RESTClientBase(Client[RESTBotT]):
         is_nsfw: bool = False,
         is_dm_enabled: bool = True,
         provided_locales: t.Sequence[hikari.Locale] | None = None,
-        injector: alluka.Client | None = None,
+        injector: alluka.abc.Client | None = None,
     ) -> None:
         super().__init__(
             app,
@@ -341,7 +341,7 @@ class GatewayClient(GatewayClientBase[hikari.GatewayBotAware]):
         This applies to all commands, and can be overridden on a per-command basis.
     provided_locales : t.Sequence[hikari.Locale] | None
         The locales that will be provided to the client by locale provider callbacks
-    injector : alluka.Client | None
+    injector : alluka.abc.Client | None
         If you already have an injector instance, you may pass it here.
         Otherwise, a new one will be created by default.
 
@@ -386,7 +386,7 @@ class RESTClient(RESTClientBase[hikari.RESTBotAware]):
         This applies to all commands, and can be overridden on a per-command basis.
     provided_locales : t.Sequence[hikari.Locale] | None
         The locales that will be provided to the client by locale provider callbacks
-    injector : alluka.Client | None
+    injector : alluka.abc.Client | None
         If you already have an injector instance, you may pass it here.
         Otherwise, a new one will be created by default.
 

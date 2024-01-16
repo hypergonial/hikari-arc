@@ -123,7 +123,7 @@ class Client(t.Generic[AppT], abc.ABC):
         is_nsfw: bool = False,
         is_dm_enabled: bool = True,
         provided_locales: t.Sequence[hikari.Locale] | None = None,
-        injector: alluka.Client | None = None,
+        injector: alluka.abc.Client | None = None,
     ) -> None:
         self._app = app
         self._default_enabled_guilds = (
@@ -143,7 +143,7 @@ class Client(t.Generic[AppT], abc.ABC):
         self._slash_commands: dict[str, SlashCommandLike[te.Self]] = {}
         self._message_commands: dict[str, MessageCommand[te.Self]] = {}
         self._user_commands: dict[str, UserCommand[te.Self]] = {}
-        self._injector: alluka.Client = injector or alluka.Client()
+        self._injector: alluka.abc.Client = injector or alluka.Client()
         self._plugins: dict[str, PluginBase[te.Self]] = {}
         self._loaded_extensions: list[str] = []
         self._hooks: list[HookT[te.Self]] = []
@@ -203,7 +203,7 @@ class Client(t.Generic[AppT], abc.ABC):
         return self._application
 
     @property
-    def injector(self) -> alluka.Client:
+    def injector(self) -> alluka.abc.Client:
         """The injector for this client."""
         return self._injector
 
