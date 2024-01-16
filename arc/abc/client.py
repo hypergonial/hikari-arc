@@ -77,6 +77,11 @@ class Client(t.Generic[AppT], abc.ABC):
     is_dm_enabled : bool
         Whether to enable commands in DMs
         This applies to all commands, and can be overridden on a per-command basis.
+    provided_locales : t.Sequence[hikari.Locale] | None
+        The locales that will be provided to the client by locale provider callbacks
+    injector : alluka.Client | None
+        If you already have an injector instance, you may pass it here.
+        Otherwise, a new one will be created by default.
     """
 
     __slots__: t.Sequence[str] = (
@@ -118,6 +123,7 @@ class Client(t.Generic[AppT], abc.ABC):
         is_nsfw: bool = False,
         is_dm_enabled: bool = True,
         provided_locales: t.Sequence[hikari.Locale] | None = None,
+        injector: alluka.Client | None = None,
     ) -> None:
         self._app = app
         self._default_enabled_guilds = (
@@ -137,7 +143,7 @@ class Client(t.Generic[AppT], abc.ABC):
         self._slash_commands: dict[str, SlashCommandLike[te.Self]] = {}
         self._message_commands: dict[str, MessageCommand[te.Self]] = {}
         self._user_commands: dict[str, UserCommand[te.Self]] = {}
-        self._injector: alluka.Client = alluka.Client()
+        self._injector: alluka.Client = injector or alluka.Client()
         self._plugins: dict[str, PluginBase[te.Self]] = {}
         self._loaded_extensions: list[str] = []
         self._hooks: list[HookT[te.Self]] = []
@@ -153,6 +159,10 @@ class Client(t.Generic[AppT], abc.ABC):
         self._command_locale_provider: CommandLocaleRequestT | None = None
         self._option_locale_provider: OptionLocaleRequestT | None = None
         self._custom_locale_provider: CustomLocaleRequestT | None = None
+
+        self._injector.set_type_dependency(Client[t.Any], self)
+        self._injector.set_type_dependency(Client, self)
+        self._injector.set_type_dependency(type(self), self)
 
     @property
     @abc.abstractmethod

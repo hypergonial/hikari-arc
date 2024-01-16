@@ -14,6 +14,7 @@ from arc.internal.types import GatewayBotT, RESTBotT
 from arc.plugin import GatewayPluginBase, RESTPluginBase
 
 if t.TYPE_CHECKING:
+    import alluka
     import typing_extensions as te
 
     from arc import AutodeferMode
@@ -40,8 +41,9 @@ logger = logging.getLogger(__name__)
 
 class GatewayClientBase(Client[GatewayBotT]):
     """The base class for an arc client with Gateway support.
+    This class primarily exists to allow for the creation of custom client types.
 
-    If you want to use a RESTBot, use [`RESTClientBase`][arc.client.RESTClientBase] instead.
+    For the default implementation of a Gateway client, see [`GatewayClient`][arc.client.GatewayClient].
 
     Parameters
     ----------
@@ -65,19 +67,9 @@ class GatewayClientBase(Client[GatewayBotT]):
         This applies to all commands, and can be overridden on a per-command basis.
     provided_locales : t.Sequence[hikari.Locale] | None
         The locales that will be provided to the client by locale provider callbacks
-
-    Examples
-    --------
-    ```py
-    import hikari
-    import arc
-
-    bot = hikari.GatewayBot("TOKEN")
-    # Default client implementation
-    client = arc.GatewayClient(bot)
-
-    ...
-    ```
+    injector : alluka.Client | None
+        If you already have an injector instance, you may pass it here.
+        Otherwise, a new one will be created by default.
     """
 
     __slots__: t.Sequence[str] = ()
@@ -94,6 +86,7 @@ class GatewayClientBase(Client[GatewayBotT]):
         is_nsfw: bool = False,
         is_dm_enabled: bool = True,
         provided_locales: t.Sequence[hikari.Locale] | None = None,
+        injector: alluka.Client | None = None,
     ) -> None:
         super().__init__(
             app,
@@ -104,6 +97,7 @@ class GatewayClientBase(Client[GatewayBotT]):
             is_nsfw=is_nsfw,
             is_dm_enabled=is_dm_enabled,
             provided_locales=provided_locales,
+            injector=injector,
         )
         self.app.event_manager.subscribe(hikari.StartedEvent, self._on_gatewaybot_startup)
         self.app.event_manager.subscribe(hikari.StoppingEvent, self._on_gatewaybot_shutdown)
@@ -199,8 +193,9 @@ class GatewayClientBase(Client[GatewayBotT]):
 
 class RESTClientBase(Client[RESTBotT]):
     """The base class for an arc client with REST support.
+    This class primarily exists to allow for the creation of custom client types.
 
-    If you want to use GatewayBot, use [`GatewayClient`][arc.client.GatewayClientBase] instead.
+    For the default implementation of a REST client, see [`RESTClient`][arc.client.RESTClient].
 
     Parameters
     ----------
@@ -224,20 +219,9 @@ class RESTClientBase(Client[RESTBotT]):
         This applies to all commands, and can be overridden on a per-command basis.
     provided_locales : t.Sequence[hikari.Locale] | None
         The locales that will be provided to the client by locale provider callbacks
-
-
-    Examples
-    --------
-    ```py
-    import hikari
-    import arc
-
-    bot = hikari.RESTBot("TOKEN")
-    # Default client implementation
-    client = arc.RESTClient(bot)
-
-    ...
-    ```
+    injector : alluka.Client | None
+        If you already have an injector instance, you may pass it here.
+        Otherwise, a new one will be created by default.
 
     !!! warning
         The client will take over the `hikari.CommandInteraction` and `hikari.AutocompleteInteraction` listeners of the passed bot.
@@ -257,6 +241,7 @@ class RESTClientBase(Client[RESTBotT]):
         is_nsfw: bool = False,
         is_dm_enabled: bool = True,
         provided_locales: t.Sequence[hikari.Locale] | None = None,
+        injector: alluka.Client | None = None,
     ) -> None:
         super().__init__(
             app,
@@ -267,6 +252,7 @@ class RESTClientBase(Client[RESTBotT]):
             is_nsfw=is_nsfw,
             is_dm_enabled=is_dm_enabled,
             provided_locales=provided_locales,
+            injector=injector,
         )
         self.app.add_startup_callback(self._on_restbot_startup)
         self.app.add_shutdown_callback(self._on_restbot_shutdown)
@@ -327,22 +313,111 @@ class RESTClientBase(Client[RESTBotT]):
         return builder
 
 
-GatewayClient = GatewayClientBase[hikari.GatewayBotAware]
-"""The default gateway client implementation. An alias for [`arc.GatewayClientBase[hikari.GatewayBotAware]`][arc.client.GatewayClientBase]."""
+# These two are classes for DI reasons, they should not ever contain any code.
+class GatewayClient(GatewayClientBase[hikari.GatewayBotAware]):
+    """The default gateway client implementation. Effectively an alias for [`arc.GatewayClientBase[hikari.GatewayBotAware]`][arc.client.GatewayClientBase].
 
-RESTClient = RESTClientBase[hikari.RESTBotAware]
-"""The default REST client implementation. An alias for [`arc.RESTClientBase[hikari.RESTBotAware]`][arc.client.RESTClientBase]."""
+    If you want to use a RESTBot, use [`RESTClient`][arc.client.RESTClient] instead.
 
-GatewayContext = Context[GatewayClientBase[hikari.GatewayBotAware]]
+    Parameters
+    ----------
+    app : hikari.GatewayBotAware
+        The application this client is for.
+    default_enabled_guilds : t.Sequence[hikari.Snowflakeish] | None
+        The guilds that commands will be registered in by default
+    autosync : bool
+        Whether to automatically sync commands on startup
+    autodefer : bool | AutodeferMode
+        Whether to automatically defer responses
+        This applies to all commands, and can be overridden on a per-command basis.
+    default_permissions : hikari.Permissions | hikari.UndefinedType
+        The default permissions for commands
+        This applies to all commands, and can be overridden on a per-command basis.
+    is_nsfw : bool
+        Whether commands are NSFW
+        This applies to all commands, and can be overridden on a per-command basis.
+    is_dm_enabled : bool
+        Whether commands are enabled in DMs
+        This applies to all commands, and can be overridden on a per-command basis.
+    provided_locales : t.Sequence[hikari.Locale] | None
+        The locales that will be provided to the client by locale provider callbacks
+    injector : alluka.Client | None
+        If you already have an injector instance, you may pass it here.
+        Otherwise, a new one will be created by default.
+
+    Examples
+    --------
+    ```py
+    import hikari
+    import arc
+
+    bot = hikari.GatewayBot("TOKEN")
+    client = arc.GatewayClient(bot)
+    ```
+    """
+
+    __slots__: t.Sequence[str] = ()
+
+
+class RESTClient(RESTClientBase[hikari.RESTBotAware]):
+    """The default REST client implementation. Effectively an alias for [`arc.RESTClientBase[hikari.RESTBotAware]`][arc.client.RESTClientBase].
+
+    If you want to use GatewayBot, use [`GatewayClient`][arc.client.GatewayClient] instead.
+
+    Parameters
+    ----------
+    app : hikari.GatewayBotAware
+        The application this client is for.
+    default_enabled_guilds : t.Sequence[hikari.Snowflakeish | hikari.PartialGuild] | None
+        The guilds that commands will be registered in by default
+    autosync : bool
+        Whether to automatically sync commands on startup
+    autodefer : bool | AutodeferMode
+        Whether to automatically defer responses
+        This applies to all commands, and can be overridden on a per-command basis.
+    default_permissions : hikari.Permissions | hikari.UndefinedType
+        The default permissions for commands
+        This applies to all commands, and can be overridden on a per-command basis.
+    is_nsfw : bool
+        Whether commands are NSFW
+        This applies to all commands, and can be overridden on a per-command basis.
+    is_dm_enabled : bool
+        Whether commands are enabled in DMs
+        This applies to all commands, and can be overridden on a per-command basis.
+    provided_locales : t.Sequence[hikari.Locale] | None
+        The locales that will be provided to the client by locale provider callbacks
+    injector : alluka.Client | None
+        If you already have an injector instance, you may pass it here.
+        Otherwise, a new one will be created by default.
+
+
+    Examples
+    --------
+    ```py
+    import hikari
+    import arc
+
+    bot = hikari.RESTBot("TOKEN")
+    client = arc.RESTClient(bot)
+    ```
+
+    !!! warning
+        The client will take over the `hikari.CommandInteraction` and `hikari.AutocompleteInteraction` listeners of the passed bot.
+    """
+
+    __slots__: t.Sequence[str] = ()
+
+
+GatewayContext = Context[GatewayClient]
 """A context using the default gateway client implementation. An alias for [`arc.Context[arc.GatewayClient]`][arc.context.base.Context]."""
 
-RESTContext = Context[RESTClientBase[hikari.RESTBotAware]]
+RESTContext = Context[RESTClient]
 """A context using the default REST client implementation. An alias for [`arc.Context[arc.RESTClient]`][arc.context.base.Context]."""
 
-RESTPlugin = RESTPluginBase[RESTClientBase[hikari.RESTBotAware]]
+RESTPlugin = RESTPluginBase[RESTClient]
 """A plugin using the default REST client implementation. An alias for [`arc.RESTPluginBase[arc.RESTClient]`][arc.plugin.RESTPluginBase]."""
 
-GatewayPlugin = GatewayPluginBase[GatewayClientBase[hikari.GatewayBotAware]]
+GatewayPlugin = GatewayPluginBase[GatewayClient]
 """An alias for [`arc.GatewayPluginBase[arc.GatewayClient]`][arc.plugin.GatewayPluginBase]."""
 
 # MIT License
