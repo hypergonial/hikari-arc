@@ -36,7 +36,8 @@ if t.TYPE_CHECKING:
 
 __all__ = ("parse_command_signature",)
 
-TYPE_TO_OPTION_MAPPING: dict[t.Type[t.Any], t.Type[CommandOptionBase[t.Any, t.Any, t.Any]]] = {
+# Potential pyright bug? This wasn't reported in 1.1.345
+TYPE_TO_OPTION_MAPPING: dict[t.Type[t.Any], t.Type[CommandOptionBase[t.Any, t.Any, t.Any]]] = {  # pyright: ignore reportGeneralTypeIssues
     bool: BoolOption,
     int: IntOption,
     str: StrOption,
