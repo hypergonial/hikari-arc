@@ -40,7 +40,7 @@ def pytest(session: nox.Session) -> None:
 @nox.session()
 def slotscheck(session: nox.Session) -> None:
     session.install("-U", "slotscheck", "-c", "dev_requirements.txt")
-    session.install(".[cron]")
+    session.install(".[dev, cron]")
     session.run("slotscheck", "-m", "arc", "-v")
 
 
