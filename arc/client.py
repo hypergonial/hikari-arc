@@ -159,7 +159,7 @@ class GatewayClientBase(Client[GatewayBotT]):
         """
         self.app.event_manager.unsubscribe(event_type, callback)  # pyright: ignore reportGeneralTypeIssues
 
-    def listen(self, *event_types: t.Type[EventT]) -> t.Callable[[EventCallbackT[EventT]], EventCallbackT[EventT]]:
+    def listen(self, *event_types: type[EventT]) -> t.Callable[[EventCallbackT[EventT]], EventCallbackT[EventT]]:
         """Generate a decorator to subscribe a callback to an event type.
 
         This is a second-order decorator.

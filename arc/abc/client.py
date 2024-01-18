@@ -1239,12 +1239,12 @@ class Client(t.Generic[AppT], abc.ABC):
 
         return self
 
-    def set_type_dependency(self, type_: t.Type[T], instance: T) -> te.Self:
+    def set_type_dependency(self, type_: type[T], instance: T) -> te.Self:
         """Set a type dependency for this client. This can then be injected into all arc callbacks.
 
         Parameters
         ----------
-        type_ : t.Type[T]
+        type_ : type[T]
             The type of the dependency.
         instance : T
             The instance of the dependency.
@@ -1280,12 +1280,12 @@ class Client(t.Generic[AppT], abc.ABC):
         self._injector.set_type_dependency(type_, instance)
         return self
 
-    def get_type_dependency(self, type_: t.Type[T]) -> T | hikari.UndefinedType:
+    def get_type_dependency(self, type_: type[T]) -> T | hikari.UndefinedType:
         """Get a type dependency for this client.
 
         Parameters
         ----------
-        type_ : t.Type[T]
+        type_ : type[T]
             The type of the dependency.
 
         Returns

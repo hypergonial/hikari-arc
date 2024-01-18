@@ -38,7 +38,7 @@ if t.TYPE_CHECKING:
 __all__ = ("parse_command_signature",)
 
 # Potential pyright bug? This wasn't reported in 1.1.345
-TYPE_TO_OPTION_MAPPING: dict[t.Type[t.Any], t.Type[CommandOptionBase[t.Any, t.Any, t.Any]]] = {  # pyright: ignore reportGeneralTypeIssues
+TYPE_TO_OPTION_MAPPING: dict[type[t.Any], type[CommandOptionBase[t.Any, t.Any, t.Any]]] = {  # pyright: ignore reportGeneralTypeIssues
     bool: BoolOption,
     int: IntOption,
     str: StrOption,
@@ -69,7 +69,7 @@ TYPE_TO_OPTION_MAPPING: dict[t.Type[t.Any], t.Type[CommandOptionBase[t.Any, t.An
     hikari.TextableGuildChannel: ChannelOption,
 }
 
-OPT_TO_PARAMS_MAPPING: dict[t.Type[CommandOptionBase[t.Any, t.Any, t.Any]], t.Type[t.Any]] = {
+OPT_TO_PARAMS_MAPPING: dict[type[CommandOptionBase[t.Any, t.Any, t.Any]], type[t.Any]] = {
     BoolOption: BoolParams,
     IntOption: IntParams,
     StrOption: StrParams,
@@ -82,7 +82,7 @@ OPT_TO_PARAMS_MAPPING: dict[t.Type[CommandOptionBase[t.Any, t.Any, t.Any]], t.Ty
 }
 
 # This is totally not cursed in any way
-CHANNEL_TYPES_MAPPING: dict[t.Type[hikari.PartialChannel], hikari.ChannelType | set[hikari.ChannelType]] = {
+CHANNEL_TYPES_MAPPING: dict[type[hikari.PartialChannel], hikari.ChannelType | set[hikari.ChannelType]] = {
     hikari.GuildTextChannel: hikari.ChannelType.GUILD_TEXT,
     hikari.GuildVoiceChannel: hikari.ChannelType.GUILD_VOICE,
     hikari.GuildCategory: hikari.ChannelType.GUILD_CATEGORY,
@@ -215,7 +215,7 @@ def _is_mentionable_union(hint: t.Any) -> bool:
     return {arg for arg in t.get_args(hint) if arg is not type(None)} == {hikari.User, hikari.Role}
 
 
-def _channels_to_channel_types(channels: t.Iterable[t.Type[hikari.PartialChannel]]) -> list[hikari.ChannelType]:
+def _channels_to_channel_types(channels: t.Iterable[type[hikari.PartialChannel]]) -> list[hikari.ChannelType]:
     """Turn a list of channels into a list of channel types.
 
     Parameters
