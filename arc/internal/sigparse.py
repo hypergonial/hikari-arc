@@ -81,91 +81,48 @@ OPT_TO_PARAMS_MAPPING: dict[type[CommandOptionBase[t.Any, t.Any, t.Any]], type[t
     AttachmentOption: AttachmentParams,
 }
 
-# This is totally not cursed in any way
-CHANNEL_TYPES_MAPPING: dict[type[hikari.PartialChannel], hikari.ChannelType | set[hikari.ChannelType]] = {
+BASE_CHANNEL_TYPE_MAP: dict[type[hikari.PartialChannel], hikari.ChannelType] = {
     hikari.GuildTextChannel: hikari.ChannelType.GUILD_TEXT,
+    hikari.DMChannel: hikari.ChannelType.DM,
     hikari.GuildVoiceChannel: hikari.ChannelType.GUILD_VOICE,
+    hikari.GroupDMChannel: hikari.ChannelType.GROUP_DM,
     hikari.GuildCategory: hikari.ChannelType.GUILD_CATEGORY,
     hikari.GuildNewsChannel: hikari.ChannelType.GUILD_NEWS,
-    hikari.GuildPrivateThread: hikari.ChannelType.GUILD_PRIVATE_THREAD,
-    hikari.GuildPublicThread: hikari.ChannelType.GUILD_PUBLIC_THREAD,
     hikari.GuildNewsThread: hikari.ChannelType.GUILD_NEWS_THREAD,
-    hikari.GuildForumChannel: hikari.ChannelType.GUILD_FORUM,
-    hikari.DMChannel: hikari.ChannelType.DM,
-    hikari.GroupDMChannel: hikari.ChannelType.GROUP_DM,
+    hikari.GuildPublicThread: hikari.ChannelType.GUILD_PUBLIC_THREAD,
+    hikari.GuildPrivateThread: hikari.ChannelType.GUILD_PRIVATE_THREAD,
     hikari.GuildStageChannel: hikari.ChannelType.GUILD_STAGE,
-    hikari.GuildThreadChannel: {
-        hikari.ChannelType.GUILD_PUBLIC_THREAD,
-        hikari.ChannelType.GUILD_PRIVATE_THREAD,
-        hikari.ChannelType.GUILD_NEWS_THREAD,
-    },
-    hikari.PartialChannel: {
-        hikari.ChannelType.GUILD_TEXT,
-        hikari.ChannelType.GUILD_VOICE,
-        hikari.ChannelType.GUILD_CATEGORY,
-        hikari.ChannelType.GUILD_NEWS,
-        hikari.ChannelType.GUILD_FORUM,
-        hikari.ChannelType.GUILD_NEWS_THREAD,
-        hikari.ChannelType.GUILD_PUBLIC_THREAD,
-        hikari.ChannelType.GUILD_PRIVATE_THREAD,
-        hikari.ChannelType.DM,
-        hikari.ChannelType.GROUP_DM,
-        hikari.ChannelType.GUILD_STAGE,
-    },
-    hikari.InteractionChannel: {
-        hikari.ChannelType.GUILD_TEXT,
-        hikari.ChannelType.GUILD_VOICE,
-        hikari.ChannelType.GUILD_CATEGORY,
-        hikari.ChannelType.GUILD_NEWS,
-        hikari.ChannelType.GUILD_FORUM,
-        hikari.ChannelType.GUILD_NEWS_THREAD,
-        hikari.ChannelType.GUILD_PUBLIC_THREAD,
-        hikari.ChannelType.GUILD_PRIVATE_THREAD,
-        hikari.ChannelType.DM,
-        hikari.ChannelType.GROUP_DM,
-        hikari.ChannelType.GUILD_STAGE,
-    },
-    hikari.TextableChannel: {
-        hikari.ChannelType.GUILD_TEXT,
-        hikari.ChannelType.GUILD_VOICE,
-        hikari.ChannelType.GUILD_NEWS,
-        hikari.ChannelType.GUILD_NEWS_THREAD,
-        hikari.ChannelType.GUILD_PUBLIC_THREAD,
-        hikari.ChannelType.GUILD_PRIVATE_THREAD,
-        hikari.ChannelType.DM,
-        hikari.ChannelType.GROUP_DM,
-        hikari.ChannelType.GUILD_STAGE,
-    },
-    hikari.GuildChannel: {
-        hikari.ChannelType.GUILD_TEXT,
-        hikari.ChannelType.GUILD_VOICE,
-        hikari.ChannelType.GUILD_CATEGORY,
-        hikari.ChannelType.GUILD_NEWS,
-        hikari.ChannelType.GUILD_FORUM,
-        hikari.ChannelType.GUILD_NEWS_THREAD,
-        hikari.ChannelType.GUILD_PUBLIC_THREAD,
-        hikari.ChannelType.GUILD_PRIVATE_THREAD,
-        hikari.ChannelType.GUILD_STAGE,
-    },
-    hikari.PrivateChannel: {hikari.ChannelType.DM, hikari.ChannelType.GROUP_DM},
-    hikari.PermissibleGuildChannel: {
-        hikari.ChannelType.GUILD_TEXT,
-        hikari.ChannelType.GUILD_VOICE,
-        hikari.ChannelType.GUILD_CATEGORY,
-        hikari.ChannelType.GUILD_FORUM,
-        hikari.ChannelType.GUILD_NEWS,
-        hikari.ChannelType.GUILD_STAGE,
-    },
-    hikari.TextableGuildChannel: {
-        hikari.ChannelType.GUILD_TEXT,
-        hikari.ChannelType.GUILD_VOICE,
-        hikari.ChannelType.GUILD_NEWS,
-        hikari.ChannelType.GUILD_NEWS_THREAD,
-        hikari.ChannelType.GUILD_PUBLIC_THREAD,
-        hikari.ChannelType.GUILD_PRIVATE_THREAD,
-        hikari.ChannelType.GUILD_STAGE,
-    },
+    hikari.GuildForumChannel: hikari.ChannelType.GUILD_FORUM,
 }
+
+
+def _get_channel_type(channel: type[hikari.PartialChannel]) -> set[hikari.ChannelType]:
+    """Get channel types from a channel."""
+    if channel in (hikari.PartialChannel, hikari.InteractionChannel):
+        return set()
+
+    types: set[hikari.ChannelType] = set()
+    for k, v in BASE_CHANNEL_TYPE_MAP.items():
+        if issubclass(k, channel):
+            types.add(v)
+
+    return types
+
+
+def _get_all_channel_types() -> dict[type[hikari.PartialChannel], set[hikari.ChannelType]]:
+    """Get all channel types."""
+    mapping: dict[type[hikari.PartialChannel], set[hikari.ChannelType]] = {}
+
+    for _, attribute in inspect.getmembers(
+        hikari, lambda a: isinstance(a, type) and issubclass(a, hikari.PartialChannel)
+    ):
+        mapping[attribute] = _get_channel_type(attribute)
+
+    return mapping
+
+
+# Python macros when
+CHANNEL_TYPES_MAPPING = _get_all_channel_types()
 
 
 def _is_param(meta: t.Any) -> bool:
@@ -238,10 +195,7 @@ def _channels_to_channel_types(channels: t.Iterable[type[hikari.PartialChannel]]
                 f"Unsupported channel type '{channel.__name__}'\nSupported types: {tuple(CHANNEL_TYPES_MAPPING)}"
             )
 
-        if isinstance(types, set):
-            channel_types.update(types)
-        else:
-            channel_types.add(types)
+        channel_types.update(types)
 
     return list(channel_types)
 
@@ -360,7 +314,7 @@ def parse_command_signature(  # noqa: C901
 
         # Get the corresponding option type
         if union is not None and _is_mentionable_union(union):
-            opt_type = TYPE_TO_OPTION_MAPPING[union]
+            opt_type = MentionableOption
         else:
             opt_type = TYPE_TO_OPTION_MAPPING[type_]
 

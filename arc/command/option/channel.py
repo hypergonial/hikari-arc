@@ -76,7 +76,7 @@ class ChannelOption(CommandOptionBase[hikari.PartialChannel, ClientT, ChannelPar
         )
 
     def _to_dict(self) -> dict[str, t.Any]:
-        return {**super()._to_dict(), "channel_types": self.channel_types}
+        return {**super()._to_dict(), "channel_types": self.channel_types or None}
 
 
 # MIT License

@@ -19,7 +19,7 @@ async def correct_command(
     c: arc.Option[float | None, arc.FloatParams(description="baz", max=50.0)],
     d: arc.Option[hikari.GuildTextChannel | hikari.GuildNewsChannel | None, arc.ChannelParams(description="qux")],
     e: arc.Option[hikari.GuildChannel | None, arc.ChannelParams(description="quux")],
-    f: arc.Option[hikari.Role | hikari.User, arc.MentionableParams(description="quuz")],
+    f: arc.Option[hikari.Role | hikari.User | None, arc.MentionableParams(description="quuz")] = None,
     g: arc.Option[hikari.Attachment | None, arc.AttachmentParams(description="among us")] = None,
     h: arc.Option[bool, arc.BoolParams(description="among us")] = False,
     i: arc.Option[str, arc.StrParams(description="foo")] = "among us",
@@ -79,7 +79,7 @@ def test_correct_command() -> None:
     assert isinstance(options["f"], arc.command.MentionableOption)
     assert options["f"].name == "f"
     assert options["f"].description == "quuz"
-    assert options["f"].is_required
+    assert not options["f"].is_required
 
     assert isinstance(options["g"], arc.command.AttachmentOption)
     assert options["g"].name == "g"
