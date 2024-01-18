@@ -5,6 +5,7 @@ import pytest
 
 import arc
 from arc.internal.sigparse import (
+    BASE_CHANNEL_TYPE_MAP,
     CHANNEL_TYPES_MAPPING,
     OPT_TO_PARAMS_MAPPING,
     TYPE_TO_OPTION_MAPPING,
@@ -167,6 +168,11 @@ def test_ensure_parse_channel_types_has_every_channel_class() -> None:
         result = attribute in TYPE_TO_OPTION_MAPPING
 
         assert result is True, f"Missing channel type for {attribute} in TYPE_TO_OPTION_MAPPING"
+
+
+def test_ensure_base_channels_has_every_channel_type() -> None:
+    for channel_type in hikari.ChannelType:
+        assert channel_type in BASE_CHANNEL_TYPE_MAP.values()
 
 
 def test_ensure_option_types_has_every_option() -> None:
