@@ -322,8 +322,6 @@ def parse_command_signature(  # noqa: C901
             )
             continue
 
-        print(type_)
-
         # Otherwise just build the option
         options[arg_name] = opt_type._from_params(
             name=params.name or arg_name, is_required=not is_optional, params=params
