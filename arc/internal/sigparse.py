@@ -330,6 +330,16 @@ def parse_command_signature(  # noqa: C901
     return options
 
 
+def _hint_to_event(hint: t.Any) -> type[hikari.Event] | None:
+    """Convert a type hint to an event type."""
+    if isinstance(hint, type) and issubclass(hint, hikari.Event):
+        return hint
+    elif (origin := t.get_origin(hint)) and issubclass(origin, hikari.Event):
+        return origin
+
+    return None
+
+
 def parse_event_signature(func: t.Callable[[EventT], t.Awaitable[None]]) -> list[type[EventT]]:
     """Parse an event callback function's signature and return the event type, ignore other type hints."""
     hints = t.get_type_hints(func)
@@ -340,13 +350,13 @@ def parse_event_signature(func: t.Callable[[EventT], t.Awaitable[None]]) -> list
     first = next(iter(hints.values()))
 
     if _is_union(first):
-        events = [arg for arg in t.get_args(first) if issubclass(arg, hikari.Event)]
+        events = [_hint_to_event(arg) for arg in t.get_args(first) if _hint_to_event(arg)]
         if not events:
             raise TypeError("Expected event callback to have first argument that inherits from 'hikari.Event'")
         return events  # pyright: ignore reportGeneralTypeIssues
 
-    elif issubclass(first, hikari.Event):
-        return [first]  # pyright: ignore reportGeneralTypeIssues
+    elif event := _hint_to_event(first):
+        return [event]  # pyright: ignore reportGeneralTypeIssues
 
     raise TypeError(
         f"Expected event callback to have first argument that inherits from 'hikari.Event', got '{first!r}'"
