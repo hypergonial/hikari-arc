@@ -334,10 +334,8 @@ def _hint_to_event(hint: t.Any) -> type[hikari.Event] | None:
     """Convert a type hint to an event type."""
     if isinstance(hint, type) and issubclass(hint, hikari.Event):
         return hint
-    elif (origin := t.get_origin(hint)) and issubclass(origin, hikari.Event):
+    elif (origin := t.get_origin(hint)) and isinstance(origin, type) and issubclass(origin, hikari.Event):
         return origin
-
-    return None
 
 
 def parse_event_signature(func: t.Callable[[EventT], t.Awaitable[None]]) -> list[type[EventT]]:
