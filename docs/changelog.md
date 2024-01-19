@@ -9,15 +9,15 @@ hide:
 
 Here you can find all the changelogs for `hikari-arc`.
 
-## Unreleased
+## v1.1.0
 
 - Add `Client.create_task` to make it easier to create "fire and forget" tasks.
 - Add `Client.is_started` and `Client.wait_until_started` for more convenient lifecycle management.
 - Add the ability to pass an already existing injector instance to `Client` via the `injector=` kwarg. If not passed, a new injector will be created by default, like before.
 - Set the client as a type dependency upon instantiation.
 - Stabilize `Context.issued_response`. This property returns a boolean that is `True` if the underlying interaction has already received an initial response.
+- Fix `hikari.User | hikari.Role | None` not being parsed as mentionable option.
 - Fix edgecase where options defaulted to `None` would be ignored in Python 3.10.
-- Make usage of `__slots__` consistent across the library.
 
 ## v1.0.0
 
