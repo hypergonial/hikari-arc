@@ -36,7 +36,7 @@ if t.TYPE_CHECKING:
 
 # pyright: reportUnnecessaryTypeIgnoreComment=false
 
-__all__ = ("parse_command_signature",)
+__all__ = ("parse_command_signature", "parse_event_signature")
 
 # This doesn't include some special cases, for the complete resolution logic see: _get_option_type()
 TYPE_TO_OPTION_MAPPING: dict[type[t.Any], type[CommandOptionBase[t.Any, t.Any, t.Any]]] = {
