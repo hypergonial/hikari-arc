@@ -39,6 +39,7 @@ The function does the following:
 - Takes a `first_name` and `last_name`.
 - Converts the first letter of each one to upper case with `title()`.
 - [Concatenates](# "Puts them together, as one. With the contents of one after the other.") them with a space in the middle.
+- Prints the result.
 
 ```py hl_lines="2"
 def print_full_name(first_name, last_name):
