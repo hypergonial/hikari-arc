@@ -159,6 +159,9 @@ class OptionParams(t.Generic[T]):
 class OptionWithChoicesParams(OptionParams[ChoiceT], t.Generic[ChoiceT, ClientT]):
     """The parameters for an option that can have choices or be autocompleted.
 
+    !!! warning
+        You cannot provide both `choices` and `autocomplete_with` at the same time.
+
     Parameters
     ----------
     name : str
@@ -173,9 +176,6 @@ class OptionWithChoicesParams(OptionParams[ChoiceT], t.Generic[ChoiceT, ClientT]
         The choices for the option. If provided, these will be the only valid values for the option.
     autocomplete_with : AutocompleteCallbackT[ClientT, ChoiceT] | None
         The callback for autocompleting the option.
-
-    !!! warning
-        You cannot provide both `choices` and `autocomplete_with` at the same time.
     """
 
     __slots__: t.Sequence[str] = ("_choices", "_autocomplete_with")

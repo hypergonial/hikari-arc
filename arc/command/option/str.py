@@ -21,6 +21,9 @@ __all__ = ("StrOption", "StrParams")
 class StrParams(OptionWithChoicesParams[str, ClientT]):
     """The parameters for a string option.
 
+    !!! warning
+        You cannot provide both `choices` and `autocomplete_with` at the same time.
+
     Parameters
     ----------
     description : str
@@ -42,9 +45,6 @@ class StrParams(OptionWithChoicesParams[str, ClientT]):
         The choices for the option. If provided, these will be the only valid values for the option.
     autocomplete_with : AutocompleteCallbackT[ClientT, str] | None
         The callback that is invoked when the user autocompletes the option
-
-    !!! warning
-        You cannot provide both `choices` and `autocomplete_with` at the same time.
     """
 
     __slots__: t.Sequence[str] = ("_min_length", "_max_length")

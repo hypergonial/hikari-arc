@@ -75,6 +75,9 @@ def user_command(
 ) -> t.Callable[[UserCommandCallbackT[ClientT]], UserCommand[ClientT]]:
     """A decorator that creates a context-menu command on a user.
 
+    !!! note
+        Parameters left as `hikari.UNDEFINED` will be inherited from the parent plugin or client.
+
     Parameters
     ----------
     name : str
@@ -92,9 +95,6 @@ def user_command(
         Keep in mind that guild administrators can change this, it should only be used to provide safe defaults.
     name_localizations : t.Mapping[hikari.Locale, str] | None
         The localizations for this command's name.
-
-    !!! note
-        Parameters left as `hikari.UNDEFINED` will be inherited from the parent plugin or client.
 
     Examples
     --------

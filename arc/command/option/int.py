@@ -20,6 +20,9 @@ __all__ = ("IntOption", "IntParams")
 class IntParams(OptionWithChoicesParams[int, ClientT]):
     """The parameters for an int option.
 
+    !!! warning
+        You cannot provide both `choices` and `autocomplete_with` at the same time.
+
     Parameters
     ----------
     description : str
@@ -41,9 +44,6 @@ class IntParams(OptionWithChoicesParams[int, ClientT]):
         The choices for the option. If provided, these will be the only valid values for the option.
     autocomplete_with : AutocompleteCallbackT[ClientT, int] | None
         The callback that is invoked when the user autocompletes the option
-
-    !!! warning
-        You cannot provide both `choices` and `autocomplete_with` at the same time.
     """
 
     __slots__: t.Sequence[str] = ("_min", "_max")

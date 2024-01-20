@@ -29,6 +29,9 @@ T = t.TypeVar("T")
 class PluginBase(HasErrorHandler[ClientT], Hookable[ClientT], HasConcurrencyLimiter[ClientT]):
     """An abstract base class for plugins.
 
+    !!! note
+        Parameters left as `hikari.UNDEFINED` will be inherited from the parent client.
+
     Parameters
     ----------
     name : str
@@ -46,9 +49,6 @@ class PluginBase(HasErrorHandler[ClientT], Hookable[ClientT], HasConcurrencyLimi
         This can be overridden on a per-command basis.
     is_nsfw : bool | hikari.UndefinedType
         Whether this plugin is only usable in NSFW channels
-
-    !!! note
-        Parameters left as `hikari.UNDEFINED` will be inherited from the parent client.
     """
 
     __slots__: t.Sequence[str] = (

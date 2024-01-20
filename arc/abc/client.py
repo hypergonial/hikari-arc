@@ -1374,14 +1374,16 @@ class Client(t.Generic[AppT], abc.ABC):
     async def purge_all_commands(self, guild: hikari.SnowflakeishOr[hikari.PartialGuild] | None = None) -> None:
         """Purge all commands registered on Discord. This can be used to clean up commands.
 
+        !!! warning
+            This will remove all commands registered on Discord, **including commands not registered by this client**.
+
         Parameters
         ----------
         guild : hikari.SnowflakeishOr[hikari.PartialGuild] | None
             The guild to purge commands from
             If a `guild` is not provided, this will purge global commands.
 
-        !!! warning
-            This will remove all commands registered on Discord, **including commands not registered by this client**.
+
 
         Raises
         ------

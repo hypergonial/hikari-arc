@@ -197,6 +197,9 @@ class RESTClientBase(Client[RESTBotT]):
 
     For the default implementation of a REST client, see [`RESTClient`][arc.client.RESTClient].
 
+    !!! warning
+        The client will take over the `hikari.CommandInteraction` and `hikari.AutocompleteInteraction` listeners of the passed bot.
+
     Parameters
     ----------
     app : hikari.GatewayBotAware
@@ -222,9 +225,6 @@ class RESTClientBase(Client[RESTBotT]):
     injector : alluka.abc.Client | None
         If you already have an injector instance, you may pass it here.
         Otherwise, a new one will be created by default.
-
-    !!! warning
-        The client will take over the `hikari.CommandInteraction` and `hikari.AutocompleteInteraction` listeners of the passed bot.
     """
 
     __slots__: t.Sequence[str] = ()

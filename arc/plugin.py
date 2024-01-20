@@ -21,6 +21,9 @@ class RESTPluginBase(PluginBase[RESTClientT]):
     """The default implementation of a REST plugin.
     To use this with the default [`RESTClient`][arc.client.RESTClient] implementation, see [`RESTPlugin`][arc.client.RESTPlugin].
 
+    !!! note
+        Parameters left as `hikari.UNDEFINED` will be inherited from the parent client.
+
     Parameters
     ----------
     name : str
@@ -38,9 +41,6 @@ class RESTPluginBase(PluginBase[RESTClientT]):
         This can be overridden on a per-command basis.
     is_nsfw : bool | hikari.UndefinedType
         Whether this plugin is only usable in NSFW channels
-
-    !!! note
-        Parameters left as `hikari.UNDEFINED` will be inherited from the parent client.
 
     Examples
     --------
@@ -69,6 +69,9 @@ class GatewayPluginBase(PluginBase[GatewayClientT]):
     """The default implementation of a gateway plugin.
     To use this with the default [`GatewayClient`][arc.client.GatewayClient] implementation, see [`GatewayPlugin`][arc.client.GatewayPlugin].
 
+    !!! note
+        Parameters left as `hikari.UNDEFINED` will be inherited from the parent client.
+
     Parameters
     ----------
     name : str
@@ -86,9 +89,6 @@ class GatewayPluginBase(PluginBase[GatewayClientT]):
         This can be overridden on a per-command basis.
     is_nsfw : bool | hikari.UndefinedType
         Whether this plugin is only usable in NSFW channels
-
-    !!! note
-        Parameters left as `hikari.UNDEFINED` will be inherited from the parent client.
 
     Examples
     --------
