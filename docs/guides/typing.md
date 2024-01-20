@@ -243,7 +243,7 @@ def process_item(item: int | str) -> None:
     print(item)
 ```
 
-In both cases this means that `item` could be an `int` or a `str`.
+This means that `item` could be an `int` or a `str`.
 
 #### Possibly `None`
 
