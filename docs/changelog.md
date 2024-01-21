@@ -9,6 +9,12 @@ hide:
 
 Here you can find all the changelogs for `hikari-arc`.
 
+## v1.2.0
+
+- Optimize command syncing by using bulk endpoints for global app commands as well, making it much faster.
+- Improve command syncing error messages.
+- Fix `@Client.listen` and `@Plugin.listen` failing to parse event types with generics from function signatures.
+
 ## v1.1.0
 
 - Add `Client.create_task` to make it easier to create "fire and forget" tasks.
