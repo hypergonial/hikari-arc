@@ -15,7 +15,7 @@ class ArcError(Exception):
 
 
 class AutocompleteError(ArcError):
-    """An erro occurred while trying to autocomplete a command."""
+    """An error occurred while trying to autocomplete a command."""
 
 
 class CommandInvokeError(ArcError):
