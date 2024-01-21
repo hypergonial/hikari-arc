@@ -163,7 +163,7 @@ plugins:
         python:
           import:
             - https://docs.python.org/3.10/objects.inv
-            - https://hikari-py--1810.org.readthedocs.build/en/1810/objects.inv
+            - https://docs.hikari-py.dev/en/latest/objects.inv
             - https://alluka.cursed.solutions/objects.inv
           options:
             heading_level: 3
