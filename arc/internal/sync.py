@@ -243,6 +243,13 @@ async def _perform_command_sync(  # noqa: C901
     if edited or created or deleted:
         try:
             upstream = await client.app.rest.set_application_commands(client.application, builders, guild)
+            logger.info(
+                f"Guild: '{guild_id}'"
+                if guild
+                else "Global"
+                f" - Published {created} new commands, "
+                f"edited {edited} commands, deleted {deleted} commands, and left {unchanged} commands unchanged."
+            )
         except Exception as e:
             if guild_id:
                 raise GuildCommandPublishFailedError(
@@ -252,14 +259,6 @@ async def _perform_command_sync(  # noqa: C901
                 raise GlobalCommandPublishFailedError(
                     f"Failed to register global commands. {_extract_error(e, builders)}"
                 ) from e
-
-        logger.info(
-            f"Guild: '{guild_id}'"
-            if guild
-            else "Global"
-            f" - Published {created} new commands, "
-            f"edited {edited} commands, deleted {deleted} commands, and left {unchanged} commands unchanged."
-        )
 
     else:
         logger.info(f"Commands are up to date in guild '{guild}'" if guild else "Global commands are up to date.")
