@@ -167,7 +167,7 @@ plugins:
             - https://alluka.cursed.solutions/objects.inv
           options:
             heading_level: 3
-            annotations_path: source
+            annotations_path: brief
             docstring_section_style: spacy
             docstring_style: numpy
             inherited_members: true
@@ -179,6 +179,7 @@ plugins:
             signature_crossrefs: true
             show_symbol_type_heading: true
             show_symbol_type_toc: true
+            line_length: 90
             extensions:
                 - griffe_inherited_docstrings
 watch:
