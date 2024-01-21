@@ -38,10 +38,13 @@ class UserCommand(CallableCommandBase[ClientT, hikari.api.ContextMenuCommandBuil
 
         return Context(self.client, command, interaction)
 
-    def _build(self) -> hikari.api.ContextMenuCommandBuilder:
+    def _build(
+        self, id: hikari.Snowflake | hikari.UndefinedType = hikari.UNDEFINED
+    ) -> hikari.api.ContextMenuCommandBuilder:
         return hikari.impl.ContextMenuCommandBuilder(
             name=self.name,
             type=self.command_type,
+            id=id,
             default_member_permissions=self.default_permissions,
             is_dm_enabled=self.is_dm_enabled,
             is_nsfw=self.is_nsfw,

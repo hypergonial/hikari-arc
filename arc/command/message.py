@@ -37,9 +37,12 @@ class MessageCommand(CallableCommandBase[ClientT, hikari.api.ContextMenuCommandB
 
         return Context(self.client, command, interaction)
 
-    def _build(self) -> hikari.api.ContextMenuCommandBuilder:
+    def _build(
+        self, id: hikari.Snowflake | hikari.UndefinedType = hikari.UNDEFINED
+    ) -> hikari.api.ContextMenuCommandBuilder:
         return hikari.impl.ContextMenuCommandBuilder(
             name=self.name,
+            id=id,
             type=self.command_type,
             default_member_permissions=self.default_permissions,
             is_dm_enabled=self.is_dm_enabled,

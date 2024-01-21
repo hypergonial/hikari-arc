@@ -14,7 +14,7 @@ from arc.abc.hookable import Hookable, HookResult
 from arc.abc.limiter import LimiterProto
 from arc.abc.option import OptionBase
 from arc.context import AutodeferMode
-from arc.errors import CommandPublishFailedError, MaxConcurrencyReachedError
+from arc.errors import GlobalCommandPublishFailedError, MaxConcurrencyReachedError
 from arc.internal.types import (
     BuilderT,
     ClientT,
@@ -352,7 +352,9 @@ class CommandBase(
         return self.name
 
     def _register_instance(
-        self, instance: hikari.PartialCommand, guild: hikari.SnowflakeishOr[hikari.PartialGuild] | None = None
+        self,
+        instance: hikari.PartialCommand,
+        guild: hikari.SnowflakeishOr[hikari.PartialGuild] | hikari.UndefinedType = hikari.UNDEFINED,
     ) -> None:
         self._instances[hikari.Snowflake(guild) if guild else None] = instance
 
@@ -432,7 +434,7 @@ class CommandBase(
                     self.client.application, type=self.command_type, **kwargs
                 )
         except Exception as e:
-            raise CommandPublishFailedError(self, f"Failed to publish command '{self.display_name}'") from e
+            raise GlobalCommandPublishFailedError(self, f"Failed to publish command '{self.display_name}'") from e
 
         self._instances[hikari.Snowflake(guild) if guild else None] = created
 
@@ -491,8 +493,15 @@ class CommandBase(
         }
 
     @abc.abstractmethod
-    def _build(self) -> BuilderT:
-        """Create a builder out of this command."""
+    def _build(self, id: hikari.Snowflake | hikari.UndefinedType = hikari.UNDEFINED) -> BuilderT:
+        """Create a builder out of this command.
+
+        Parameters
+        ----------
+        id : hikari.Snowflake | hikari.UndefinedType
+            The ID of the command, if it already exists.
+            If provided, this will edit the existing command, otherwise it will create a new one.
+        """
 
     def _client_include_hook(self, client: ClientT) -> None:
         """Called when the client requests the command be added to it."""

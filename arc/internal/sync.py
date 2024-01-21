@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import itertools
+import json
 import logging
 import typing as t
 from collections import defaultdict
@@ -8,7 +9,7 @@ from contextlib import suppress
 
 import hikari
 
-from arc.errors import GuildCommandPublishFailedError
+from arc.errors import GlobalCommandPublishFailedError, GuildCommandPublishFailedError
 
 if t.TYPE_CHECKING:
     from arc.abc.client import Client
@@ -45,17 +46,17 @@ def _rebuild_hikari_command(
     NotImplementedError
         The command type is not supported.
     """
-    if command.type is hikari.CommandType.SLASH:
+    if isinstance(command, hikari.SlashCommand):
         return hikari.impl.SlashCommandBuilder(
             name=command.name,
             id=command.id,
-            description=getattr(command, "description", "No description provided."),
-            options=getattr(command, "options", []),
+            description=command.description,
+            options=list(command.options) if command.options else [],
             default_member_permissions=command.default_member_permissions,
             is_dm_enabled=command.is_dm_enabled,
             is_nsfw=command.is_nsfw,
             name_localizations=command.name_localizations,
-            description_localizations=getattr(command, "description_localizations", {}),
+            description_localizations=command.description_localizations,
         )
     elif command.type is hikari.CommandType.MESSAGE or command.type is hikari.CommandType.USER:
         return hikari.impl.ContextMenuCommandBuilder(
@@ -106,6 +107,11 @@ def _compare_commands(arc_command: CommandBase[t.Any, t.Any], hk_command: hikari
         and arc_command.name_localizations == hk_command.name_localizations
         and cmd_dict.get("description_localizations", None) == getattr(hk_command, "description_localizations", None)
     )
+
+
+def _get_empty_mapping() -> CommandMapping:
+    """Get an empty command mapping."""
+    return {hikari.CommandType.MESSAGE: {}, hikari.CommandType.USER: {}, hikari.CommandType.SLASH: {}}
 
 
 def _get_all_commands(
@@ -163,59 +169,23 @@ def _process_localizations(
                 command._request_command_locale()
 
 
-async def _sync_global_commands(client: Client[AppT], commands: CommandMapping) -> None:
-    """Add, edit, and delete global commands to match the client's slash commands.
+def _extract_error(exc: Exception, builders: t.Sequence[hikari.api.CommandBuilder]) -> str:
+    """Try to figure out which command made the bot explod and include it in the error message."""
+    if isinstance(exc, hikari.BadRequestError) and exc.errors:
+        try:
+            key = int(next(iter(exc.errors)))
+        except ValueError:
+            return str(exc)
 
-    Parameters
-    ----------
-    client : Client[AppT]
-        The client to sync commands for.
-    commands : CommandMapping
-        The commands to sync.
-    """
-    assert client.application is not None
-
-    unchanged, edited, created, deleted = 0, 0, 0, 0
-
-    upstream = await client.app.rest.fetch_application_commands(client.application)
-
-    published: dict[hikari.CommandType, set[str]] = defaultdict(set)
-
-    for existing in upstream:
-        # Ignore unsupported command types
-        if existing.type not in commands:
-            continue
-
-        # Delete commands that don't exist locally
-        if existing.name not in commands[existing.type]:
-            await existing.delete()
-            deleted += 1
-        # If the command exists locally, but is not the same, edit it
-        elif (cmd := commands[existing.type][existing.name]) and not _compare_commands(cmd, existing):
-            await cmd.publish()
-            edited += 1
-        # Otherwise, keep it
-        else:
-            commands[existing.type][existing.name]._register_instance(existing)
-            unchanged += 1
-
-        published[existing.type].add(existing.name)
-
-    for mapping in commands.values():
-        for existing in mapping.values():
-            if existing.name in published[existing.command_type]:
-                continue
-
-            await existing.publish()
-            created += 1
-
-    logger.debug(
-        f"Global - Published {created} new commands, edited {edited} commands, deleted {deleted} commands, and left {unchanged} commands unchanged."
-    )
+        command = builders[key]
+        return f"Command '{command.name}' failed to register:\n{json.dumps(exc.errors[str(key)], indent=2)}"
+    return str(exc)
 
 
-async def _sync_commands_for_guild(
-    client: Client[AppT], guild: hikari.SnowflakeishOr[hikari.PartialGuild], commands: CommandMapping
+async def _perform_command_sync(  # noqa: C901
+    client: Client[AppT],
+    commands: CommandMapping,
+    guild: hikari.SnowflakeishOr[hikari.PartialGuild] | hikari.UndefinedType = hikari.UNDEFINED,
 ) -> None:
     """Add, edit, and delete commands in the given guild to match the client's slash commands.
 
@@ -230,9 +200,10 @@ async def _sync_commands_for_guild(
     """
     assert client.application is not None
 
-    guild_id = hikari.Snowflake(guild)
+    guild_id = hikari.Snowflake(guild) if guild else hikari.UNDEFINED
 
-    logger.info(f"Syncing commands for guild: {guild_id}")
+    if guild:
+        logger.info(f"Syncing commands for guild: {guild_id}")
 
     unchanged, edited, created, deleted = 0, 0, 0, 0
 
@@ -253,7 +224,7 @@ async def _sync_commands_for_guild(
 
         # If the command exists locally, but is not the same, edit it
         elif (local := commands[existing.type].get(existing.name)) and not _compare_commands(local, existing):
-            builders.append(local._build())
+            builders.append(local._build(existing.id))
             edited += 1
         # Otherwise, keep it
         else:
@@ -269,20 +240,33 @@ async def _sync_commands_for_guild(
             builders.append(existing._build())
             created += 1
 
-    try:
-        created = await client.app.rest.set_application_commands(client.application, builders, guild)
-    except Exception as e:
-        raise GuildCommandPublishFailedError(guild_id, e, f"Failed to register commands in guild {guild_id}.") from e
+    if edited or created or deleted:
+        try:
+            upstream = await client.app.rest.set_application_commands(client.application, builders, guild)
+        except Exception as e:
+            if guild_id:
+                raise GuildCommandPublishFailedError(
+                    guild_id, f"Failed to register commands in guild {guild_id}. {_extract_error(e, builders)}"
+                ) from e
+            else:
+                raise GlobalCommandPublishFailedError(
+                    f"Failed to register global commands. {_extract_error(e, builders)}"
+                ) from e
 
-    for existing in created:
+        logger.info(
+            f"Guild: '{guild_id}'"
+            if guild
+            else "Global"
+            f" - Published {created} new commands, "
+            f"edited {edited} commands, deleted {deleted} commands, and left {unchanged} commands unchanged."
+        )
+
+    else:
+        logger.info(f"Commands are up to date in guild '{guild}'" if guild else "Global commands are up to date.")
+
+    for existing in upstream:
         with suppress(KeyError):
             commands[existing.type][existing.name]._register_instance(existing, guild_id)
-
-    logger.info(f"Synced commands for guild: {guild_id}")
-
-    logger.debug(
-        f"Guild: {guild_id} - Published {created} new commands, edited {edited} commands, deleted {deleted} commands, and left {unchanged} commands unchanged."
-    )
 
 
 async def _sync_commands(client: Client[AppT]) -> None:
@@ -304,20 +288,19 @@ async def _sync_commands(client: Client[AppT]) -> None:
     commands = _get_all_commands(client)
     _process_localizations(client, commands)
 
-    global_commands = commands.pop(None, None)
+    global_commands = commands.pop(None, _get_empty_mapping())
 
+    # TODO: Should all guilds be iterated over and guilds with no commands explicitly cleared?
     if commands:
         logger.info("Syncing guild commands...")
 
         for guild_id, command in commands.items():
             assert guild_id is not None
-            await _sync_commands_for_guild(client, guild_id, command)
-            logger.info(f"Synced commands for guild: {guild_id}")
+            await _perform_command_sync(client, command, guild_id)
 
-    if global_commands:
-        logger.info("Syncing global commands...")
+    logger.info("Syncing global commands...")
 
-        await _sync_global_commands(client, global_commands)
+    await _perform_command_sync(client, global_commands)
 
     logger.info("Command syncing complete!")
 

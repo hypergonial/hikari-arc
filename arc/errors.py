@@ -5,7 +5,6 @@ import typing as t
 if t.TYPE_CHECKING:
     import hikari
 
-    from arc.abc.command import CommandProto
     from arc.abc.concurrency_limiting import ConcurrencyLimiterProto
     from arc.abc.limiter import LimiterProto
 
@@ -142,20 +141,14 @@ class MaxConcurrencyReachedError(ArcError):
 
 
 class CommandPublishFailedError(ArcError):
-    """Raised when a command could not be published to Discord.
-
-    Attributes
-    ----------
-    command : arc.abc.command.CommandProto
-        The command that failed to publish.
-    """
-
-    def __init__(self, command: CommandProto, *args: t.Any) -> None:
-        self.command = command
-        super().__init__(*args)
+    """Raised when a set of commands could not be published to Discord."""
 
 
-class GuildCommandPublishFailedError(ArcError):
+class GlobalCommandPublishFailedError(CommandPublishFailedError):
+    """Raised when a command could not be published to Discord."""
+
+
+class GuildCommandPublishFailedError(CommandPublishFailedError):
     """Raised when a set of commands could not be published to a guild.
 
     Attributes

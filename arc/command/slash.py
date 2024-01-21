@@ -98,10 +98,11 @@ class SlashCommand(CallableCommandBase[ClientT, hikari.api.SlashCommandBuilder])
             payload["options"] = [option.to_command_option() for option in sorted_options]
         return payload
 
-    def _build(self) -> hikari.api.SlashCommandBuilder:
+    def _build(self, id: hikari.Snowflake | hikari.UndefinedType = hikari.UNDEFINED) -> hikari.api.SlashCommandBuilder:
         return hikari.impl.SlashCommandBuilder(
             name=self.name,
             description=self.description,
+            id=id,
             options=[option.to_command_option() for option in self.options.values()],
             default_member_permissions=self.default_permissions,
             is_dm_enabled=self.is_dm_enabled,
@@ -252,10 +253,11 @@ class SlashGroup(CommandBase[ClientT, hikari.api.SlashCommandBuilder]):
 
         return Context(self.client, command, interaction)
 
-    def _build(self) -> hikari.api.SlashCommandBuilder:
+    def _build(self, id: hikari.Snowflake | hikari.UndefinedType = hikari.UNDEFINED) -> hikari.api.SlashCommandBuilder:
         return hikari.impl.SlashCommandBuilder(
             name=self.name,
             description=self.description,
+            id=id,
             options=[subcmd.to_command_option() for subcmd in self.children.values()],
             default_member_permissions=self.default_permissions,
             is_dm_enabled=self.is_dm_enabled,
