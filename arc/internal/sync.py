@@ -170,15 +170,27 @@ def _process_localizations(
 
 
 def _extract_error(exc: Exception, builders: t.Sequence[hikari.api.CommandBuilder]) -> str:
-    """Try to figure out which command made the bot explod and include it in the error message."""
+    """Try to figure out which commands made the bot explod and include it in the error message."""
     if isinstance(exc, hikari.BadRequestError) and exc.errors:
-        try:
-            key = int(next(iter(exc.errors)))
-        except ValueError:
-            return str(exc)
+        errors: list[str] = []
 
-        command = builders[key]
-        return f"Command '{command.name}' failed to register:\n{json.dumps(exc.errors[str(key)], indent=2)}"
+        for key in exc.errors:
+            try:
+                key = int(key)
+            except ValueError:
+                continue
+
+            command = builders[key] if key < len(builders) else None
+
+            if command is None:
+                continue
+
+            errors.append(
+                f"Command '{command.name}' failed to register:\n{json.dumps(exc.errors[str(key)], indent=2)}\n"
+            )
+        if errors:
+            return "\n".join(errors)
+
     return str(exc)
 
 
@@ -253,11 +265,11 @@ async def _perform_command_sync(  # noqa: C901
         except Exception as e:
             if guild_id:
                 raise GuildCommandPublishFailedError(
-                    guild_id, f"Failed to register commands in guild {guild_id}. {_extract_error(e, builders)}"
+                    guild_id, f"Failed to register commands in guild {guild_id}.\n{_extract_error(e, builders)}"
                 ) from e
             else:
                 raise GlobalCommandPublishFailedError(
-                    f"Failed to register global commands. {_extract_error(e, builders)}"
+                    f"Failed to register global commands.\n{_extract_error(e, builders)}"
                 ) from e
 
     else:
