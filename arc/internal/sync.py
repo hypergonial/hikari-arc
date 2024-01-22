@@ -276,7 +276,11 @@ async def _perform_command_sync(  # noqa: C901
                 ) from e
 
     else:
-        logger.info(f"Commands are up to date in guild '{guild}'" if guild else "Global commands are up to date.")
+        logger.info(
+            f"Commands are already up to date in guild '{guild}'"
+            if guild
+            else "Global commands are already up to date."
+        )
 
     for existing in upstream:
         with suppress(KeyError):
