@@ -232,11 +232,13 @@ async def _perform_command_sync(  # noqa: C901
 
         # Delete commands that don't exist locally
         elif existing.name not in commands[existing.type]:
+            logger.debug(f"Command '{existing.name}' not found locally, will delete.")
             deleted += 1
 
         # If the command exists locally, but is not the same, edit it
         elif (local := commands[existing.type].get(existing.name)) and not _compare_commands(local, existing):
             builders.append(local._build(existing.id))
+            logger.debug(f"Command '{local.name}' is out of date upstream, will edit.")
             edited += 1
         # Otherwise, keep it
         else:
@@ -246,10 +248,11 @@ async def _perform_command_sync(  # noqa: C901
         built[existing.type].add(existing.name)
 
     for mapping in commands.values():
-        for existing in mapping.values():
-            if existing.name in built[existing.command_type]:
+        for to_register in mapping.values():
+            if to_register.name in built[to_register.command_type]:
                 continue
-            builders.append(existing._build())
+            builders.append(to_register._build())
+            logger.debug(f"Command '{to_register.name}' not found upstream, will create.")
             created += 1
 
     if edited or created or deleted:
