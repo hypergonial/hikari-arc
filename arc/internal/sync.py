@@ -22,9 +22,6 @@ CommandMapping: t.TypeAlias = "dict[hikari.CommandType, dict[str, CommandBase[t.
 
 logger = logging.getLogger(__name__)
 
-# Acknowledgement: The logic behind the following code is partially adapted from hikari-lightbulb's internal.py
-# https://github.com/tandemdude/hikari-lightbulb/blob/master/lightbulb/internal.py
-
 
 def _rebuild_hikari_command(
     command: hikari.PartialCommand,
@@ -137,14 +134,15 @@ def _get_all_commands(
     for command in itertools.chain(
         client._slash_commands.values(), client._message_commands.values(), client._user_commands.values()
     ):
-        if command.guilds:
-            for guild_id in command.guilds:
-                mapping[guild_id][command.command_type][command.name] = command
-        elif command.plugin and command.plugin.default_enabled_guilds:
-            for guild_id in command.plugin.default_enabled_guilds:
-                mapping[guild_id][command.command_type][command.name] = command
-        elif command.client.default_enabled_guilds:
-            for guild_id in command.client.default_enabled_guilds:
+        guild_ids = (
+            command.guilds
+            or (command.plugin.default_enabled_guilds if command.plugin else None)
+            or client.default_enabled_guilds
+            or None
+        )
+
+        if guild_ids:
+            for guild_id in guild_ids:
                 mapping[guild_id][command.command_type][command.name] = command
         else:
             mapping[None][command.command_type][command.name] = command
@@ -170,7 +168,20 @@ def _process_localizations(
 
 
 def _extract_error(exc: Exception, builders: t.Sequence[hikari.api.CommandBuilder]) -> str:
-    """Try to figure out which commands made the bot explod and include it in the error message."""
+    """Try to figure out which commands made the bot explod and include it in the error message.
+
+    Parameters
+    ----------
+    exc : Exception
+        The exception to extract the error from.
+    builders : t.Sequence[hikari.api.CommandBuilder]
+        The builders that were used to register commands, that may have caused the error.
+
+    Returns
+    -------
+    str
+        The error message to display.
+    """
     if isinstance(exc, hikari.BadRequestError) and exc.errors:
         errors: list[str] = []
 
@@ -308,7 +319,6 @@ async def _sync_commands(client: Client[AppT]) -> None:
 
     global_commands = commands.pop(None, _get_empty_mapping())
 
-    # TODO: Should all guilds be iterated over and guilds with no commands explicitly cleared?
     if commands:
         logger.info("Syncing guild commands...")
 
