@@ -1,7 +1,7 @@
 import typing as t
 
 __author__: t.Final[str] = "hypergonial"
-__author_email__: t.Final[str] = "46067571+hypergonial@users.noreply.github.com"
+__author_email__: t.Final[str] = "git@hypergonial.com"
 __maintainer__: t.Final[str] = "hypergonial"
 __license__: t.Final[str] = "MIT"
 __url__: t.Final[str] = "https://github.com/hypergonial/hikari-arc"
