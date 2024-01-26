@@ -109,7 +109,26 @@ If you're trying to inject a function that already has decorators on it, the [`@
 
 This means you can inject dependencies into [hooks](./hooks.md), [error handlers](./error_handling.md), [loops](./loops.md), or literally any ordinary Python function. The sky is the limit!
 
-## The benefits of dependency injection
+### Getting dependencies without injection
+
+In some cases it may not be convenient to use [`@Client.inject_dependencies`][arc.abc.client.Client.inject_dependencies], so for this reason, the client exposes a lower-level method of getting the dependencies directly, in the form of [`Client.get_type_dependency`][arc.abc.client.Client.get_type_dependency].
+
+This method takes the type of the dependency, and an optional default as parameters, and returns the dependency, if one exists:
+
+```py
+def compare_counter(value: int) -> None:
+    db = client.get_type_dependency(MyDatabase)
+
+    if value > db.value:
+        print("Value is bigger!")
+    else:
+        print("Counter is bigger or equal!")
+```
+
+!!! note
+    This function practically serves the exact same purpose as previous snippet, with the difference that a `db` cannot be passed to the function to override the injected default, reducing it's flexibility.
+
+## Why dependency injection?
 
 Dependency injection **separates the concern** of constructing an object from using them, therefore it is possible to **loosely couple** the logic and state of your program. One benefit of this approach is that you can separate the actual implementations from the abstract types that functions may consume.
 

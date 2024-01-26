@@ -48,6 +48,7 @@ __all__ = ("Client",)
 
 
 T = t.TypeVar("T")
+DefaultT = t.TypeVar("DefaultT")
 P = t.ParamSpec("P")
 
 logger = logging.getLogger(__name__)
@@ -1280,20 +1281,44 @@ class Client(t.Generic[AppT], abc.ABC):
         self._injector.set_type_dependency(type_, instance)
         return self
 
-    def get_type_dependency(self, type_: type[T]) -> T | hikari.UndefinedType:
+    @t.overload
+    def get_type_dependency(self, type_: type[T]) -> T:
+        ...
+
+    @t.overload
+    def get_type_dependency(self, type_: type[T], *, default: DefaultT) -> T | DefaultT:
+        ...
+
+    def get_type_dependency(
+        self, type_: type[T], *, default: DefaultT | hikari.UndefinedType = hikari.UNDEFINED
+    ) -> T | DefaultT:
         """Get a type dependency for this client.
 
         Parameters
         ----------
         type_ : type[T]
             The type of the dependency.
+        default : DefaultT
+            The default value to return if the dependency does not exist.
+            If not provided, this will raise an exception if the dependency does not exist.
 
         Returns
         -------
-        T | hikari.UndefinedType
-            The instance of the dependency, if it exists.
+        T | DefaultT
+            The instance of the dependency, if it exists, otherwise `default`.
+
+        Raises
+        ------
+        KeyError
+            If the dependency does not exist and `default` was not provided.
         """
-        return self._injector.get_type_dependency(type_, default=hikari.UNDEFINED)
+        if default is hikari.UNDEFINED:
+            value = self._injector.get_type_dependency(type_)
+            if isinstance(value, alluka.abc.Undefined):
+                raise KeyError(f"Could not resolve dependency of type {type_}.")
+            return value
+        else:
+            return self._injector.get_type_dependency(type_, default=default)
 
     @t.overload
     def inject_dependencies(self, func: t.Callable[P, T]) -> t.Callable[P, T]:
