@@ -77,6 +77,11 @@ def global_limiter(period: float, limit: int) -> LimiterHook[t.Any]:
     limit : int
         The amount of requests allowed in a bucket.
 
+    Raises
+    ------
+    RateLimiterExhaustedError
+        If the limiter is exhausted.
+
     Examples
     --------
     ```py
@@ -97,6 +102,11 @@ def guild_limiter(period: float, limit: int) -> LimiterHook[t.Any]:
         The period, in seconds, after which the bucket resets.
     limit : int
         The amount of requests allowed in a bucket.
+
+    Raises
+    ------
+    RateLimiterExhaustedError
+        If the limiter is exhausted.
 
     Examples
     --------
@@ -119,6 +129,11 @@ def channel_limiter(period: float, limit: int) -> LimiterHook[t.Any]:
     limit : int
         The amount of requests allowed in a bucket.
 
+    Raises
+    ------
+    RateLimiterExhaustedError
+        If the limiter is exhausted.
+
     Examples
     --------
     ```py
@@ -139,6 +154,11 @@ def user_limiter(period: float, limit: int) -> LimiterHook[t.Any]:
         The period, in seconds, after which the bucket resets.
     limit : int
         The amount of requests allowed in a bucket.
+
+    Raises
+    ------
+    RateLimiterExhaustedError
+        If the limiter is exhausted.
 
     Examples
     --------
@@ -162,6 +182,11 @@ def member_limiter(period: float, limit: int) -> LimiterHook[t.Any]:
     limit : int
         The amount of requests allowed in a bucket.
 
+    Raises
+    ------
+    RateLimiterExhaustedError
+        If the limiter is exhausted.
+
     Examples
     --------
     ```py
@@ -184,6 +209,11 @@ def custom_limiter(period: float, limit: int, get_key_with: t.Callable[[Context[
         A callable that returns a key for the ratelimiter bucket. This key is used to identify the bucket.
         For instance, to create a ratelimiter that is shared across all contexts in a guild,
         you would use `lambda ctx: str(ctx.guild_id)`.
+
+    Raises
+    ------
+    RateLimiterExhaustedError
+        If the limiter is exhausted.
 
     Examples
     --------

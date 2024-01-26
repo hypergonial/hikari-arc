@@ -25,6 +25,11 @@ def guild_only(ctx: Context[t.Any]) -> HookResult:
     ```py
     @arc.with_hook(arc.guild_only)
     ```
+
+    Raises
+    ------
+    GuildOnlyError
+        If the command is invoked outside of a guild.
     """
     if ctx.guild_id is None:
         raise GuildOnlyError("This command can only be used in a guild.")
@@ -39,6 +44,11 @@ def dm_only(ctx: Context[t.Any]) -> HookResult:
     ```py
     @arc.with_hook(arc.dm_only)
     ```
+
+    Raises
+    ------
+    DMOnlyError
+        If the command is invoked outside of a DM.
     """
     if ctx.guild_id is not None:
         raise DMOnlyError("This command can only be used in a DM.")
@@ -53,6 +63,11 @@ def owner_only(ctx: Context[t.Any]) -> HookResult:
     ```py
     @arc.with_hook(arc.owner_only)
     ```
+
+    Raises
+    ------
+    NotOwnerError
+        If the command is invoked by a non-owner.
     """
     if ctx.author.id not in ctx.client.owner_ids:
         raise NotOwnerError("This command can only be used by the application owners.")
@@ -82,6 +97,13 @@ def has_permissions(perms: hikari.Permissions) -> t.Callable[[Context[t.Any]], H
     ----------
     perms : hikari.Permissions
         The permissions to check for.
+
+    Raises
+    ------
+    GuildOnlyError
+        If the command is invoked outside of a guild.
+    InvokerMissingPermissionsError
+        If the invoker is missing some of the specified permissions.
 
     Examples
     --------
@@ -119,6 +141,13 @@ def bot_has_permissions(perms: hikari.Permissions) -> t.Callable[[Context[t.Any]
     ----------
     perms : hikari.Permissions
         The permissions to check for.
+
+    Raises
+    ------
+    GuildOnlyError
+        If the command is invoked outside of a guild.
+    BotMissingPermissionsError
+        If the bot is missing some of the specified permissions.
 
     Examples
     --------
