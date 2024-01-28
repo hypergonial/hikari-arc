@@ -162,14 +162,14 @@ class InteractionResponse:
 
     async def edit(
         self,
-        content: t.Any | hikari.UndefinedType = hikari.UNDEFINED,
+        content: t.Any | hikari.UndefinedType | None = hikari.UNDEFINED,
         *,
-        component: hikari.api.ComponentBuilder | hikari.UndefinedType = hikari.UNDEFINED,
-        components: t.Sequence[hikari.api.ComponentBuilder] | hikari.UndefinedType = hikari.UNDEFINED,
-        attachment: hikari.Resourceish | hikari.UndefinedType = hikari.UNDEFINED,
-        attachments: t.Sequence[hikari.Resourceish] | hikari.UndefinedType = hikari.UNDEFINED,
-        embed: hikari.Embed | hikari.UndefinedType = hikari.UNDEFINED,
-        embeds: t.Sequence[hikari.Embed] | hikari.UndefinedType = hikari.UNDEFINED,
+        component: hikari.api.ComponentBuilder | hikari.UndefinedType | None = hikari.UNDEFINED,
+        components: t.Sequence[hikari.api.ComponentBuilder] | hikari.UndefinedType | None = hikari.UNDEFINED,
+        attachment: hikari.Resourceish | hikari.UndefinedType | None = hikari.UNDEFINED,
+        attachments: t.Sequence[hikari.Resourceish] | hikari.UndefinedType | None = hikari.UNDEFINED,
+        embed: hikari.Embed | hikari.UndefinedType | None = hikari.UNDEFINED,
+        embeds: t.Sequence[hikari.Embed] | hikari.UndefinedType | None = hikari.UNDEFINED,
         mentions_everyone: bool | hikari.UndefinedType = hikari.UNDEFINED,
         user_mentions: t.Sequence[hikari.Snowflakeish | hikari.PartialUser]
         | bool
