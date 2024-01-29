@@ -746,7 +746,7 @@ def slash_command(
     default_permissions: hikari.Permissions | hikari.UndefinedType = hikari.UNDEFINED,
     name_localizations: t.Mapping[hikari.Locale, str] | None = None,
     description_localizations: t.Mapping[hikari.Locale, str] | None = None,
-) -> t.Callable[[t.Callable[t.Concatenate[Context[ClientT], ...], t.Awaitable[None]]], SlashCommand[ClientT]]:
+) -> t.Callable[[CommandCallbackT[ClientT]], SlashCommand[ClientT]]:
     """A decorator that creates a slash command.
 
     Parameters
@@ -791,7 +791,7 @@ def slash_command(
     ```
     """
 
-    def decorator(func: t.Callable[t.Concatenate[Context[ClientT], ...], t.Awaitable[None]]) -> SlashCommand[ClientT]:
+    def decorator(func: CommandCallbackT[ClientT]) -> SlashCommand[ClientT]:
         guild_ids = tuple(hikari.Snowflake(i) for i in guilds) if guilds is not hikari.UNDEFINED else hikari.UNDEFINED
         options = parse_command_signature(func)
 
@@ -819,7 +819,7 @@ def slash_subcommand(
     autodefer: bool | AutodeferMode | hikari.UndefinedType = hikari.UNDEFINED,
     name_localizations: t.Mapping[hikari.Locale, str] | None = None,
     description_localizations: t.Mapping[hikari.Locale, str] | None = None,
-) -> t.Callable[[t.Callable[t.Concatenate[Context[ClientT], ...], t.Awaitable[None]]], SlashSubCommand[ClientT]]:
+) -> t.Callable[[CommandCallbackT[ClientT]], SlashSubCommand[ClientT]]:
     """A decorator that creates a slash sub command. It should be included in a slash command group.
 
     Parameters
@@ -859,9 +859,7 @@ def slash_subcommand(
     ```
     """
 
-    def decorator(
-        func: t.Callable[t.Concatenate[Context[ClientT], ...], t.Awaitable[None]],
-    ) -> SlashSubCommand[ClientT]:
+    def decorator(func: CommandCallbackT[ClientT]) -> SlashSubCommand[ClientT]:
         options = parse_command_signature(func)
 
         return SlashSubCommand(
