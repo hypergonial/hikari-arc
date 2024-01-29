@@ -49,6 +49,7 @@ from .context import AutocompleteData, AutodeferMode, Context, InteractionRespon
 from .errors import (
     ArcError,
     AutocompleteError,
+    BotMissingPermissionsError,
     CommandInvokeError,
     CommandPublishFailedError,
     DMOnlyError,
@@ -148,6 +149,7 @@ __all__ = (
     "CommandPublishFailedError",
     "GuildCommandPublishFailedError",
     "GlobalCommandPublishFailedError",
+    "BotMissingPermissionsError",
     "MaxConcurrencyReachedError",
     "NoResponseIssuedError",
     "ResponseAlreadyIssuedError",
