@@ -243,8 +243,13 @@ class CommandConcurrencyLimiter(ConcurrencyLimiter[Context[ClientT]], Concurrenc
         return super().__call__(item)
 
 
-def global_concurrency() -> CommandConcurrencyLimiter[t.Any]:
+def global_concurrency(limit: int) -> CommandConcurrencyLimiter[t.Any]:
     """Limit a command to a certain amount of concurrent instances globally.
+
+    Parameters
+    ----------
+    limit : int
+        The maximum amount of concurrently running command instances.
 
     Returns
     -------
@@ -257,7 +262,7 @@ def global_concurrency() -> CommandConcurrencyLimiter[t.Any]:
     @arc.with_concurrency_limit(arc.global_concurrency())
     ```
     """
-    return CommandConcurrencyLimiter(1, get_key_with=lambda _: "amongus")
+    return CommandConcurrencyLimiter(limit, get_key_with=lambda _: "amongus")
 
 
 def guild_concurrency(limit: int) -> CommandConcurrencyLimiter[t.Any]:

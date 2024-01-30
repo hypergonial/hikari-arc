@@ -9,6 +9,10 @@ hide:
 
 Here you can find all the changelogs for `hikari-arc`.
 
+## Unreleased
+
+- Fix `arc.utils.global_concurrency` missing a `limit` argument.
+
 ## v1.2.0
 
 - Optimize command syncing by using bulk endpoints for global app commands as well, making it much faster.
