@@ -15,7 +15,7 @@ from contextlib import suppress
 import alluka
 import hikari
 
-from arc.abc.command import _CommandSettings
+from arc.abc.command import CallableCommandBase, _CommandSettings
 from arc.abc.plugin import PluginBase
 from arc.command.message import MessageCommand
 from arc.command.slash import SlashCommand, SlashGroup, SlashSubCommand, SlashSubGroup
@@ -507,16 +507,19 @@ class Client(t.Generic[AppT], abc.ABC):
                 yield command
 
     @t.overload
-    def include(self) -> t.Callable[[CommandBase[te.Self, BuilderT]], CommandBase[te.Self, BuilderT]]:
+    def include(self) -> t.Callable[[CallableCommandBase[te.Self, BuilderT]], CallableCommandBase[te.Self, BuilderT]]:
         ...
 
     @t.overload
-    def include(self, command: CommandBase[te.Self, BuilderT]) -> CommandBase[te.Self, BuilderT]:
+    def include(self, command: CallableCommandBase[te.Self, BuilderT]) -> CallableCommandBase[te.Self, BuilderT]:
         ...
 
     def include(
-        self, command: CommandBase[te.Self, BuilderT] | None = None
-    ) -> CommandBase[te.Self, BuilderT] | t.Callable[[CommandBase[te.Self, BuilderT]], CommandBase[te.Self, BuilderT]]:
+        self, command: CallableCommandBase[te.Self, BuilderT] | None = None
+    ) -> (
+        CallableCommandBase[te.Self, BuilderT]
+        | t.Callable[[CallableCommandBase[te.Self, BuilderT]], CallableCommandBase[te.Self, BuilderT]]
+    ):
         """Decorator to add a command to this client.
 
         !!! note
@@ -542,7 +545,7 @@ class Client(t.Generic[AppT], abc.ABC):
         ```
         """
 
-        def decorator(command: CommandBase[te.Self, BuilderT]) -> CommandBase[te.Self, BuilderT]:
+        def decorator(command: CallableCommandBase[te.Self, BuilderT]) -> CallableCommandBase[te.Self, BuilderT]:
             if command.plugin is not None:
                 raise RuntimeError(
                     f"Command '{command.name}' is already registered with plugin '{command.plugin.name}'."

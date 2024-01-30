@@ -8,7 +8,7 @@ import typing as t
 
 import hikari
 
-from arc.abc.command import _CommandSettings
+from arc.abc.command import CallableCommandBase, _CommandSettings
 from arc.abc.concurrency_limiting import ConcurrencyLimiterProto, HasConcurrencyLimiter
 from arc.abc.error_handler import HasErrorHandler
 from arc.abc.hookable import Hookable
@@ -209,16 +209,19 @@ class PluginBase(HasErrorHandler[ClientT], Hookable[ClientT], HasConcurrencyLimi
             raise TypeError(f"Unknown command type '{type(command).__name__}'.")
 
     @t.overload
-    def include(self) -> t.Callable[[CommandBase[ClientT, BuilderT]], CommandBase[ClientT, BuilderT]]:
+    def include(self) -> t.Callable[[CallableCommandBase[ClientT, BuilderT]], CallableCommandBase[ClientT, BuilderT]]:
         ...
 
     @t.overload
-    def include(self, command: CommandBase[ClientT, BuilderT]) -> CommandBase[ClientT, BuilderT]:
+    def include(self, command: CallableCommandBase[ClientT, BuilderT]) -> CallableCommandBase[ClientT, BuilderT]:
         ...
 
     def include(
-        self, command: CommandBase[ClientT, BuilderT] | None = None
-    ) -> CommandBase[ClientT, BuilderT] | t.Callable[[CommandBase[ClientT, BuilderT]], CommandBase[ClientT, BuilderT]]:
+        self, command: CallableCommandBase[ClientT, BuilderT] | None = None
+    ) -> (
+        CallableCommandBase[ClientT, BuilderT]
+        | t.Callable[[CallableCommandBase[ClientT, BuilderT]], CallableCommandBase[ClientT, BuilderT]]
+    ):
         """Add a command to this plugin.
 
         !!! note
@@ -235,7 +238,7 @@ class PluginBase(HasErrorHandler[ClientT], Hookable[ClientT], HasConcurrencyLimi
             If the command is already included in this plugin.
         """
 
-        def decorator(command: CommandBase[ClientT, BuilderT]) -> CommandBase[ClientT, BuilderT]:
+        def decorator(command: CallableCommandBase[ClientT, BuilderT]) -> CallableCommandBase[ClientT, BuilderT]:
             if command.plugin is not None:
                 raise ValueError(f"Command '{command.name}' is already registered with plugin '{command.plugin.name}'.")
 
