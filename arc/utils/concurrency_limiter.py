@@ -259,7 +259,7 @@ def global_concurrency(limit: int) -> CommandConcurrencyLimiter[t.Any]:
     Examples
     --------
     ```py
-    @arc.with_concurrency_limit(arc.global_concurrency())
+    @arc.with_concurrency_limit(arc.global_concurrency(1))
     ```
     """
     return CommandConcurrencyLimiter(limit, get_key_with=lambda _: "amongus")
