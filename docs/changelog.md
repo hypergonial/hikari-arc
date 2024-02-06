@@ -9,9 +9,10 @@ hide:
 
 Here you can find all the changelogs for `hikari-arc`.
 
-## Unreleased
+## v1.2.1
 
 - Fix `arc.utils.global_concurrency` missing a `limit` argument.
+- Fix slash subcommands failing to resolve autodefer settings.
 
 ## v1.2.0
 

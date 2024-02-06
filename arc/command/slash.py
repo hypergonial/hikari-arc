@@ -518,7 +518,7 @@ class SlashSubGroup(SubCommandBase[ClientT, SlashGroup[ClientT]]):
 
         return settings.apply(
             _CommandSettings(
-                autodefer=self.autodefer,
+                autodefer=self._autodefer,
                 default_permissions=hikari.UNDEFINED,
                 is_nsfw=hikari.UNDEFINED,
                 is_dm_enabled=hikari.UNDEFINED,
