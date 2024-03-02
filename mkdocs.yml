@@ -186,3 +186,6 @@ watch:
   - docs
   - README.md
   - arc
+extra_css:
+  - stylesheets/additional_coloring.css
+
