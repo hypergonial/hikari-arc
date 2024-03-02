@@ -32,12 +32,12 @@
 }
 
 
-/*  Hack to make sure `classmethod` is rendered properly
+/*   Hack to make sure `classmethod` is rendered properly
  *
  *  For some godawful reasons, "classmethod" is rendered as:
  *      <div>
  *          <code>
- *              <mark>classmeth</mark>
+ *             <mark>classmeth</mark>
  *              od
  *          </code>
  *      </div>
@@ -48,7 +48,7 @@
  *  entirely.
  */
 .doc-label-classmethod > code > mark {
-    background-color: rgba(var(--class-method-color), 0.1);
+    background-color: rgba(var(--classmethod-color), 0.1);
     color: rgb(var(--classmethod-color));
 }
 
