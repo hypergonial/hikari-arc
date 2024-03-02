@@ -34,7 +34,7 @@
 
 /*   Hack to make sure `classmethod` is rendered properly
  *
- *  For some godawful reasons, "classmethod" is rendered as:
+ *  For some godawful reasons, very rarely "classmethod" is rendered as:
  *      <div>
  *          <code>
  *             <mark>classmeth</mark>
