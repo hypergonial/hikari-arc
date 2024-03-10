@@ -3,5 +3,5 @@ pyright==1.1.350
 nox==2023.4.22
 typing_extensions==4.9.0
 pytest==7.4.4
-pytest-asyncio==0.23.4
+pytest-asyncio==0.23.5.post1
 slotscheck==0.17.1
