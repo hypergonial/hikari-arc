@@ -127,9 +127,9 @@ def _get_all_commands(
         A mapping of guilds to command types to command names to commands that should be registered.
     """
     # The big daddy of all mappings
-    mapping: dict[
-        hikari.Snowflake | None, dict[hikari.CommandType, dict[str, CommandBase[t.Any, t.Any]]]
-    ] = defaultdict(lambda: defaultdict(lambda: defaultdict(dict)))  # type: ignore
+    mapping: dict[hikari.Snowflake | None, dict[hikari.CommandType, dict[str, CommandBase[t.Any, t.Any]]]] = (
+        defaultdict(lambda: defaultdict(lambda: defaultdict(dict)))  # type: ignore
+    )
 
     for command in itertools.chain(
         client._slash_commands.values(), client._message_commands.values(), client._user_commands.values()

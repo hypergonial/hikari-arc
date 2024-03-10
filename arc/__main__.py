@@ -1,4 +1,5 @@
 """CLI entry point for arc."""
+
 import os
 import platform
 import sys

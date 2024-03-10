@@ -403,12 +403,10 @@ class SlashGroup(CommandBase[ClientT, hikari.api.SlashCommandBuilder]):
             sub._request_option_locale(self._client, self)
 
     @t.overload
-    def include(self) -> t.Callable[[SlashSubCommand[ClientT]], SlashSubCommand[ClientT]]:
-        ...
+    def include(self) -> t.Callable[[SlashSubCommand[ClientT]], SlashSubCommand[ClientT]]: ...
 
     @t.overload
-    def include(self, command: SlashSubCommand[ClientT]) -> SlashSubCommand[ClientT]:
-        ...
+    def include(self, command: SlashSubCommand[ClientT]) -> SlashSubCommand[ClientT]: ...
 
     def include(
         self, command: SlashSubCommand[ClientT] | None = None
@@ -554,12 +552,10 @@ class SlashSubGroup(SubCommandBase[ClientT, SlashGroup[ClientT]]):
             subcommand._request_option_locale(client, command)
 
     @t.overload
-    def include(self) -> t.Callable[[SlashSubCommand[ClientT]], SlashSubCommand[ClientT]]:
-        ...
+    def include(self) -> t.Callable[[SlashSubCommand[ClientT]], SlashSubCommand[ClientT]]: ...
 
     @t.overload
-    def include(self, command: SlashSubCommand[ClientT]) -> SlashSubCommand[ClientT]:
-        ...
+    def include(self, command: SlashSubCommand[ClientT]) -> SlashSubCommand[ClientT]: ...
 
     def include(
         self, command: SlashSubCommand[ClientT] | None = None

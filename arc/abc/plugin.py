@@ -209,12 +209,12 @@ class PluginBase(HasErrorHandler[ClientT], Hookable[ClientT], HasConcurrencyLimi
             raise TypeError(f"Unknown command type '{type(command).__name__}'.")
 
     @t.overload
-    def include(self) -> t.Callable[[CallableCommandBase[ClientT, BuilderT]], CallableCommandBase[ClientT, BuilderT]]:
-        ...
+    def include(
+        self,
+    ) -> t.Callable[[CallableCommandBase[ClientT, BuilderT]], CallableCommandBase[ClientT, BuilderT]]: ...
 
     @t.overload
-    def include(self, command: CallableCommandBase[ClientT, BuilderT]) -> CallableCommandBase[ClientT, BuilderT]:
-        ...
+    def include(self, command: CallableCommandBase[ClientT, BuilderT]) -> CallableCommandBase[ClientT, BuilderT]: ...
 
     def include(
         self, command: CallableCommandBase[ClientT, BuilderT] | None = None
@@ -323,12 +323,10 @@ class PluginBase(HasErrorHandler[ClientT], Hookable[ClientT], HasConcurrencyLimi
         return group
 
     @t.overload
-    def inject_dependencies(self, func: t.Callable[P, T]) -> t.Callable[P, T]:
-        ...
+    def inject_dependencies(self, func: t.Callable[P, T]) -> t.Callable[P, T]: ...
 
     @t.overload
-    def inject_dependencies(self) -> t.Callable[[t.Callable[P, T]], t.Callable[P, T]]:
-        ...
+    def inject_dependencies(self) -> t.Callable[[t.Callable[P, T]], t.Callable[P, T]]: ...
 
     def inject_dependencies(
         self, func: t.Callable[P, T] | None = None
@@ -404,26 +402,24 @@ class PluginBase(HasErrorHandler[ClientT], Hookable[ClientT], HasConcurrencyLimi
     @t.overload
     def walk_commands(
         self, command_type: t.Literal[hikari.CommandType.USER], *, callable_only: bool = False
-    ) -> t.Iterator[UserCommand[ClientT]]:
-        ...
+    ) -> t.Iterator[UserCommand[ClientT]]: ...
 
     @t.overload
     def walk_commands(
         self, command_type: t.Literal[hikari.CommandType.MESSAGE], *, callable_only: bool = False
-    ) -> t.Iterator[MessageCommand[ClientT]]:
-        ...
+    ) -> t.Iterator[MessageCommand[ClientT]]: ...
 
     @t.overload
     def walk_commands(
         self, command_type: t.Literal[hikari.CommandType.SLASH], *, callable_only: t.Literal[False]
-    ) -> t.Iterator[SlashCommand[ClientT] | SlashSubCommand[ClientT] | SlashGroup[ClientT] | SlashSubGroup[ClientT]]:
-        ...
+    ) -> t.Iterator[
+        SlashCommand[ClientT] | SlashSubCommand[ClientT] | SlashGroup[ClientT] | SlashSubGroup[ClientT]
+    ]: ...
 
     @t.overload
     def walk_commands(
         self, command_type: t.Literal[hikari.CommandType.SLASH], *, callable_only: t.Literal[True]
-    ) -> t.Iterator[SlashCommand[ClientT] | SlashSubCommand[ClientT]]:
-        ...
+    ) -> t.Iterator[SlashCommand[ClientT] | SlashSubCommand[ClientT]]: ...
 
     def walk_commands(  # noqa: C901
         self, command_type: hikari.CommandType, *, callable_only: bool = False

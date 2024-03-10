@@ -417,26 +417,24 @@ class Client(t.Generic[AppT], abc.ABC):
     @t.overload
     def walk_commands(
         self, command_type: t.Literal[hikari.CommandType.USER], *, callable_only: bool = False
-    ) -> t.Iterator[UserCommand[te.Self]]:
-        ...
+    ) -> t.Iterator[UserCommand[te.Self]]: ...
 
     @t.overload
     def walk_commands(
         self, command_type: t.Literal[hikari.CommandType.MESSAGE], *, callable_only: bool = False
-    ) -> t.Iterator[MessageCommand[te.Self]]:
-        ...
+    ) -> t.Iterator[MessageCommand[te.Self]]: ...
 
     @t.overload
     def walk_commands(
         self, command_type: t.Literal[hikari.CommandType.SLASH], *, callable_only: t.Literal[False] = False
-    ) -> t.Iterator[SlashCommand[te.Self] | SlashSubCommand[te.Self] | SlashGroup[te.Self] | SlashSubGroup[te.Self]]:
-        ...
+    ) -> t.Iterator[
+        SlashCommand[te.Self] | SlashSubCommand[te.Self] | SlashGroup[te.Self] | SlashSubGroup[te.Self]
+    ]: ...
 
     @t.overload
     def walk_commands(
         self, command_type: t.Literal[hikari.CommandType.SLASH], *, callable_only: t.Literal[True] = True
-    ) -> t.Iterator[SlashCommand[te.Self] | SlashSubCommand[te.Self]]:
-        ...
+    ) -> t.Iterator[SlashCommand[te.Self] | SlashSubCommand[te.Self]]: ...
 
     def walk_commands(  # noqa: C901
         self, command_type: hikari.CommandType, *, callable_only: bool = False
@@ -507,12 +505,12 @@ class Client(t.Generic[AppT], abc.ABC):
                 yield command
 
     @t.overload
-    def include(self) -> t.Callable[[CallableCommandBase[te.Self, BuilderT]], CallableCommandBase[te.Self, BuilderT]]:
-        ...
+    def include(
+        self,
+    ) -> t.Callable[[CallableCommandBase[te.Self, BuilderT]], CallableCommandBase[te.Self, BuilderT]]: ...
 
     @t.overload
-    def include(self, command: CallableCommandBase[te.Self, BuilderT]) -> CallableCommandBase[te.Self, BuilderT]:
-        ...
+    def include(self, command: CallableCommandBase[te.Self, BuilderT]) -> CallableCommandBase[te.Self, BuilderT]: ...
 
     def include(
         self, command: CallableCommandBase[te.Self, BuilderT] | None = None
@@ -703,12 +701,10 @@ class Client(t.Generic[AppT], abc.ABC):
         return self
 
     @t.overload
-    def add_hook(self, hook: HookT[te.Self]) -> te.Self:
-        ...
+    def add_hook(self, hook: HookT[te.Self]) -> te.Self: ...
 
     @t.overload
-    def add_hook(self) -> t.Callable[[HookT[te.Self]], HookT[te.Self]]:
-        ...
+    def add_hook(self) -> t.Callable[[HookT[te.Self]], HookT[te.Self]]: ...
 
     def add_hook(self, hook: HookT[te.Self] | None = None) -> te.Self | t.Callable[[HookT[te.Self]], HookT[te.Self]]:
         """Add a pre-execution hook to this client.
@@ -739,12 +735,10 @@ class Client(t.Generic[AppT], abc.ABC):
         return decorator
 
     @t.overload
-    def add_post_hook(self, hook: PostHookT[te.Self]) -> te.Self:
-        ...
+    def add_post_hook(self, hook: PostHookT[te.Self]) -> te.Self: ...
 
     @t.overload
-    def add_post_hook(self) -> t.Callable[[PostHookT[te.Self]], PostHookT[te.Self]]:
-        ...
+    def add_post_hook(self) -> t.Callable[[PostHookT[te.Self]], PostHookT[te.Self]]: ...
 
     def add_post_hook(
         self, hook: PostHookT[te.Self] | None = None
@@ -780,12 +774,10 @@ class Client(t.Generic[AppT], abc.ABC):
         return decorator
 
     @t.overload
-    def set_error_handler(self, handler: ErrorHandlerCallbackT[te.Self]) -> te.Self:
-        ...
+    def set_error_handler(self, handler: ErrorHandlerCallbackT[te.Self]) -> te.Self: ...
 
     @t.overload
-    def set_error_handler(self) -> t.Callable[[ErrorHandlerCallbackT[te.Self]], te.Self]:
-        ...
+    def set_error_handler(self) -> t.Callable[[ErrorHandlerCallbackT[te.Self]], te.Self]: ...
 
     def set_error_handler(
         self, handler: ErrorHandlerCallbackT[te.Self] | None = None
@@ -834,12 +826,10 @@ class Client(t.Generic[AppT], abc.ABC):
         return decorator
 
     @t.overload
-    def set_startup_hook(self, hook: LifeCycleHookT[te.Self]) -> te.Self:
-        ...
+    def set_startup_hook(self, hook: LifeCycleHookT[te.Self]) -> te.Self: ...
 
     @t.overload
-    def set_startup_hook(self) -> t.Callable[[LifeCycleHookT[te.Self]], te.Self]:
-        ...
+    def set_startup_hook(self) -> t.Callable[[LifeCycleHookT[te.Self]], te.Self]: ...
 
     def set_startup_hook(
         self, hook: LifeCycleHookT[te.Self] | None = None
@@ -883,12 +873,10 @@ class Client(t.Generic[AppT], abc.ABC):
         return decorator
 
     @t.overload
-    def set_shutdown_hook(self, hook: LifeCycleHookT[te.Self]) -> te.Self:
-        ...
+    def set_shutdown_hook(self, hook: LifeCycleHookT[te.Self]) -> te.Self: ...
 
     @t.overload
-    def set_shutdown_hook(self) -> t.Callable[[LifeCycleHookT[te.Self]], te.Self]:
-        ...
+    def set_shutdown_hook(self) -> t.Callable[[LifeCycleHookT[te.Self]], te.Self]: ...
 
     def set_shutdown_hook(
         self, hook: LifeCycleHookT[te.Self] | None = None
@@ -932,12 +920,10 @@ class Client(t.Generic[AppT], abc.ABC):
         return decorator
 
     @t.overload
-    def set_command_locale_provider(self, provider: CommandLocaleRequestT) -> te.Self:
-        ...
+    def set_command_locale_provider(self, provider: CommandLocaleRequestT) -> te.Self: ...
 
     @t.overload
-    def set_command_locale_provider(self) -> t.Callable[[CommandLocaleRequestT], te.Self]:
-        ...
+    def set_command_locale_provider(self) -> t.Callable[[CommandLocaleRequestT], te.Self]: ...
 
     def set_command_locale_provider(
         self, provider: CommandLocaleRequestT | None = None
@@ -981,12 +967,10 @@ class Client(t.Generic[AppT], abc.ABC):
         return decorator
 
     @t.overload
-    def set_option_locale_provider(self, provider: OptionLocaleRequestT) -> te.Self:
-        ...
+    def set_option_locale_provider(self, provider: OptionLocaleRequestT) -> te.Self: ...
 
     @t.overload
-    def set_option_locale_provider(self) -> t.Callable[[OptionLocaleRequestT], te.Self]:
-        ...
+    def set_option_locale_provider(self) -> t.Callable[[OptionLocaleRequestT], te.Self]: ...
 
     def set_option_locale_provider(
         self, provider: OptionLocaleRequestT | None = None
@@ -1030,12 +1014,10 @@ class Client(t.Generic[AppT], abc.ABC):
         return decorator
 
     @t.overload
-    def set_custom_locale_provider(self, provider: CustomLocaleRequestT) -> te.Self:
-        ...
+    def set_custom_locale_provider(self, provider: CustomLocaleRequestT) -> te.Self: ...
 
     @t.overload
-    def set_custom_locale_provider(self) -> t.Callable[[CustomLocaleRequestT], te.Self]:
-        ...
+    def set_custom_locale_provider(self) -> t.Callable[[CustomLocaleRequestT], te.Self]: ...
 
     def set_custom_locale_provider(
         self, provider: CustomLocaleRequestT | None = None
@@ -1285,12 +1267,10 @@ class Client(t.Generic[AppT], abc.ABC):
         return self
 
     @t.overload
-    def get_type_dependency(self, type_: type[T]) -> T:
-        ...
+    def get_type_dependency(self, type_: type[T]) -> T: ...
 
     @t.overload
-    def get_type_dependency(self, type_: type[T], *, default: DefaultT) -> T | DefaultT:
-        ...
+    def get_type_dependency(self, type_: type[T], *, default: DefaultT) -> T | DefaultT: ...
 
     def get_type_dependency(
         self, type_: type[T], *, default: DefaultT | hikari.UndefinedType = hikari.UNDEFINED
@@ -1324,12 +1304,10 @@ class Client(t.Generic[AppT], abc.ABC):
             return self._injector.get_type_dependency(type_, default=default)
 
     @t.overload
-    def inject_dependencies(self, func: t.Callable[P, T]) -> t.Callable[P, T]:
-        ...
+    def inject_dependencies(self, func: t.Callable[P, T]) -> t.Callable[P, T]: ...
 
     @t.overload
-    def inject_dependencies(self) -> t.Callable[[t.Callable[P, T]], t.Callable[P, T]]:
-        ...
+    def inject_dependencies(self) -> t.Callable[[t.Callable[P, T]], t.Callable[P, T]]: ...
 
     def inject_dependencies(
         self, func: t.Callable[P, T] | None = None

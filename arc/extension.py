@@ -8,13 +8,11 @@ if t.TYPE_CHECKING:
 
 
 @t.overload
-def loader() -> t.Callable[[t.Callable[[ClientT], None]], t.Callable[[ClientT], None]]:
-    ...
+def loader() -> t.Callable[[t.Callable[[ClientT], None]], t.Callable[[ClientT], None]]: ...
 
 
 @t.overload
-def loader(callback: t.Callable[[ClientT], None]) -> t.Callable[[ClientT], None]:
-    ...
+def loader(callback: t.Callable[[ClientT], None]) -> t.Callable[[ClientT], None]: ...
 
 
 def loader(
@@ -51,13 +49,11 @@ def loader(
 
 
 @t.overload
-def unloader() -> t.Callable[[t.Callable[[ClientT], None]], t.Callable[[ClientT], None]]:
-    ...
+def unloader() -> t.Callable[[t.Callable[[ClientT], None]], t.Callable[[ClientT], None]]: ...
 
 
 @t.overload
-def unloader(callback: t.Callable[[ClientT], None]) -> t.Callable[[ClientT], None]:
-    ...
+def unloader(callback: t.Callable[[ClientT], None]) -> t.Callable[[ClientT], None]: ...
 
 
 def unloader(
