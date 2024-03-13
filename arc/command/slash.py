@@ -36,9 +36,17 @@ __all__ = (
 
 
 def _choices_to_builders(
-    choices: t.Sequence[hikari.api.AutocompleteChoiceBuilder] | t.Sequence[t.Any],
+    choices: t.Sequence[hikari.api.AutocompleteChoiceBuilder] | t.Sequence[t.Any] | t.Mapping[str, t.Any],
 ) -> t.Sequence[hikari.api.AutocompleteChoiceBuilder]:
     """Convert a sequence of choices to a sequence of choice builders."""
+    if isinstance(choices, t.Mapping):
+        return [
+            hikari.impl.AutocompleteChoiceBuilder(str(k), v)
+            if not isinstance(v, hikari.api.AutocompleteChoiceBuilder)
+            else v
+            for k, v in choices.items()
+        ]
+
     return [
         (
             hikari.impl.AutocompleteChoiceBuilder(str(e), e)

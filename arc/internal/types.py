@@ -34,7 +34,7 @@ SlashCommandLike: t.TypeAlias = "SlashCommand[ClientT] | SlashGroup[ClientT]"
 CommandCallbackT: t.TypeAlias = "t.Callable[t.Concatenate[Context[ClientT], ...], t.Awaitable[None]]"
 MessageCommandCallbackT: t.TypeAlias = "t.Callable[[Context[ClientT], hikari.Message], t.Awaitable[None]]"
 UserCommandCallbackT: t.TypeAlias = "t.Callable[[Context[ClientT], hikari.User], t.Awaitable[None]]"
-AutocompleteCallbackT: t.TypeAlias = "t.Callable[[AutocompleteData[ClientT, ChoiceT]], t.Awaitable[t.Sequence[ChoiceT]]] | t.Callable[[AutocompleteData[ClientT, ChoiceT]], t.Awaitable[t.Sequence[hikari.api.AutocompleteChoiceBuilder]]]"
+AutocompleteCallbackT: t.TypeAlias = "t.Callable[[AutocompleteData[ClientT, ChoiceT]], t.Awaitable[t.Sequence[ChoiceT]]] | t.Callable[[AutocompleteData[ClientT, ChoiceT]], t.Awaitable[t.Mapping[str, ChoiceT]]] | t.Callable[[AutocompleteData[ClientT, ChoiceT]], t.Awaitable[t.Sequence[hikari.api.AutocompleteChoiceBuilder]]]"
 ResponseBuilderT: t.TypeAlias = (
     "hikari.api.InteractionMessageBuilder | hikari.api.InteractionDeferredBuilder | hikari.api.InteractionModalBuilder"
 )

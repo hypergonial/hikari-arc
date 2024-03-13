@@ -9,6 +9,10 @@ hide:
 
 Here you can find all the changelogs for `hikari-arc`.
 
+## v1.3.0
+
+- Add the ability to return `Mapping[str, T]` from autocomplete callbacks.
+
 ## v1.2.1
 
 - Fix `arc.utils.global_concurrency` missing a `limit` argument.
