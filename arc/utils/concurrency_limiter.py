@@ -166,7 +166,7 @@ class ConcurrencyLimiter(t.Generic[KeyT]):
         This will block until a slot is available.
         """
         key = self._get_key(item)
-        bucket = self._buckets.setdefault(key, _Bucket.for_limiter(key, self))
+        bucket = self._buckets.setdefault(key, _Bucket.for_limiter(key, self))  # pyright: ignore reportUnknowMemberType
         await bucket.semaphore.acquire()
 
     def release(self, item: KeyT) -> None:

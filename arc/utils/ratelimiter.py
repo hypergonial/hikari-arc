@@ -184,7 +184,7 @@ class RateLimiter(t.Generic[KeyT]):
 
         key = self.get_key(item)
         # Get existing or insert new bucket
-        bucket = self._buckets.setdefault(key, _Bucket.for_limiter(key, self))
+        bucket = self._buckets.setdefault(key, _Bucket.for_limiter(key, self))  # pyright: ignore reportUnknowMemberType
 
         if bucket.is_exhausted and not wait:
             raise RateLimiterExhaustedError(
