@@ -402,12 +402,12 @@ class CommandBase(
         return None
 
     def _resolve_hooks(self) -> list[HookT[ClientT]]:
-        plugin_hooks = self.plugin._resolve_hooks() if self.plugin else []
-        return self.client._hooks + plugin_hooks + self._hooks
+        upstream_hooks = self.plugin._resolve_hooks() if self.plugin else self.client._hooks
+        return upstream_hooks + self._hooks
 
     def _resolve_post_hooks(self) -> list[PostHookT[ClientT]]:
-        plugin_hooks = self.plugin._resolve_post_hooks() if self.plugin else []
-        return self.client._post_hooks + plugin_hooks + self._post_hooks
+        upstream_hooks = self.plugin._resolve_post_hooks() if self.plugin else self.client._post_hooks
+        return upstream_hooks + self._post_hooks
 
     async def publish(self, guild: hikari.SnowflakeishOr[hikari.PartialGuild] | None = None) -> hikari.PartialCommand:
         """Publish this command to the given guild, or globally if no guild is provided.
