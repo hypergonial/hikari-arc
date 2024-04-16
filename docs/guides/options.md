@@ -204,7 +204,12 @@ First, you need to define an autocomplete callback, this will be called repeated
         return ["Short", "is", "better!"]
     ```
 
-This callback should either return a `list[option_type]` (`list[str]`) in this case, or a `list[hikari.CommandChoice]`.
+This callback should return one of the following (where `ChoiceT` is the type of the option being autocompleted, e.g. `str`):
+
+- `Sequence[ChoiceT]` to return a sequence of choices (e.g. `list[str]`)
+- `Mapping[str, ChoiceT]` to return a mapping of names to values (e.g. `dict[str, str]`)
+- `Sequence[hikari.impl.AutocompleteChoiceBuilder]` to also return a mapping of names to values along with localization
+
 
 Then, to add autocomplete to an option, specify the `autocomplete_with=` argument in the params object and pass your autocomplete callback:
 
