@@ -13,6 +13,7 @@ Here you can find all the changelogs for `hikari-arc`.
 
 - Add the ability to return `Mapping[str, T]` from autocomplete callbacks.
 - Fix client hooks being executed twice if a command is added to a plugin.
+- Fix options mapping not taking name overrides into account.
 
 ## v1.2.1
 

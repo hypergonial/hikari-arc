@@ -16,7 +16,7 @@ async def my_command(
     d: arc.Option[hikari.GuildTextChannel | hikari.GuildNewsChannel | None, arc.ChannelParams(description="qux")],
     e: arc.Option[hikari.GuildChannel | None, arc.ChannelParams(description="quux")],
     f: arc.Option[hikari.Role | hikari.User, arc.MentionableParams(description="quuz")],
-    g: arc.Option[hikari.Attachment | None, arc.AttachmentParams(description="among us")],
+    g: arc.Option[hikari.Attachment | None, arc.AttachmentParams(name="last", description="among us")],
 ) -> None:
     pass
 
@@ -32,8 +32,8 @@ subgroup = group.include_subgroup("my_subgroup", "My subgroup description")
 @arc.slash_subcommand("test_subcommand", "My subcommand description")
 async def my_subcommand(
     ctx: arc.GatewayContext,
-    a: arc.Option[int, arc.IntParams(description="foo", min=10)],
-    b: arc.Option[str, arc.StrParams(description="bar", min_length=100)],
+    a: arc.Option[int, arc.IntParams("foo", min=10)],
+    b: arc.Option[str, arc.StrParams("bar", min_length=100)],
 ) -> None:
     pass
 
@@ -42,8 +42,8 @@ async def my_subcommand(
 @arc.slash_subcommand("test_subsubcommand", "My subsubcommand description")
 async def my_subsubcommand(
     ctx: arc.GatewayContext,
-    a: arc.Option[int, arc.IntParams(description="foo", min=10)],
-    b: arc.Option[str, arc.StrParams(description="bar", min_length=100)],
+    a: arc.Option[int, arc.IntParams("foo", min=10)],
+    b: arc.Option[str, arc.StrParams("bar", min_length=100)],
 ) -> None:
     pass
 
@@ -116,10 +116,10 @@ def test_my_command() -> None:
     assert options["f"].description == "quuz"
     assert options["f"].is_required
 
-    assert isinstance(options["g"], arc.command.AttachmentOption)
-    assert options["g"].name == "g"
-    assert options["g"].description == "among us"
-    assert not options["g"].is_required
+    assert isinstance(options["last"], arc.command.AttachmentOption)
+    assert options["last"].name == "last"
+    assert options["last"].description == "among us"
+    assert not options["last"].is_required
 
 
 def test_my_group() -> None:

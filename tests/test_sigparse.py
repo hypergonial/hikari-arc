@@ -143,12 +143,12 @@ def test_di_annotation() -> None:
     assert options["a"].min == 10
     assert options["a"].max is None
 
-    assert isinstance(options["c"], arc.command.StrOption)
-    assert options["c"].name == "b"
-    assert options["c"].description == "bar"
-    assert options["c"].is_required
-    assert options["c"].min_length == 100
-    assert options["c"].max_length is None
+    assert isinstance(options["b"], arc.command.StrOption)
+    assert options["b"].name == "b"
+    assert options["b"].description == "bar"
+    assert options["b"].is_required
+    assert options["b"].min_length == 100
+    assert options["b"].max_length is None
 
 
 def test_ensure_parse_channel_types_has_every_channel_class() -> None:

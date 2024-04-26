@@ -305,14 +305,14 @@ def parse_command_signature(  # noqa: C901
         # If it's a union of channel types, we need to parse all channel types
         if union is not None and any(arg in CHANNEL_TYPES_MAPPING for arg in t.get_args(union)):
             channel_types = _parse_channel_union_type_hint(union)
-            options[arg_name] = ChannelOption._from_params(
+            options[params.name or arg_name] = ChannelOption._from_params(
                 name=params.name or arg_name, is_required=not is_optional, params=params, channel_types=channel_types
             )
             continue
 
         # If it's a single channel type, just pass the channel type
         elif type_ in CHANNEL_TYPES_MAPPING:
-            options[arg_name] = ChannelOption._from_params(
+            options[params.name or arg_name] = ChannelOption._from_params(
                 name=params.name or arg_name,
                 is_required=not is_optional,
                 params=params,
@@ -321,7 +321,7 @@ def parse_command_signature(  # noqa: C901
             continue
 
         # Otherwise just build the option
-        options[arg_name] = opt_type._from_params(
+        options[params.name or arg_name] = opt_type._from_params(
             name=params.name or arg_name, is_required=not is_optional, params=params
         )
 
