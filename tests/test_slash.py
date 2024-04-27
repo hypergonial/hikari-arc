@@ -118,6 +118,7 @@ def test_my_command() -> None:
 
     assert isinstance(options["last"], arc.command.AttachmentOption)
     assert options["last"].name == "last"
+    assert options["last"].arg_name == "g"
     assert options["last"].description == "among us"
     assert not options["last"].is_required
 

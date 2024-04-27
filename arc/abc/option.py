@@ -273,15 +273,22 @@ class CommandOptionBase(OptionBase[T], t.Generic[T, ClientT, ParamsT]):
     is_required: bool = True
     """Whether the option is required."""
 
+    arg_name: str
+    """The name of the parameter this option represents.
+    This is going to be the same as `name` unless `name` was overriden.
+    """
+
     @classmethod
     @abc.abstractmethod
-    def _from_params(cls, *, name: str, is_required: bool, params: ParamsT, **kwargs: t.Any) -> te.Self:
+    def _from_params(cls, *, name: str, arg_name: str, is_required: bool, params: ParamsT, **kwargs: t.Any) -> te.Self:
         """Construct a new Option instance from the given parameters object.
 
         Parameters
         ----------
         name : str
             The name of the option
+        arg_name : str
+            The name of the parameter this option represents
         is_required : bool
             Whether the option is required
         params : ParamsT

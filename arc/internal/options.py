@@ -89,18 +89,18 @@ def resolve_options(
     """
     option_kwargs: dict[str, t.Any] = {}
 
-    for arg_name, opt in local_options.items():
+    for opt in local_options.values():
         inter_opt = next((o for o in incoming_options if o.name == opt.name), None)
 
         if inter_opt is None:
             continue
 
         if isinstance(inter_opt.value, hikari.Snowflake) and resolved:
-            option_kwargs[arg_name] = resolve_snowflake_value(inter_opt.value, inter_opt.type, resolved)
+            option_kwargs[opt.arg_name] = resolve_snowflake_value(inter_opt.value, inter_opt.type, resolved)
 
         elif isinstance(inter_opt.value, hikari.Snowflake):
             raise ValueError(f"Missing resolved option data for '{inter_opt.name}'.")
         else:
-            option_kwargs[arg_name] = inter_opt.value
+            option_kwargs[opt.arg_name] = inter_opt.value
 
     return option_kwargs
