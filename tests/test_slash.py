@@ -10,12 +10,12 @@ client = arc.GatewayClient(bot)
 @arc.slash_command("test", default_permissions=hikari.Permissions.ADMINISTRATOR)
 async def my_command(
     ctx: arc.GatewayContext,
-    a: arc.Option[int, arc.IntParams(description="foo", min=10)],
-    b: arc.Option[str, arc.StrParams(description="bar", min_length=100)],
-    c: arc.Option[float | None, arc.FloatParams(description="baz", max=50.0)],
-    d: arc.Option[hikari.GuildTextChannel | hikari.GuildNewsChannel | None, arc.ChannelParams(description="qux")],
-    e: arc.Option[hikari.GuildChannel | None, arc.ChannelParams(description="quux")],
-    f: arc.Option[hikari.Role | hikari.User, arc.MentionableParams(description="quuz")],
+    a: arc.Option[int, arc.IntParams("foo", min=10)],
+    b: arc.Option[str, arc.StrParams("bar", min_length=100)],
+    c: arc.Option[float | None, arc.FloatParams("baz", max=50.0)],
+    d: arc.Option[hikari.GuildTextChannel | hikari.GuildNewsChannel | None, arc.ChannelParams("qux")],
+    e: arc.Option[hikari.GuildChannel | None, arc.ChannelParams("quux")],
+    f: arc.Option[hikari.Role | hikari.User, arc.MentionableParams("quuz")],
     g: arc.Option[hikari.Attachment | None, arc.AttachmentParams(name="last", description="among us")],
 ) -> None:
     pass
