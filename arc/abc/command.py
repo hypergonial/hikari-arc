@@ -361,14 +361,14 @@ class CommandBase(
     async def _handle_exception(self, ctx: Context[ClientT], exc: Exception) -> None:
         try:
             if self.error_handler is not None:
-                await self.error_handler(ctx, exc)
+                await self.client.injector.call_with_async_di(self.error_handler, ctx, exc)
             else:
                 raise exc
         except Exception as exc:
             if self.plugin:
-                await self.plugin._handle_exception(ctx, exc)
+                await self.client.injector.call_with_async_di(self.plugin._handle_exception, ctx, exc)
             else:
-                await self.client._on_error(ctx, exc)
+                await self.client.injector.call_with_async_di(self.client._on_error, ctx, exc)
 
     def _resolve_settings(self) -> _CommandSettings:
         """Resolve all settings that apply to this command."""
@@ -549,10 +549,10 @@ class CommandBase(
         try:
             hooks = command._resolve_hooks()
             for hook in hooks:
-                res = hook(ctx)
-
-                if inspect.isawaitable(res):
-                    res = await res
+                if inspect.iscoroutinefunction(hook):
+                    res = await self.client.injector.call_with_async_di(hook, ctx)
+                else:
+                    res = self.client.injector.call_with_di(hook, ctx)
 
                 res = t.cast(HookResult | None, res)
 
@@ -570,9 +570,9 @@ class CommandBase(
             post_hooks = command._resolve_post_hooks()
             for hook in post_hooks:
                 if inspect.iscoroutinefunction(hook):
-                    await hook(ctx)
+                    await self.client.injector.call_with_async_di(hook, ctx)
                 else:
-                    hook(ctx)
+                    self.client.injector.call_with_di(hook, ctx)
         except Exception as e:
             await command._handle_exception(ctx, e)
         finally:

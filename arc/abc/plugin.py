@@ -155,11 +155,11 @@ class PluginBase(HasErrorHandler[ClientT], Hookable[ClientT], HasConcurrencyLimi
     async def _handle_exception(self, ctx: Context[ClientT], exc: Exception) -> None:
         try:
             if self.error_handler is not None:
-                await self.error_handler(ctx, exc)
+                await self.client.injector.call_with_async_di(self.error_handler, ctx, exc)
             else:
                 raise exc
         except Exception as exc:
-            await self.client._on_error(ctx, exc)
+            await self.client.injector.call_with_async_di(self.client._on_error, ctx, exc)
 
     def _resolve_settings(self) -> _CommandSettings:
         settings = self._client._cmd_settings if self._client is not None else _CommandSettings.default()
