@@ -1296,10 +1296,7 @@ class Client(t.Generic[AppT], abc.ABC):
             If the dependency does not exist and `default` was not provided.
         """
         if default is hikari.UNDEFINED:
-            value = self._injector.get_type_dependency(type_)
-            if isinstance(value, alluka.abc.Undefined):
-                raise KeyError(f"Could not resolve dependency of type {type_}.")
-            return value
+            return self._injector.get_type_dependency(type_)
         else:
             return self._injector.get_type_dependency(type_, default=default)
 
