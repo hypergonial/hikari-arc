@@ -51,8 +51,9 @@ arc.Option[int, arc.IntParams(...)]
 class OptionType(enum.IntEnum):
     """The type of a command option.
 
-    This is practically identical to `hikari.OptionType` at the moment.
-    It may however be used in the future to define custom option types.
+    This includes all hikari option types along with some custom ones.
+
+    Custom arc-specific options start with 10k.
     """
 
     SUB_COMMAND = 1
