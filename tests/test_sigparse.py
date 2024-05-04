@@ -18,13 +18,15 @@ async def correct_command(
     g: arc.Option[hikari.Attachment | None, arc.AttachmentParams("among us")] = None,
     h: arc.Option[bool, arc.BoolParams("among us")] = False,
     i: arc.Option[str, arc.StrParams("foo")] = "among us",
+    j: arc.Option[hikari.Member | None, arc.MemberParams("among us")] = None,
+    k: arc.Option[hikari.Color, arc.ColorParams("foo", name="color")] = hikari.Color(0x000000),
 ) -> None:
     pass
 
 
 def test_correct_command() -> None:
     options = parse_command_signature(correct_command)
-    assert len(options) == 9
+    assert len(options) == 11
 
     assert isinstance(options["a"], arc.command.IntOption)
     assert options["a"].name == "a"
@@ -90,6 +92,17 @@ def test_correct_command() -> None:
     assert options["i"].name == "i"
     assert options["i"].description == "foo"
     assert not options["i"].is_required
+
+    assert isinstance(options["j"], arc.command.MemberOption)
+    assert options["j"].name == "j"
+    assert options["j"].description == "among us"
+    assert not options["j"].is_required
+
+    assert isinstance(options["color"], arc.command.ColorOption)
+    assert options["color"].name == "color"
+    assert options["color"].arg_name == "k"
+    assert options["color"].description == "foo"
+    assert not options["color"].is_required
 
 
 async def wrong_params_type(

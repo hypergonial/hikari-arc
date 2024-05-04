@@ -4,7 +4,7 @@ import typing as t
 
 import hikari
 
-from arc.abc.option import OptionType
+from arc.abc.option import ConverterOption, OptionType
 
 if t.TYPE_CHECKING:
     from arc.abc.option import CommandOptionBase
@@ -21,6 +21,8 @@ OPTIONTYPE_TO_TYPE: dict[OptionType, type[t.Any]] = {
     OptionType.MENTIONABLE: hikari.Unique,
     OptionType.FLOAT: float,
     OptionType.ATTACHMENT: hikari.Attachment,
+    OptionType.COLOR: hikari.Color,
+    OptionType.MEMBER: hikari.Member,
 }
 """Used for runtime type checking in Context.get_option, not much else at the moment."""
 
@@ -102,5 +104,8 @@ def resolve_options(
             raise ValueError(f"Missing resolved option data for '{inter_opt.name}'.")
         else:
             option_kwargs[opt.arg_name] = inter_opt.value
+
+        if isinstance(opt, ConverterOption):
+            option_kwargs[opt.arg_name] = opt._convert_value(option_kwargs[opt.arg_name])  # pyright: ignore
 
     return option_kwargs

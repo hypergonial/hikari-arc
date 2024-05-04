@@ -7,6 +7,7 @@ if t.TYPE_CHECKING:
 
     from arc.abc.concurrency_limiting import ConcurrencyLimiterProto
     from arc.abc.limiter import LimiterProto
+    from arc.abc.option import ConverterOption
 
 
 class ArcError(Exception):
@@ -159,6 +160,23 @@ class GuildCommandPublishFailedError(CommandPublishFailedError):
 
     def __init__(self, guild_id: hikari.Snowflake, *args: t.Any) -> None:
         self.guild_id = guild_id
+        super().__init__(*args)
+
+
+class OptionConverterFailureError(ArcError):
+    """Raised when an option converter fails to convert a value.
+
+    Attributes
+    ----------
+    option : arc.abc.option.ConverterOption
+        The option that failed to convert the value.
+    value : t.Any
+        The value that failed to be converted.
+    """
+
+    def __init__(self, option: ConverterOption[t.Any, t.Any, t.Any, t.Any], value: t.Any, *args: t.Any) -> None:
+        self.option = option
+        self.value = value
         super().__init__(*args)
 
 
