@@ -3,7 +3,6 @@ from __future__ import annotations
 import abc
 import enum
 import typing as t
-from typing import Any
 
 import attr
 import hikari
@@ -311,7 +310,7 @@ class CommandOptionBase(OptionBase[T], t.Generic[T, ClientT, ParamsT]):
             Any additional keyword arguments to pass to the constructor
         """
 
-    def _to_dict(self) -> dict[str, Any]:
+    def _to_dict(self) -> dict[str, t.Any]:
         return {**super()._to_dict(), "is_required": self.is_required}
 
 
