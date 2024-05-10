@@ -10,7 +10,7 @@ import hikari
 
 from arc.abc.concurrency_limiting import ConcurrencyLimiterProto, HasConcurrencyLimiter
 from arc.abc.error_handler import HasErrorHandler
-from arc.abc.hookable import Hookable, HookResult
+from arc.abc.hookable import Hookable
 from arc.abc.limiter import LimiterProto
 from arc.abc.option import OptionBase
 from arc.context import AutodeferMode
@@ -553,8 +553,6 @@ class CommandBase(
 
                 if inspect.isawaitable(res):
                     res = await res
-
-                res = t.cast(HookResult | None, res)
 
                 if res and res._abort:
                     aborted = True
