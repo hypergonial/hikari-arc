@@ -7,6 +7,7 @@ import logging
 import typing as t
 from contextlib import suppress
 
+import alluka
 import attr
 import hikari
 
@@ -22,6 +23,9 @@ if t.TYPE_CHECKING:
 __all__ = ("Context", "InteractionResponse", "AutodeferMode")
 
 logger = logging.getLogger(__name__)
+
+T = t.TypeVar("T")
+DefaultT = t.TypeVar("DefaultT")
 
 
 @t.final
@@ -254,6 +258,7 @@ class Context(t.Generic[ClientT]):
         "_created_at",
         "_has_command_failed",
         "_options",
+        "_injection_ctx",
     )
 
     def __init__(
@@ -261,6 +266,7 @@ class Context(t.Generic[ClientT]):
     ) -> None:
         self._client = client
         self._command = command
+        self._injection_ctx = alluka.OverridingContext.from_client(client.injector)
         self._interaction: hikari.CommandInteraction = interaction
         self._options: t.Sequence[hikari.CommandInteractionOption] | None = None
         self._responses: t.MutableSequence[InteractionResponse] = []
@@ -528,6 +534,40 @@ class Context(t.Generic[ClientT]):
 
         request = CustomLocaleRequest(self.command, locale, self, key)
         return self._client._custom_locale_provider(request).format(**kwargs)
+
+    @t.overload
+    def get_type_dependency(self, type_: type[T]) -> T: ...
+
+    @t.overload
+    def get_type_dependency(self, type_: type[T], *, default: DefaultT) -> T | DefaultT: ...
+
+    def get_type_dependency(
+        self, type_: type[T], *, default: DefaultT | hikari.UndefinedType = hikari.UNDEFINED
+    ) -> T | DefaultT:
+        """Get a type dependency for the current context.
+
+        Parameters
+        ----------
+        type_ : type[T]
+            The type of the dependency.
+        default : DefaultT
+            The default value to return if the dependency does not exist.
+            If not provided, this will raise an exception if the dependency does not exist.
+
+        Returns
+        -------
+        T | DefaultT
+            The instance of the dependency, if it exists, otherwise `default`.
+
+        Raises
+        ------
+        KeyError
+            If the dependency does not exist and `default` was not provided.
+        """
+        if default is hikari.UNDEFINED:
+            return self._injection_ctx.get_type_dependency(type_)
+        else:
+            return self._injection_ctx.get_type_dependency(type_, default=default)
 
     async def get_last_response(self) -> InteractionResponse:
         """Get the last response issued to the interaction this context is proxying.

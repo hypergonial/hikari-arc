@@ -30,6 +30,7 @@ from arc.internal.types import (
     CustomLocaleRequestT,
     ErrorHandlerCallbackT,
     HookT,
+    InjectionHookT,
     LifeCycleHookT,
     OptionLocaleRequestT,
     PostHookT,
@@ -98,6 +99,7 @@ class Client(t.Generic[AppT], abc.ABC):
         "_loaded_extensions",
         "_hooks",
         "_post_hooks",
+        "_injection_hooks",
         "_owner_ids",
         "_error_handler",
         "_startup_hook",
@@ -149,6 +151,7 @@ class Client(t.Generic[AppT], abc.ABC):
         self._loaded_extensions: list[str] = []
         self._hooks: list[HookT[te.Self]] = []
         self._post_hooks: list[PostHookT[te.Self]] = []
+        self._injection_hooks: list[InjectionHookT[te.Self]] = []
         self._owner_ids: list[hikari.Snowflake] = []
         self._tasks: set[asyncio.Task[t.Any]] = set()
         self._started: asyncio.Event = asyncio.Event()
@@ -310,6 +313,16 @@ class Client(t.Generic[AppT], abc.ABC):
             # Try to respond to make autodefer less jarring when a command fails.
             if ctx.is_valid:
                 await ctx.respond("❌ Something went wrong. Please contact the bot developer.")
+
+    async def _create_overriding_ctx_for_command(self, ctx: Context[te.Self]) -> alluka.OverridingContext:
+        inj_ctx = alluka.OverridingContext.from_client(self.injector)
+
+        for hook in self._injection_hooks:
+            if inspect.iscoroutinefunction(hook):
+                await hook(ctx, inj_ctx)
+            else:
+                hook(ctx, inj_ctx)
+        return inj_ctx
 
     def _provide_command_locale(self, request: CommandLocaleRequest) -> LocaleResponse:
         """Provide a locale for a command."""
@@ -772,6 +785,72 @@ class Client(t.Generic[AppT], abc.ABC):
             return hook
 
         return decorator
+
+    @t.overload
+    def add_injection_hook(self, hook: InjectionHookT[te.Self]) -> te.Self: ...
+
+    @t.overload
+    def add_injection_hook(self) -> t.Callable[[InjectionHookT[te.Self]], InjectionHookT[te.Self]]: ...
+
+    def add_injection_hook(
+        self, hook: InjectionHookT[te.Self] | None = None
+    ) -> te.Self | t.Callable[[InjectionHookT[te.Self]], InjectionHookT[te.Self]]:
+        """Add an injection hook to this client.
+        This hook will be called when a command is called, and an OverridingContext is passed, allowing you to inject dependencies for the command call.
+
+        Parameters
+        ----------
+        hook : InjectionHookT[te.Self]
+            The hook to add.
+
+        Returns
+        -------
+        te.Self
+            The client for chaining calls.
+
+        Example
+        -------
+        ```py
+        @client.add_injection_hook
+        async def inject(ctx: arc.GatewayContext, inj_ctx: arc.InjectorOverridingContext) -> None:
+            foo: MyType = example_data[ctx.guild_id]
+            inj_ctx.set_type_dependency(MyType, foo)
+        ```
+
+        See Also
+        --------
+        - [`Client.set_type_dependency`][arc.client.Client.set_type_dependency]
+        """
+        if hook is not None:
+            self._injection_hooks.append(hook)
+            return self
+
+        def decorator(hook: InjectionHookT[te.Self]) -> InjectionHookT[te.Self]:
+            self._injection_hooks.append(hook)
+            return hook
+
+        return decorator
+
+    def remove_injection_hook(self, hook: InjectionHookT[te.Self]) -> te.Self:
+        """Remove an injection hook from this client.
+
+        Parameters
+        ----------
+        hook : InjectionHookT[te.Self]
+            The hook to remove.
+
+        Returns
+        -------
+        te.Self
+            The client for chaining calls.
+
+        Raises
+        ------
+        ValueError
+            If the hook is not registered with this client.
+        """
+        self._injection_hooks.remove(hook)
+        return self
 
     @t.overload
     def set_error_handler(self, handler: ErrorHandlerCallbackT[te.Self]) -> te.Self: ...

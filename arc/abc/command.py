@@ -597,7 +597,9 @@ class CommandBase(
             if await self._handle_pre_hooks(command, ctx):
                 return
 
-            await self.client.injector.call_with_async_di(command.callback, ctx, *args, **kwargs)
+            injection_ctx = await self.client._create_overriding_ctx_for_command(ctx)
+            ctx._injection_ctx = injection_ctx
+            await injection_ctx.call_with_async_di(command.callback, ctx, *args, **kwargs)
 
         except Exception as e:
             ctx._has_command_failed = True

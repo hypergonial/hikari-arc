@@ -9,6 +9,7 @@ https://arc.hypergonial.com
 """
 
 from alluka import Client as Injector
+from alluka import OverridingContext as InjectorOverridingContext
 from alluka import inject
 
 from arc import abc, command, ext, utils
@@ -117,7 +118,7 @@ __all__ = (
     "AutocompleteData",
     "Option",
     "Context",
-    "Context",
+    "InjectorOverridingContext",
     "BoolParams",
     "IntParams",
     "StrParams",
