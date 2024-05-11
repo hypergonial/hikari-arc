@@ -103,9 +103,12 @@ class FloatOption(OptionWithChoices[float, ClientT, FloatParams[ClientT]]):
         return OptionType.FLOAT
 
     @classmethod
-    def _from_params(cls, *, name: str, is_required: bool, params: FloatParams[ClientT], **kwargs: t.Any) -> te.Self:
+    def _from_params(
+        cls, *, name: str, arg_name: str, is_required: bool, params: FloatParams[ClientT], **kwargs: t.Any
+    ) -> te.Self:
         return cls(
             name=name,
+            arg_name=arg_name,
             description=params.description,
             is_required=is_required,
             min=params.min,

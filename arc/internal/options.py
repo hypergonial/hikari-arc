@@ -4,7 +4,7 @@ import typing as t
 
 import hikari
 
-from arc.abc.option import OptionType
+from arc.abc.option import ConverterOption, OptionType
 
 if t.TYPE_CHECKING:
     from arc.abc.option import CommandOptionBase
@@ -21,6 +21,8 @@ OPTIONTYPE_TO_TYPE: dict[OptionType, type[t.Any]] = {
     OptionType.MENTIONABLE: hikari.Unique,
     OptionType.FLOAT: float,
     OptionType.ATTACHMENT: hikari.Attachment,
+    OptionType.COLOR: hikari.Color,
+    OptionType.MEMBER: hikari.Member,
 }
 """Used for runtime type checking in Context.get_option, not much else at the moment."""
 
@@ -89,18 +91,21 @@ def resolve_options(
     """
     option_kwargs: dict[str, t.Any] = {}
 
-    for arg_name, opt in local_options.items():
+    for opt in local_options.values():
         inter_opt = next((o for o in incoming_options if o.name == opt.name), None)
 
         if inter_opt is None:
             continue
 
         if isinstance(inter_opt.value, hikari.Snowflake) and resolved:
-            option_kwargs[arg_name] = resolve_snowflake_value(inter_opt.value, inter_opt.type, resolved)
+            option_kwargs[opt.arg_name] = resolve_snowflake_value(inter_opt.value, inter_opt.type, resolved)
 
         elif isinstance(inter_opt.value, hikari.Snowflake):
             raise ValueError(f"Missing resolved option data for '{inter_opt.name}'.")
         else:
-            option_kwargs[arg_name] = inter_opt.value
+            option_kwargs[opt.arg_name] = inter_opt.value
+
+        if isinstance(opt, ConverterOption):
+            option_kwargs[opt.arg_name] = opt._convert_value(option_kwargs[opt.arg_name])  # pyright: ignore
 
     return option_kwargs

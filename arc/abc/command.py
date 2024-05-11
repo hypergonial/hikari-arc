@@ -10,7 +10,7 @@ import hikari
 
 from arc.abc.concurrency_limiting import ConcurrencyLimiterProto, HasConcurrencyLimiter
 from arc.abc.error_handler import HasErrorHandler
-from arc.abc.hookable import Hookable, HookResult
+from arc.abc.hookable import Hookable
 from arc.abc.limiter import LimiterProto
 from arc.abc.option import OptionBase
 from arc.context import AutodeferMode
@@ -554,8 +554,6 @@ class CommandBase(
                 else:
                     res = self.client.injector.call_with_di(hook, ctx)
 
-                res = t.cast(HookResult | None, res)
-
                 if res and res._abort:
                     aborted = True
         except Exception as e:
@@ -599,7 +597,9 @@ class CommandBase(
             if await self._handle_pre_hooks(command, ctx):
                 return
 
-            await self.client.injector.call_with_async_di(command.callback, ctx, *args, **kwargs)
+            injection_ctx = await self.client._create_overriding_ctx_for_command(ctx)
+            ctx._injection_ctx = injection_ctx
+            await injection_ctx.call_with_async_di(command.callback, ctx, *args, **kwargs)
 
         except Exception as e:
             ctx._has_command_failed = True

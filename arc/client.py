@@ -18,8 +18,7 @@ if t.TYPE_CHECKING:
     import typing_extensions as te
 
     from arc import AutodeferMode
-
-    from .internal.types import EventCallbackT, EventT, ResponseBuilderT
+    from arc.internal.types import EventCallbackT, EventT, ResponseBuilderT
 
 __all__ = (
     "GatewayClientBase",

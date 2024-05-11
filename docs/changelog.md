@@ -11,9 +11,13 @@ Here you can find all the changelogs for `hikari-arc`.
 
 ## v1.3.0
 
-- Add the ability to return `Mapping[str, T]` from autocomplete callbacks.
+- Add options with converters. These options do not exist on Discord's end, arc simply tries to convert a more primitive optiontype into the requested one, failing if it is not possible.
+- Add new optiontypes with converters for `hikari.Member` and `hikari.Color`.
+- Add `arc.OptionConverterFailureError` when a converter fails to convert an option value.
+- Add support for injecting dependencies contextually to command callbacks via `Client.add_injection_hook` and `Client.remove_injection_hook`.
 - Fix client hooks being executed twice if a command is added to a plugin.
 - Fix options mapping not taking name overrides into account.
+- Bump alluka to `0.3+`.
 
 ## v1.2.1
 

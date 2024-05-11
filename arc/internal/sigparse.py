@@ -15,10 +15,14 @@ from arc.command.option import (
     BoolParams,
     ChannelOption,
     ChannelParams,
+    ColorOption,
+    ColorParams,
     FloatOption,
     FloatParams,
     IntOption,
     IntParams,
+    MemberOption,
+    MemberParams,
     MentionableOption,
     MentionableParams,
     RoleOption,
@@ -46,6 +50,9 @@ TYPE_TO_OPTION_MAPPING: dict[type[t.Any], type[CommandOptionBase[t.Any, t.Any, t
     float: FloatOption,
     hikari.Role: RoleOption,
     hikari.Attachment: AttachmentOption,
+    hikari.Member: MemberOption,
+    hikari.InteractionMember: MemberOption,
+    hikari.Color: ColorOption,
     hikari.User: UserOption,
 }
 
@@ -59,6 +66,8 @@ OPT_TO_PARAMS_MAPPING: dict[type[CommandOptionBase[t.Any, t.Any, t.Any]], type[t
     MentionableOption: MentionableParams,
     RoleOption: RoleParams,
     AttachmentOption: AttachmentParams,
+    MemberOption: MemberParams,
+    ColorOption: ColorParams,
 }
 
 BASE_CHANNEL_TYPE_MAP: dict[type[hikari.PartialChannel], hikari.ChannelType] = {
@@ -306,7 +315,11 @@ def parse_command_signature(  # noqa: C901
         if union is not None and any(arg in CHANNEL_TYPES_MAPPING for arg in t.get_args(union)):
             channel_types = _parse_channel_union_type_hint(union)
             options[params.name or arg_name] = ChannelOption._from_params(
-                name=params.name or arg_name, is_required=not is_optional, params=params, channel_types=channel_types
+                name=params.name or arg_name,
+                arg_name=arg_name,
+                is_required=not is_optional,
+                params=params,
+                channel_types=channel_types,
             )
             continue
 
@@ -314,6 +327,7 @@ def parse_command_signature(  # noqa: C901
         elif type_ in CHANNEL_TYPES_MAPPING:
             options[params.name or arg_name] = ChannelOption._from_params(
                 name=params.name or arg_name,
+                arg_name=arg_name,
                 is_required=not is_optional,
                 params=params,
                 channel_types=_channels_to_channel_types([type_]),
@@ -322,7 +336,7 @@ def parse_command_signature(  # noqa: C901
 
         # Otherwise just build the option
         options[params.name or arg_name] = opt_type._from_params(
-            name=params.name or arg_name, is_required=not is_optional, params=params
+            name=params.name or arg_name, arg_name=arg_name, is_required=not is_optional, params=params
         )
 
     return options

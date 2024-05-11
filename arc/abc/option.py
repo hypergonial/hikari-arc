@@ -3,7 +3,6 @@ from __future__ import annotations
 import abc
 import enum
 import typing as t
-from typing import Any
 
 import attr
 import hikari
@@ -24,10 +23,12 @@ __all__ = (
     "OptionWithChoicesParams",
     "OptionBase",
     "CommandOptionBase",
+    "ConverterOption",
     "OptionType",
 )
 
 T = t.TypeVar("T")
+OriginT = t.TypeVar("OriginT")
 
 Option = t.Annotated
 """Alias for typing.Annotated.
@@ -49,8 +50,9 @@ arc.Option[int, arc.IntParams(...)]
 class OptionType(enum.IntEnum):
     """The type of a command option.
 
-    This is practically identical to `hikari.OptionType` at the moment.
-    It may however be used in the future to define custom option types.
+    This includes all hikari option types along with some custom ones.
+
+    Custom arc-specific options start with 10k.
     """
 
     SUB_COMMAND = 1
@@ -92,6 +94,14 @@ class OptionType(enum.IntEnum):
     ATTACHMENT = 11
     """Denotes a command option where the value will be an attachment."""
 
+    # Custom optiontypes are 10k+
+
+    MEMBER = 10001
+    """Denotes a command option where the value will be resolved to a member."""
+
+    COLOR = 10002
+    """Denotes a command option where the value will be a color."""
+
     @classmethod
     def from_hikari(cls, option_type: hikari.OptionType) -> OptionType:
         """Convert a hikari.OptionType to an OptionType."""
@@ -99,10 +109,13 @@ class OptionType(enum.IntEnum):
 
     def to_hikari(self) -> hikari.OptionType:
         """Convert an OptionType to a hikari.OptionType."""
-        # TODO: Map custom option types to their respective hikari.OptionType
-        return hikari.OptionType(self.value)
+        if self.value < 10000:
+            return hikari.OptionType(self.value)
 
-    # TODO: When adding custom convertible option types, add them with an offset of 1000 or so
+        if self is OptionType.MEMBER:
+            return hikari.OptionType.USER
+        else:
+            return hikari.OptionType.STRING
 
 
 class OptionParams(t.Generic[T]):
@@ -273,15 +286,22 @@ class CommandOptionBase(OptionBase[T], t.Generic[T, ClientT, ParamsT]):
     is_required: bool = True
     """Whether the option is required."""
 
+    arg_name: str
+    """The name of the parameter this option represents.
+    This is going to be the same as `name` unless `name` was overriden.
+    """
+
     @classmethod
     @abc.abstractmethod
-    def _from_params(cls, *, name: str, is_required: bool, params: ParamsT, **kwargs: t.Any) -> te.Self:
+    def _from_params(cls, *, name: str, arg_name: str, is_required: bool, params: ParamsT, **kwargs: t.Any) -> te.Self:
         """Construct a new Option instance from the given parameters object.
 
         Parameters
         ----------
         name : str
             The name of the option
+        arg_name : str
+            The name of the parameter this option represents
         is_required : bool
             Whether the option is required
         params : ParamsT
@@ -290,8 +310,17 @@ class CommandOptionBase(OptionBase[T], t.Generic[T, ClientT, ParamsT]):
             Any additional keyword arguments to pass to the constructor
         """
 
-    def _to_dict(self) -> dict[str, Any]:
+    def _to_dict(self) -> dict[str, t.Any]:
         return {**super()._to_dict(), "is_required": self.is_required}
+
+
+@attr.define(slots=True, kw_only=True)
+class ConverterOption(CommandOptionBase[T, ClientT, ParamsT], t.Generic[T, ClientT, ParamsT, OriginT]):
+    """An option with a built-in converter."""
+
+    @abc.abstractmethod
+    def _convert_value(self, value: OriginT) -> T:
+        """Convert the value to the desired type."""
 
 
 @attr.define(slots=True, kw_only=True)

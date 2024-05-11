@@ -63,10 +63,13 @@ class ChannelOption(CommandOptionBase[hikari.PartialChannel, ClientT, ChannelPar
         return OptionType.CHANNEL
 
     @classmethod
-    def _from_params(cls, *, name: str, is_required: bool, params: ChannelParams, **kwargs: t.Any) -> te.Self:
+    def _from_params(
+        cls, *, name: str, arg_name: str, is_required: bool, params: ChannelParams, **kwargs: t.Any
+    ) -> te.Self:
         channel_types = kwargs.pop("channel_types")
         return cls(
             name=name,
+            arg_name=arg_name,
             description=params.description,
             is_required=is_required,
             name_localizations=params.name_localizations,

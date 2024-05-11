@@ -5,19 +5,20 @@ import typing as t
 import attr
 import hikari
 
-from arc.abc.option import CommandOptionBase, OptionParams, OptionType
+from arc.abc.option import ConverterOption, OptionParams, OptionType
+from arc.errors import OptionConverterFailureError
 from arc.internal.types import ClientT
 
 if t.TYPE_CHECKING:
     import typing_extensions as te
 
 
-__all__ = ("UserOption", "UserParams")
+__all__ = ("ColorOption", "ColorParams", "ColourOption", "ColourParams")
 
 
 @t.final
-class UserParams(OptionParams[hikari.User]):
-    """The parameters for a user option.
+class ColorParams(OptionParams[hikari.Color]):
+    """The parameters for a color option.
 
     Parameters
     ----------
@@ -38,23 +39,31 @@ class UserParams(OptionParams[hikari.User]):
 
 
 @attr.define(slots=True, kw_only=True)
-class UserOption(CommandOptionBase[hikari.User, ClientT, UserParams]):
-    """A slash command option that represents a user.
+class ColorOption(ConverterOption[hikari.Color, ClientT, ColorParams, str]):
+    """A slash command option that represents a color.
 
     ??? hint
         To add an option of this type to your command, add an argument to your command function with the following type hint:
         ```py
-        opt_name: arc.Option[hikari.User, UserParams(...)]
+        opt_name: arc.Option[hikari.Color, ColorParams(...)]
         ```
     """
 
     @property
     def option_type(self) -> OptionType:
-        return OptionType.USER
+        return OptionType.COLOR
+
+    def _convert_value(self, value: str) -> hikari.Color:
+        try:
+            return hikari.Color.of(value)
+        except ValueError as exc:
+            raise OptionConverterFailureError(
+                self, value, f"Option '{self.name}' expected a valid color, got {value!r}."
+            ) from exc
 
     @classmethod
     def _from_params(
-        cls, *, name: str, arg_name: str, is_required: bool, params: UserParams, **kwargs: t.Any
+        cls, *, name: str, arg_name: str, is_required: bool, params: ColorParams, **kwargs: t.Any
     ) -> te.Self:
         return cls(
             name=name,
@@ -66,6 +75,13 @@ class UserOption(CommandOptionBase[hikari.User, ClientT, UserParams]):
             **kwargs,
         )
 
+
+# God save the queen
+ColourParams = ColorParams
+"""An alias for `ColorParams`."""
+
+ColourOption = ColorOption
+"""An alias for `ColorOption`."""
 
 # MIT License
 #

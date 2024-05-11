@@ -9,6 +9,7 @@ https://arc.hypergonial.com
 """
 
 from alluka import Client as Injector
+from alluka import OverridingContext as InjectorOverridingContext
 from alluka import inject
 
 from arc import abc, command, ext, utils
@@ -28,8 +29,11 @@ from .command import (
     AttachmentParams,
     BoolParams,
     ChannelParams,
+    ColorParams,
+    ColourParams,
     FloatParams,
     IntParams,
+    MemberParams,
     MentionableParams,
     MessageCommand,
     RoleParams,
@@ -65,6 +69,7 @@ from .errors import (
     MaxConcurrencyReachedError,
     NoResponseIssuedError,
     NotOwnerError,
+    OptionConverterFailureError,
     ResponseAlreadyIssuedError,
     UnderCooldownError,
 )
@@ -113,7 +118,7 @@ __all__ = (
     "AutocompleteData",
     "Option",
     "Context",
-    "Context",
+    "InjectorOverridingContext",
     "BoolParams",
     "IntParams",
     "StrParams",
@@ -123,6 +128,9 @@ __all__ = (
     "RoleParams",
     "MentionableParams",
     "AttachmentParams",
+    "MemberParams",
+    "ColorParams",
+    "ColourParams",
     "SlashCommand",
     "SlashGroup",
     "SlashSubCommand",
@@ -158,6 +166,7 @@ __all__ = (
     "ExtensionUnloadError",
     "HookAbortError",
     "InteractionResponseError",
+    "OptionConverterFailureError",
     "PluginBase",
     "RESTPluginBase",
     "GatewayPluginBase",

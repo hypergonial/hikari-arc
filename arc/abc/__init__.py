@@ -8,6 +8,7 @@ from .hookable import Hookable, HookResult, with_hook, with_post_hook
 from .limiter import LimiterProto
 from .option import (
     CommandOptionBase,
+    ConverterOption,
     Option,
     OptionBase,
     OptionParams,
@@ -29,6 +30,7 @@ __all__ = (
     "OptionBase",
     "OptionType",
     "CommandOptionBase",
+    "ConverterOption",
     "OptionParams",
     "OptionWithChoices",
     "OptionWithChoicesParams",
