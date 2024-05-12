@@ -17,6 +17,7 @@ Here you can find all the changelogs for `hikari-arc`.
 - Add `arc.OptionConverterFailureError` when a converter fails to convert an option value.
 - Add support for injecting dependencies contextually to command callbacks via `Client.add_injection_hook` and `Client.remove_injection_hook`.
 - Add support for multiple startup & shutdown hooks via `Client.add_startup_hook` and `Client.add_shutdown_hook` respectively.
+- Inject dependencies by default into pre/post-execution hooks & error handlers.
 - Fix client hooks being executed twice if a command is added to a plugin.
 - Fix options mapping not taking name overrides into account.
 - Bump alluka to `0.3+`.
