@@ -76,23 +76,25 @@ To make an option **not required**, you should set a default value:
         await ctx.respond(f"You provided {number} and {user.mention if user else None}!")
     ```
 
-### Supported option types
+### Basic option types
 
-The following option types are supported:
+The following basic option types are supported:
 
-- `bool` & [`arc.BoolParams`][arc.command.option.BoolParams]
-- `int` & [`arc.IntParams`][arc.command.option.IntParams]
-- `float` & [`arc.FloatParams`][arc.command.option.FloatParams]
-- `str` & [`arc.StrParams`][arc.command.option.StrParams]
-- `hikari.Attachment` & [`arc.AttachmentParams`][arc.command.option.AttachmentParams]
-- `hikari.User` & [`arc.UserParams`][arc.command.option.UserParams]
-- `hikari.Role` & [`arc.RoleParams`][arc.command.option.RoleParams]
-- `hikari.User | hikari.Role` & [`arc.MentionableParams`][arc.command.option.MentionableParams]
-- Any hikari channel type & [`arc.ChannelParams`][arc.command.option.ChannelParams]
+| Type | Params object |
+|------|---------------|
+| `bool` | [`arc.BoolParams`][arc.command.option.BoolParams] |
+| `int` | [`arc.IntParams`][arc.command.option.IntParams] |
+| `float` | [`arc.FloatParams`][arc.command.option.FloatParams] |
+| `str` | [`arc.StrParams`][arc.command.option.StrParams] |
+| `hikari.Attachment` | [`arc.AttachmentParams`][arc.command.option.AttachmentParams] |
+| `hikari.User` | [`arc.UserParams`][arc.command.option.UserParams] |
+| `hikari.Role` | [`arc.RoleParams`][arc.command.option.RoleParams] |
+| `hikari.User | hikari.Role` | [`arc.MentionableParams`][arc.command.option.MentionableParams] |
+| Any hikari channel type | [`arc.ChannelParams`][arc.command.option.ChannelParams] |
 
-Trying to use any other type as an option will lead to errors.
+These option types map directly to the ones [defined by the Discord API](https://discord.com/developers/docs/interactions/application-commands#application-command-object-application-command-option-type).
 
-!!! tip
+??? tip "Setting channel types"
     The types of channels a user can pass to a **channel option** will depend on the type(s) of channels specified as the first parameter of a channel option.
 
     This will only allow textable guild channels to be passed:
@@ -108,6 +110,20 @@ Trying to use any other type as an option will lead to errors.
     ```
 
     To allow any channel type (including categories and threads!) use `hikari.PartialChannel`.
+
+### Option types with converters
+
+`arc` also ships with a couple of custom option types not directly defined by the Discord API. These  use converters to try and convert from a more primitive option type:
+
+| Type | Params object | Converts From |
+|------|---------------|---------------|
+| `hikari.Member` | [`arc.MemberParams`][arc.command.option.MemberParams] | `hikari.User` |
+| `hikari.Color`  | [`arc.ColorParams`][arc.command.option.ColorParams]  | `str` |
+
+If the option cannot be converted successfully, a [`OptionConverterFailureError`][arc.errors.OptionConverterFailureError] will be raised, and should be handled with an [error handler](./error_handling.md).
+
+!!! warning
+    Trying to use any other types from the ones listed above as an option will lead to errors.
 
 ## Choices & Autocomplete
 
