@@ -10,7 +10,7 @@ import hikari
 
 from arc.abc.concurrency_limiting import ConcurrencyLimiterProto, HasConcurrencyLimiter
 from arc.abc.error_handler import HasErrorHandler
-from arc.abc.hookable import Hookable
+from arc.abc.hookable import Hookable, HookResult
 from arc.abc.limiter import LimiterProto
 from arc.abc.option import OptionBase
 from arc.context import AutodeferMode
@@ -361,7 +361,7 @@ class CommandBase(
     async def _handle_exception(self, ctx: Context[ClientT], exc: Exception) -> None:
         try:
             if self.error_handler is not None:
-                await self.error_handler(ctx, exc)
+                await ctx._injection_ctx.call_with_async_di(self.error_handler, ctx, exc)
             else:
                 raise exc
         except Exception as exc:
@@ -549,10 +549,12 @@ class CommandBase(
         try:
             hooks = command._resolve_hooks()
             for hook in hooks:
-                res = hook(ctx)
+                if inspect.iscoroutinefunction(hook):
+                    res = await ctx._injection_ctx.call_with_async_di(hook, ctx)
+                else:
+                    res = ctx._injection_ctx.call_with_di(hook, ctx)
 
-                if inspect.isawaitable(res):
-                    res = await res
+                res = t.cast(HookResult | None, res)
 
                 if res and res._abort:
                     aborted = True
@@ -568,9 +570,9 @@ class CommandBase(
             post_hooks = command._resolve_post_hooks()
             for hook in post_hooks:
                 if inspect.iscoroutinefunction(hook):
-                    await hook(ctx)
+                    await ctx._injection_ctx.call_with_async_di(hook, ctx)
                 else:
-                    hook(ctx)
+                    ctx._injection_ctx.call_with_di(hook, ctx)
         except Exception as e:
             await command._handle_exception(ctx, e)
         finally:
@@ -582,6 +584,9 @@ class CommandBase(
     ) -> None:
         """Handle the callback of a command. Invoke all hooks and the callback, and handle any exceptions."""
         # If hook aborted, stop invocation
+
+        injection_ctx = await self.client._create_overriding_ctx_for_command(ctx)
+        ctx._injection_ctx = injection_ctx
 
         max_concurrency = command._resolve_concurrency_limiter()
 
@@ -597,8 +602,6 @@ class CommandBase(
             if await self._handle_pre_hooks(command, ctx):
                 return
 
-            injection_ctx = await self.client._create_overriding_ctx_for_command(ctx)
-            ctx._injection_ctx = injection_ctx
             await injection_ctx.call_with_async_di(command.callback, ctx, *args, **kwargs)
 
         except Exception as e:
