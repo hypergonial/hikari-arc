@@ -10,7 +10,7 @@ import hikari
 
 from arc.abc.concurrency_limiting import ConcurrencyLimiterProto, HasConcurrencyLimiter
 from arc.abc.error_handler import HasErrorHandler
-from arc.abc.hookable import Hookable
+from arc.abc.hookable import Hookable, HookResult
 from arc.abc.limiter import LimiterProto
 from arc.abc.option import OptionBase
 from arc.context import AutodeferMode
@@ -553,6 +553,8 @@ class CommandBase(
                     res = await ctx._injection_ctx.call_with_async_di(hook, ctx)
                 else:
                     res = ctx._injection_ctx.call_with_di(hook, ctx)
+
+                res = t.cast(HookResult | None, res)
 
                 if res and res._abort:
                     aborted = True
