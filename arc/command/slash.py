@@ -541,13 +541,12 @@ class SlashSubGroup(SubCommandBase[ClientT, SlashGroup[ClientT]]):
     async def _handle_exception(self, ctx: Context[ClientT], exc: Exception) -> None:
         try:
             if self.error_handler:
-                await self.client.injector.call_with_async_di(self.error_handler, ctx, exc)
+                await ctx._injection_ctx.call_with_async_di(self.error_handler, ctx, exc)
             else:
                 raise exc
-        except Exception as e:
+        except Exception as exc:
             assert self._parent is not None
-            await self.client.injector.call_with_async_di(self._parent._handle_exception, ctx, exc)
-            await self._parent._handle_exception(ctx, e)
+            await ctx._injection_ctx.call_with_async_di(self._parent._handle_exception, ctx, exc)
 
     def _request_option_locale(self, client: Client[t.Any], command: CommandProto) -> None:
         super()._request_option_locale(client, command)
@@ -695,14 +694,12 @@ class SlashSubCommand(
     async def _handle_exception(self, ctx: Context[ClientT], exc: Exception) -> None:
         try:
             if self.error_handler:
-                await self.client.injector.call_with_async_di(self.error_handler, ctx, exc)
-                await self.error_handler(ctx, exc)
+                await ctx._injection_ctx.call_with_async_di(self.error_handler, ctx, exc)
             else:
                 raise exc
         except Exception as e:
             assert self._parent is not None
-            await self.client.injector.call_with_async_di(self._handle_exception, ctx, exc)
-            await self._parent._handle_exception(ctx, e)
+            await ctx._injection_ctx.call_with_async_di(self._handle_exception, ctx, e)
 
     def _request_option_locale(self, client: Client[t.Any], command: CommandProto) -> None:
         super()._request_option_locale(client, command)

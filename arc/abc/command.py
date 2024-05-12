@@ -366,9 +366,9 @@ class CommandBase(
                 raise exc
         except Exception as exc:
             if self.plugin:
-                await self.client.injector.call_with_async_di(self.plugin._handle_exception, ctx, exc)
+                await ctx._injection_ctx.call_with_async_di(self.plugin._handle_exception, ctx, exc)
             else:
-                await self.client.injector.call_with_async_di(self.client._on_error, ctx, exc)
+                await ctx._injection_ctx.call_with_async_di(self.client._on_error, ctx, exc)
 
     def _resolve_settings(self) -> _CommandSettings:
         """Resolve all settings that apply to this command."""
@@ -546,6 +546,9 @@ class CommandBase(
             Whether the command should be aborted.
         """
         aborted = False
+        injection_ctx = await self.client._create_overriding_ctx_for_command(ctx)
+        ctx._injection_ctx = injection_ctx
+
         try:
             hooks = command._resolve_hooks()
             for hook in hooks:
