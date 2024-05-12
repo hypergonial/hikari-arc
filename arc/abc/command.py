@@ -366,9 +366,9 @@ class CommandBase(
                 raise exc
         except Exception as exc:
             if self.plugin:
-                await ctx._injection_ctx.call_with_async_di(self.plugin._handle_exception, ctx, exc)
+                await self.plugin._handle_exception(ctx, exc)
             else:
-                await ctx._injection_ctx.call_with_async_di(self.client._on_error, ctx, exc)
+                await self.client._on_error(ctx, exc)
 
     def _resolve_settings(self) -> _CommandSettings:
         """Resolve all settings that apply to this command."""
@@ -546,6 +546,7 @@ class CommandBase(
             Whether the command should be aborted.
         """
         aborted = False
+
         injection_ctx = await self.client._create_overriding_ctx_for_command(ctx)
         ctx._injection_ctx = injection_ctx
 
@@ -553,9 +554,9 @@ class CommandBase(
             hooks = command._resolve_hooks()
             for hook in hooks:
                 if inspect.iscoroutinefunction(hook):
-                    res = await self.client.injector.call_with_async_di(hook, ctx)
+                    res = await ctx._injection_ctx.call_with_async_di(hook, ctx)
                 else:
-                    res = self.client.injector.call_with_di(hook, ctx)
+                    res = ctx._injection_ctx.call_with_di(hook, ctx)
 
                 if res and res._abort:
                     aborted = True
@@ -567,13 +568,16 @@ class CommandBase(
 
     async def _handle_post_hooks(self, command: CallableCommandProto[ClientT], ctx: Context[ClientT]) -> None:
         """Handle all post-execution hooks for a command, and release the concurrency limiter if applicable."""
+        injection_ctx = await self.client._create_overriding_ctx_for_command(ctx)
+        ctx._injection_ctx = injection_ctx
+
         try:
             post_hooks = command._resolve_post_hooks()
             for hook in post_hooks:
                 if inspect.iscoroutinefunction(hook):
-                    await self.client.injector.call_with_async_di(hook, ctx)
+                    await ctx._injection_ctx.call_with_async_di(hook, ctx)
                 else:
-                    self.client.injector.call_with_di(hook, ctx)
+                    ctx._injection_ctx.call_with_di(hook, ctx)
         except Exception as e:
             await command._handle_exception(ctx, e)
         finally:

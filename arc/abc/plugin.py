@@ -159,7 +159,7 @@ class PluginBase(HasErrorHandler[ClientT], Hookable[ClientT], HasConcurrencyLimi
             else:
                 raise exc
         except Exception as exc:
-            await ctx._injection_ctx.call_with_async_di(self.client._on_error, ctx, exc)
+            await self.client._on_error(ctx, exc)
 
     def _resolve_settings(self) -> _CommandSettings:
         settings = self._client._cmd_settings if self._client is not None else _CommandSettings.default()
