@@ -1,0 +1,58 @@
+[data-md-color-primary="teal"] {
+    --async-color: 255, 92, 122;
+    --property-color: 38, 166, 153;
+    --classmethod-color: 0, 198, 245;
+    --class-attribute-color: 230, 170, 0;
+    --instance-attribute-color: 181, 156, 255;
+}
+
+/*  Colors for various uncolored elements. This follows Material for MkDocs'
+ *  style of 100% alpha for foreground and 10% alpha for background.
+ *
+ *  Colors should work in both light and dark themes.
+ */
+.doc-label-async > code {
+    background-color: rgba(var(--async-color), 0.1);
+    color: rgb(var(--async-color));
+}
+
+.doc-label-property > code {
+    background-color: rgba(var(--property-color), 0.1);
+    color: rgb(var(--property-color));
+}
+
+.doc-label-class-attribute > code {
+    background-color: rgba(var(--class-attribute-color), 0.1);
+    color: rgb(var(--class-attribute-color));
+}
+
+.doc-label-instance-attribute > code {
+    background-color: rgba(var(--instance-attribute-color), 0.1);
+    color: rgb(var(--instance-attribute-color));
+}
+
+
+/*   Hack to make sure `classmethod` is rendered properly
+ *
+ *  For some godawful reasons, very rarely "classmethod" is rendered as:
+ *      <div>
+ *          <code>
+ *             <mark>classmeth</mark>
+ *              od
+ *          </code>
+ *      </div>
+ *
+ *  Why? Beats me. I don't know whether it's mkdocstrings's fault or
+ *  Material for MkDocs's fault. When that gets fixed, yea, remove the
+ *  `> mark` part of the first selector and remove the second one
+ *  entirely.
+ */
+.doc-label-classmethod > code > mark {
+    background-color: rgba(var(--classmethod-color), 0.1);
+    color: rgb(var(--classmethod-color));
+}
+
+.doc-label-classmethod > code {
+    color: rgb(var(--classmethod-color));
+}
+
