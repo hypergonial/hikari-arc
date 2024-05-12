@@ -22,6 +22,7 @@ from arc.command.slash import SlashCommand, SlashGroup, SlashSubCommand, SlashSu
 from arc.command.user import UserCommand
 from arc.context import AutodeferMode, Context
 from arc.errors import ExtensionLoadError, ExtensionUnloadError
+from arc.internal.deprecation import warn_deprecate
 from arc.internal.sync import _sync_commands
 from arc.internal.types import (
     AppT,
@@ -36,6 +37,7 @@ from arc.internal.types import (
     PostHookT,
     ResponseBuilderT,
 )
+from arc.internal.version import Version
 from arc.locale import CommandLocaleRequest, LocaleResponse, OptionLocaleRequest
 
 if t.TYPE_CHECKING:
@@ -102,8 +104,8 @@ class Client(t.Generic[AppT], abc.ABC):
         "_injection_hooks",
         "_owner_ids",
         "_error_handler",
-        "_startup_hook",
-        "_shutdown_hook",
+        "_startup_hooks",
+        "_shutdown_hooks",
         "_provided_locales",
         "_command_locale_provider",
         "_option_locale_provider",
@@ -158,8 +160,8 @@ class Client(t.Generic[AppT], abc.ABC):
         self._application: hikari.Application | None = None
         self._error_handler: ErrorHandlerCallbackT[te.Self] | None = None
         self._concurrency_limiter: ConcurrencyLimiterProto[te.Self] | None = None
-        self._startup_hook: LifeCycleHookT[te.Self] | None = None
-        self._shutdown_hook: LifeCycleHookT[te.Self] | None = None
+        self._startup_hooks: list[LifeCycleHookT[te.Self] | None] = [None]
+        self._shutdown_hooks: list[LifeCycleHookT[te.Self] | None] = [None]
         self._command_locale_provider: CommandLocaleRequestT | None = None
         self._option_locale_provider: OptionLocaleRequestT | None = None
         self._custom_locale_provider: CustomLocaleRequestT | None = None
@@ -288,8 +290,13 @@ class Client(t.Generic[AppT], abc.ABC):
             await _sync_commands(self)
 
         try:
-            if self._startup_hook:
-                await self._startup_hook(self)
+            for hook in self._startup_hooks:
+                if hook:
+                    try:
+                        await hook(self)
+                    except Exception as e:
+                        logger.error(f"Error in startup hook '{hook.__name__}': {e}")
+                        traceback.print_exc()
         finally:
             self._started.set()
 
@@ -297,8 +304,16 @@ class Client(t.Generic[AppT], abc.ABC):
         """Called when the client is shutting down.
         Reserved for internal shutdown logic.
         """
-        if self._shutdown_hook:
-            await self._shutdown_hook(self)
+        for hook in self._shutdown_hooks:
+            if hook:
+                try:
+                    await hook(self)
+                except Exception as e:
+                    logger.error(f"Error in shutdown hook '{hook.__name__}': {e}")
+                    traceback.print_exc()
+
+        for task in self._tasks:
+            task.cancel()
 
     async def _on_error(self, ctx: Context[te.Self], exception: Exception) -> None:
         if self._error_handler is not None:
@@ -905,6 +920,100 @@ class Client(t.Generic[AppT], abc.ABC):
         return decorator
 
     @t.overload
+    def add_startup_hook(self, hook: LifeCycleHookT[te.Self]) -> te.Self: ...
+
+    @t.overload
+    def add_startup_hook(self) -> t.Callable[[LifeCycleHookT[te.Self]], te.Self]: ...
+
+    def add_startup_hook(
+        self, hook: LifeCycleHookT[te.Self] | None = None
+    ) -> te.Self | t.Callable[[LifeCycleHookT[te.Self]], te.Self]:
+        """Decorator to add a startup hook for this client.
+
+        This will be called when the client starts up.
+
+        Parameters
+        ----------
+        hook : LifeCycleHookT[te.Self]
+            The startup hook to add.
+
+        Returns
+        -------
+        te.Self
+            The client for chaining calls.
+
+        Examples
+        --------
+        ```py
+        @client.add_startup_hook
+        async def startup_hook(client: arc.GatewayClient) -> None:
+            print("Client started up!")
+        ```
+
+        Or, as a function:
+
+        ```py
+        client.add_startup_hook(startup_hook)
+        ```
+        """
+
+        def decorator(handler: LifeCycleHookT[te.Self]) -> te.Self:
+            self._startup_hooks.append(handler)
+            return self
+
+        if hook is not None:
+            return decorator(hook)
+
+        return decorator
+
+    @t.overload
+    def add_shutdown_hook(self, hook: LifeCycleHookT[te.Self]) -> te.Self: ...
+
+    @t.overload
+    def add_shutdown_hook(self) -> t.Callable[[LifeCycleHookT[te.Self]], te.Self]: ...
+
+    def add_shutdown_hook(
+        self, hook: LifeCycleHookT[te.Self] | None = None
+    ) -> te.Self | t.Callable[[LifeCycleHookT[te.Self]], te.Self]:
+        """Decorator to add a shutdown hook for this client.
+
+        This will be called when the client shuts down.
+
+        Parameters
+        ----------
+        hook : LifeCycleHookT[te.Self]
+            The shutdown hook to add.
+
+        Returns
+        -------
+        te.Self
+            The client for chaining calls.
+
+        Examples
+        --------
+        ```py
+        @client.add_shutdown_hook
+        async def shutdown_hook(client: arc.GatewayClient) -> None:
+            print("Client shut down!")
+        ```
+
+        Or, as a function:
+
+        ```py
+        client.add_shutdown_hook(shutdown_hook)
+        ```
+        """
+
+        def decorator(handler: LifeCycleHookT[te.Self]) -> te.Self:
+            self._shutdown_hooks.append(handler)
+            return self
+
+        if hook is not None:
+            return decorator(hook)
+
+        return decorator
+
+    @t.overload
     def set_startup_hook(self, hook: LifeCycleHookT[te.Self]) -> te.Self: ...
 
     @t.overload
@@ -916,6 +1025,10 @@ class Client(t.Generic[AppT], abc.ABC):
         """Decorator to set the startup hook for this client.
 
         This will be called when the client starts up.
+
+        !!! warning "Deprecation Notice"
+            This method is deprecated and will be removed in version `2.0.0`.
+            Use [`Client.add_startup_hook`][arc.client.Client.add_startup_hook] instead.
 
         Parameters
         ----------
@@ -941,9 +1054,10 @@ class Client(t.Generic[AppT], abc.ABC):
         client.set_startup_hook(startup_hook)
         ```
         """
+        warn_deprecate(what="set_startup_hook", when=Version(2, 0, 0), use_instead="add_startup_hook")
 
         def decorator(handler: LifeCycleHookT[te.Self]) -> te.Self:
-            self._startup_hook = handler
+            self._startup_hooks[0] = handler
             return self
 
         if hook is not None:
@@ -963,6 +1077,10 @@ class Client(t.Generic[AppT], abc.ABC):
         """Decorator to set the shutdown hook for this client.
 
         This will be called when the client shuts down.
+
+        !!! warning "Deprecation Notice"
+            This method is deprecated and will be removed in version `2.0.0`.
+            Use [`Client.add_shutdown_hook`][arc.client.Client.add_shutdown_hook] instead.
 
         Parameters
         ----------
@@ -988,9 +1106,10 @@ class Client(t.Generic[AppT], abc.ABC):
         client.set_shutdown_hook(shutdown_hook)
         ```
         """
+        warn_deprecate(what="set_shutdown_hook", when=Version(2, 0, 0), use_instead="add_shutdown_hook")
 
         def decorator(handler: LifeCycleHookT[te.Self]) -> te.Self:
-            self._shutdown_hook = handler
+            self._shutdown_hooks[0] = handler
             return self
 
         if hook is not None:
