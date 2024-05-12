@@ -15,7 +15,7 @@ Here you can find all the changelogs for `hikari-arc`.
 - Add options with converters. These options do not exist on Discord's end, arc simply tries to convert a more primitive optiontype into the requested one, failing if it is not possible.
 - Add new optiontypes with converters for `hikari.Member` and `hikari.Color`.
 - Add `arc.OptionConverterFailureError` when a converter fails to convert an option value.
-- Add support for injecting dependencies contextually to command callbacks via `Client.add_injection_hook` and `Client.remove_injection_hook`.
+- Add support for injecting dependencies contextually to command callbacks, hooks, and error handlers via `Client.add_injection_hook` and `Client.remove_injection_hook`.
 - Add support for multiple startup & shutdown hooks via `Client.add_startup_hook` and `Client.add_shutdown_hook` respectively.
 - Inject dependencies by default into pre/post-execution hooks & error handlers.
 - Fix client hooks being executed twice if a command is added to a plugin.
