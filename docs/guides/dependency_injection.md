@@ -91,7 +91,7 @@ And here you request that `arc` injects the dependency you declared earlier into
 
 ### Injecting other functions
 
-By default, only command callbacks are injected with dependencies, but you might want to inject other functions too. This can be done via the [`@Client.inject_dependencies`][arc.abc.client.Client.inject_dependencies] decorator (or [`@Plugin.inject_dependencies`][arc.abc.plugin.PluginBase.inject_dependencies] if working in a plugin).
+By default, **only command callbacks, pre/post hooks & error handlers are injected** with dependencies, but you might want to inject other functions too. This can be done via the [`@Client.inject_dependencies`][arc.abc.client.Client.inject_dependencies] decorator (or [`@Plugin.inject_dependencies`][arc.abc.plugin.PluginBase.inject_dependencies] if working in a plugin).
 
 ```py hl_lines="1"
 @client.inject_dependencies
