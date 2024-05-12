@@ -11,7 +11,7 @@ Here you can find all the changelogs for `hikari-arc`.
 
 ## v1.3.0
 
-- **Deprecate** `Client.set_startup_hook` and `Client.add_shutdown_hook`. These will be removed in `v2.0.0`. Use the newly added `Client.add_startup_hook` and `Client.add_shutdown_hook` instead.
+- **Deprecate** `Client.set_startup_hook` and `Client.set_shutdown_hook`. These will be removed in `v2.0.0`. Use the newly added `Client.add_startup_hook` and `Client.add_shutdown_hook` instead.
 - Add options with converters. These options do not exist on Discord's end, arc simply tries to convert a more primitive optiontype into the requested one, failing if it is not possible.
 - Add new optiontypes with converters for `hikari.Member` and `hikari.Color`.
 - Add `arc.OptionConverterFailureError` when a converter fails to convert an option value.
