@@ -206,6 +206,8 @@ class CronLoop(_LoopBase[P]):
         The coroutine to run at the specified interval.
     cron_format : str
         The cron format to use. See https://en.wikipedia.org/wiki/Cron for more information.
+    timezone : datetime.timezone
+        The timezone to use for the cron format. Defaults to UTC.
 
     Raises
     ------
@@ -227,20 +229,30 @@ class CronLoop(_LoopBase[P]):
     create a [`CronLoop`][arc.utils.loops.CronLoop] from a coroutine function.
     """
 
-    __slots__ = ("_iter",)
+    __slots__ = ("_iter", "_tz")
 
-    def __init__(self, callback: t.Callable[P, t.Awaitable[None]], cron_format: str) -> None:
+    def __init__(
+        self,
+        callback: t.Callable[P, t.Awaitable[None]],
+        cron_format: str,
+        *,
+        timezone: datetime.timezone = datetime.timezone.utc,
+    ) -> None:
         super().__init__(callback, run_on_start=False)
+        self._tz = timezone
 
         try:
             import croniter
 
-            self._iter = croniter.croniter(cron_format, datetime.datetime.now())
+            self._iter = croniter.croniter(cron_format)
         except ImportError:
             raise ImportError("Missing dependency for CronLoop: 'croniter'")
 
     def _get_next_run(self) -> float:
-        return self._iter.get_next(float) - datetime.datetime.now().timestamp()
+        return (
+            self._iter.get_next(float, start_time=datetime.datetime.now(self._tz))
+            - datetime.datetime.now(self._tz).timestamp()
+        )
 
 
 def interval_loop(

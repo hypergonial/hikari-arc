@@ -9,6 +9,11 @@ hide:
 
 Here you can find all the changelogs for `hikari-arc`.
 
+## v1.3.1
+
+- Add the ability to configure if an `IntervalLoop` should run immediately after being started or not.
+- Fix `CronLoop` running immediately after being started.
+
 ## v1.3.0
 
 - **Deprecate** `Client.set_startup_hook` and `Client.set_shutdown_hook`. These will be removed in `v2.0.0`. Use the newly added `Client.add_startup_hook` and `Client.add_shutdown_hook` instead.
