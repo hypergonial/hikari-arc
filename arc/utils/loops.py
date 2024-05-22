@@ -25,12 +25,13 @@ class _LoopBase(abc.ABC, t.Generic[P]):
     - [`CronLoop`][arc.utils.loops.CronLoop]
     """
 
-    __slots__ = ("_coro", "_task", "_failed", "_stop_next")
+    __slots__ = ("_coro", "_task", "_failed", "_stop_next", "_run_on_start")
 
-    def __init__(self, callback: t.Callable[P, t.Awaitable[None]]) -> None:
+    def __init__(self, callback: t.Callable[P, t.Awaitable[None]], *, run_on_start: bool = True) -> None:
         self._coro = callback
         self._task: asyncio.Task[None] | None = None
         self._failed: int = 0
+        self._run_on_start: bool = run_on_start
         self._stop_next: bool = False
 
         if not inspect.iscoroutinefunction(self._coro):
@@ -51,23 +52,28 @@ class _LoopBase(abc.ABC, t.Generic[P]):
             The number of seconds to wait before running the coroutine again.
         """
 
+    async def _call_callback(self, *args: P.args, **kwargs: P.kwargs) -> None:
+        """Call the callback and handle exceptions."""
+        try:
+            await self._coro(*args, **kwargs)
+        except Exception as e:
+            traceback_msg = "\n".join(traceback.format_exception(type(e), e, e.__traceback__))
+            print(f"Loop encountered exception: {e}", file=sys.stderr)
+            print(traceback_msg, file=sys.stderr)
+
+            if self._failed < 3:
+                self._failed += 1
+            else:
+                raise RuntimeError(f"Loop failed repeatedly, stopping it. Exception: {e}")
+
     async def _loopy_loop(self, *args: P.args, **kwargs: P.kwargs) -> None:
         """Main loop logic."""
-        while not self._stop_next:
-            try:
-                await self._coro(*args, **kwargs)
-            except Exception as e:
-                traceback_msg = "\n".join(traceback.format_exception(type(e), e, e.__traceback__))
-                print(f"Loop encountered exception: {e}", file=sys.stderr)
-                print(traceback_msg, file=sys.stderr)
+        if self._run_on_start:
+            await self._call_callback(*args, **kwargs)
 
-                if self._failed < 3:
-                    self._failed += 1
-                    await asyncio.sleep(self._get_next_run())
-                else:
-                    raise RuntimeError(f"Loop failed repeatedly, stopping it. Exception: {e}")
-            else:
-                await asyncio.sleep(self._get_next_run())
+        while not self._stop_next:
+            await asyncio.sleep(self._get_next_run())
+            await self._call_callback(*args, **kwargs)
         self.cancel()
 
     def _create_task(self, *args: P.args, **kwargs: P.kwargs) -> asyncio.Task[None]:
@@ -135,6 +141,9 @@ class IntervalLoop(_LoopBase[P]):
         The number of hours to wait before running the coroutine again.
     days : float, optional
         The number of days to wait before running the coroutine again.
+    run_on_start : bool, optional
+        Whether to run the callback immediately after starting the loop.
+        If set to false, the loop will wait for the specified interval before first running the callback.
 
     Raises
     ------
@@ -164,8 +173,9 @@ class IntervalLoop(_LoopBase[P]):
         minutes: float | None = None,
         hours: float | None = None,
         days: float | None = None,
+        run_on_start: bool = True,
     ) -> None:
-        super().__init__(callback)
+        super().__init__(callback, run_on_start=run_on_start)
         if not seconds and not minutes and not hours and not days:
             raise ValueError("At least one of 'seconds', 'minutes', 'hours' or 'days' must be not None.")
         else:
@@ -220,7 +230,7 @@ class CronLoop(_LoopBase[P]):
     __slots__ = ("_iter",)
 
     def __init__(self, callback: t.Callable[P, t.Awaitable[None]], cron_format: str) -> None:
-        super().__init__(callback)
+        super().__init__(callback, run_on_start=False)
 
         try:
             import croniter
