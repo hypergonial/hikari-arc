@@ -207,7 +207,7 @@ class CronLoop(_LoopBase[P]):
     cron_format : str
         The cron format to use. See https://en.wikipedia.org/wiki/Cron for more information.
     timezone : datetime.timezone
-        The timezone to use for the cron format. Defaults to UTC.
+        The timezone to use for the cron loop. Defaults to UTC.
 
     Raises
     ------
@@ -256,7 +256,12 @@ class CronLoop(_LoopBase[P]):
 
 
 def interval_loop(
-    *, seconds: float | None = None, minutes: float | None = None, hours: float | None = None, days: float | None = None
+    *,
+    seconds: float | None = None,
+    minutes: float | None = None,
+    hours: float | None = None,
+    days: float | None = None,
+    run_on_start: bool = True,
 ) -> t.Callable[[t.Callable[P, t.Awaitable[None]]], IntervalLoop[P]]:
     """A decorator to create an [`IntervalLoop`][arc.utils.loops.IntervalLoop] out of a coroutine function.
 
@@ -270,6 +275,9 @@ def interval_loop(
         The number of hours to wait before running the coroutine again.
     days : float, optional
         The number of days to wait before running the coroutine again.
+    run_on_start : bool, optional
+        Whether to run the callback immediately after starting the loop.
+        If set to false, the loop will wait for the specified interval before first running the callback.
 
     Returns
     -------
@@ -300,12 +308,14 @@ def interval_loop(
     """
 
     def decorator(coro: t.Callable[P, t.Awaitable[None]]) -> IntervalLoop[P]:
-        return IntervalLoop(coro, seconds=seconds, minutes=minutes, hours=hours, days=days)
+        return IntervalLoop(coro, seconds=seconds, minutes=minutes, hours=hours, days=days, run_on_start=run_on_start)
 
     return decorator
 
 
-def cron_loop(cron_format: str) -> t.Callable[[t.Callable[P, t.Awaitable[None]]], CronLoop[P]]:
+def cron_loop(
+    cron_format: str, timezone: datetime.timezone = datetime.timezone.utc
+) -> t.Callable[[t.Callable[P, t.Awaitable[None]]], CronLoop[P]]:
     """Decorator to create a [`CronLoop`][arc.utils.loops.CronLoop] out of a coroutine function.
 
     !!! warning
@@ -319,6 +329,8 @@ def cron_loop(cron_format: str) -> t.Callable[[t.Callable[P, t.Awaitable[None]]]
     ----------
     cron_format : str
         The cron format to use. See https://en.wikipedia.org/wiki/Cron for more information.
+    timezone : datetime.timezone
+        The timezone to use for the cron loop. Defaults to UTC.
 
     Returns
     -------
@@ -351,7 +363,7 @@ def cron_loop(cron_format: str) -> t.Callable[[t.Callable[P, t.Awaitable[None]]]
     """
 
     def decorator(coro: t.Callable[P, t.Awaitable[None]]) -> CronLoop[P]:
-        return CronLoop(coro, cron_format)
+        return CronLoop(coro, cron_format, timezone=timezone)
 
     return decorator
 
