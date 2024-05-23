@@ -199,6 +199,9 @@ class IntervalLoop(_LoopBase[P]):
     ):
         """Set a new specified interval.
 
+        !!! note
+            You need to restart the loop if you want these changes to take effect immediately.
+
         Parameters
         ----------
         seconds : float | None, optional
@@ -284,28 +287,6 @@ class CronLoop(_LoopBase[P]):
             self._iter.get_next(float, start_time=datetime.datetime.now(self._tz))
             - datetime.datetime.now(self._tz).timestamp()
         )
-
-    def set_interval(self, cron_format: str) -> None:
-        """Set new specified interval.
-
-        Parameters
-        ---------
-        cron_format : str
-            The cron format to use. See https://en.wikipedia.org/wiki/Cron for more information.
-
-        Raises
-        -----
-        ImportError
-            If the `croniter` package is not installed.
-        croniter.CroniterBadCronError
-            If the cron format is invalid.
-        """
-        try:
-            import croniter
-
-            self._iter = croniter.croniter(cron_format)
-        except ImportError:
-            raise ImportError("Missing dependency for CronLoop: 'croniter'")
 
 
 def interval_loop(
