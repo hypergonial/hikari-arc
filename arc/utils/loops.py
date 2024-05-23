@@ -212,6 +212,16 @@ class IntervalLoop(_LoopBase[P]):
             The number of hours to wait before running the coroutine again.
         days : float | None, optional
             The number of days to wait before running the coroutine again.
+
+        Examples
+        --------
+        ```py
+        loop = IntervalLoop(my_coro, seconds=5)
+        loop.start()
+        loop.set_interval(seconds=10)
+        loop.cancel()
+        loop.start()
+        ```
         """
         if not seconds and not minutes and not hours and not days:
             raise ValueError("At least one of 'seconds', 'minutes', 'hours' or 'days' must be not None.")
