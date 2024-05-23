@@ -189,6 +189,37 @@ class IntervalLoop(_LoopBase[P]):
     def _get_next_run(self) -> float:
         return self._sleep
 
+    def set_interval(
+        self,
+        *,
+        seconds: float | None = None,
+        minutes: float | None = None,
+        hours: float | None = None,
+        days: float | None = None,
+    ):
+        """Set new specified interval.
+
+        Parameters
+        ----------
+        seconds : float | None, optional
+            The number of seconds to wait before running the coroutine again.
+        minutes : float | None, optional
+            The number of minutes to wait before running the coroutine again.
+        hours : float | None, optional
+            The number of hours to wait before running the coroutine again.
+        days : float | None, optional
+            The number of days to wait before running the coroutine again.
+        """
+        if not seconds and not minutes and not hours and not days:
+            raise ValueError("At least one of 'seconds', 'minutes', 'hours' or 'days' must be not None.")
+        else:
+            seconds = seconds or 0
+            minutes = minutes or 0
+            hours = hours or 0
+            days = hours or 0
+
+        self._sleep: float = seconds + minutes * 60 + hours * 3600 + days * 24 * 3600
+
 
 class CronLoop(_LoopBase[P]):
     """A simple interval loop that runs a coroutine at a specified interval.
@@ -253,6 +284,28 @@ class CronLoop(_LoopBase[P]):
             self._iter.get_next(float, start_time=datetime.datetime.now(self._tz))
             - datetime.datetime.now(self._tz).timestamp()
         )
+
+    def set_interval(self, cron_format: str) -> None:
+        """Set new specified interval.
+
+        Parameters
+        ---------
+        cron_format : str
+            The cron format to use. See https://en.wikipedia.org/wiki/Cron for more information.
+
+        Raises
+        -----
+        ImportError
+            If the `croniter` package is not installed.
+        croniter.CroniterBadCronError
+            If the cron format is invalid.
+        """
+        try:
+            import croniter
+
+            self._iter = croniter.croniter(cron_format)
+        except ImportError:
+            raise ImportError("Missing dependency for CronLoop: 'croniter'")
 
 
 def interval_loop(
