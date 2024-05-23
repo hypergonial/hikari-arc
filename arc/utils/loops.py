@@ -197,7 +197,7 @@ class IntervalLoop(_LoopBase[P]):
         hours: float | None = None,
         days: float | None = None,
     ):
-        """Set new specified interval.
+        """Set a new specified interval.
 
         Parameters
         ----------
