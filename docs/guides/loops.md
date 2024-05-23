@@ -18,36 +18,73 @@ To create a loop, you should decorate an async function with either [`@arc.utils
     pip install hikari-arc[cron]
     ```
 
-```py
-# Create a loop out of a function
-@arc.utils.interval_loop(seconds=10.0)
-async def loopy_loop(value: int) -> None:
-    print(value)
+=== "Gateway"
 
-# Somewhere else:
+    ```py
+    # Create a loop out of a function
+    @arc.utils.interval_loop(seconds=10.0)
+    async def loopy_loop(value: int) -> None:
+        print(value)
 
-@client.set_startup_hook
-async def startup(client: arc.GatewayClient) -> None:
-    # Start the loop by passing all the parameters it needs
-    loopy_loop.start(value=10)
-```
+    # Somewhere else:
+
+    @client.add_startup_hook
+    async def startup(client: arc.GatewayClient) -> None:
+        # Start the loop by passing all the parameters it needs
+        loopy_loop.start(value=10)
+    ```
+
+=== "REST"
+
+    ```py
+    # Create a loop out of a function
+    @arc.utils.interval_loop(seconds=10.0)
+    async def loopy_loop(value: int) -> None:
+        print(value)
+
+    # Somewhere else:
+
+    @client.add_startup_hook
+    async def startup(client: arc.RESTClient) -> None:
+        # Start the loop by passing all the parameters it needs
+        loopy_loop.start(value=10)
+    ```
 
 If a decorator doesn't suit your needs, you may also use the [`IntervalLoop`][arc.utils.loops.IntervalLoop] and [`CronLoop`][arc.utils.loops.CronLoop] classes directly:
 
-```py
-async def loopy_loop(value: int) -> None:
-    print(value)
+=== "Gateway"
 
-# Create a loop by passing the function in
-loop = arc.utils.IntervalLoop(loopy_loop, seconds=10.0)
+    ```py
+    async def loopy_loop(value: int) -> None:
+        print(value)
 
-# Somewhere else:
+    # Create a loop by passing the function in
+    loop = arc.utils.IntervalLoop(loopy_loop, seconds=10.0)
 
-@client.set_startup_hook
-async def startup(client: arc.GatewayClient) -> None:
-    # Start the loop by passing all the parameters it needs
-    loop.start(value=10)
-```
+    # Somewhere else:
+
+    @client.add_startup_hook
+    async def startup(client: arc.GatewayClient) -> None:
+        # Start the loop by passing all the parameters it needs
+        loop.start(value=10)
+    ```
+
+=== "REST"
+
+    ```py
+    async def loopy_loop(value: int) -> None:
+        print(value)
+
+    # Create a loop by passing the function in
+    loop = arc.utils.IntervalLoop(loopy_loop, seconds=10.0)
+
+    # Somewhere else:
+
+    @client.add_startup_hook
+    async def startup(client: arc.RESTClient) -> None:
+        # Start the loop by passing all the parameters it needs
+        loop.start(value=10)
+    ```
 
 This is identical to using the decorator from above.
 
