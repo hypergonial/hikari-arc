@@ -7,7 +7,7 @@ hide:
 
 # Startup & Shutdown
 
-It is possible to execute code when the client has started up or shut down, this can be done via the [`@Client.add_startup_hook`][arc.abc.Client.set_startup_hook] and [`@Client.add_shutdown_hook`][arc.abc.Client.set_shutdown_hook] respectively.
+It is possible to execute code when the client has started up or shut down, this can be done via the [`@Client.add_startup_hook`][arc.abc.Client.add_startup_hook] and [`@Client.add_shutdown_hook`][arc.abc.Client.add_shutdown_hook] respectively.
 
 === "Gateway"
 
