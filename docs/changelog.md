@@ -12,6 +12,7 @@ Here you can find all the changelogs for `hikari-arc`.
 ## v1.3.2
 
 - Add `IntervalLoop.set_interval()` to change the loop interval after loop creation.
+- Fix error handling with slash subcommands sometimes causing infinite recursion.
 
 ## v1.3.1
 
