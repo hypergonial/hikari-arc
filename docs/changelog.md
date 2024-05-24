@@ -9,6 +9,10 @@ hide:
 
 Here you can find all the changelogs for `hikari-arc`.
 
+## v1.3.2
+
+- Add `IntervalLoop.set_interval()` to change the loop interval after loop creation.
+
 ## v1.3.1
 
 - Add the ability to configure if an `IntervalLoop` should run immediately after being started or not.

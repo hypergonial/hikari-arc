@@ -189,6 +189,50 @@ class IntervalLoop(_LoopBase[P]):
     def _get_next_run(self) -> float:
         return self._sleep
 
+    def set_interval(
+        self,
+        *,
+        seconds: float | None = None,
+        minutes: float | None = None,
+        hours: float | None = None,
+        days: float | None = None,
+    ):
+        """Set a new specified interval.
+
+        !!! note
+            You need to restart the loop if you want these changes to take effect immediately.
+
+        Parameters
+        ----------
+        seconds : float | None, optional
+            The number of seconds to wait before running the coroutine again.
+        minutes : float | None, optional
+            The number of minutes to wait before running the coroutine again.
+        hours : float | None, optional
+            The number of hours to wait before running the coroutine again.
+        days : float | None, optional
+            The number of days to wait before running the coroutine again.
+
+        Examples
+        --------
+        ```py
+        loop = IntervalLoop(my_coro, seconds=5)
+        loop.start()
+        loop.set_interval(seconds=10)
+        loop.cancel()
+        loop.start()
+        ```
+        """
+        if not seconds and not minutes and not hours and not days:
+            raise ValueError("At least one of 'seconds', 'minutes', 'hours' or 'days' must be not None.")
+        else:
+            seconds = seconds or 0
+            minutes = minutes or 0
+            hours = hours or 0
+            days = hours or 0
+
+        self._sleep: float = seconds + minutes * 60 + hours * 3600 + days * 24 * 3600
+
 
 class CronLoop(_LoopBase[P]):
     """A simple interval loop that runs a coroutine at a specified interval.
