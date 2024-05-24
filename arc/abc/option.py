@@ -33,7 +33,7 @@ OriginT = t.TypeVar("OriginT")
 Option = t.Annotated
 """Alias for typing.Annotated.
 
-Examples
+Example
 --------
 ```py
 arc.Option[type, arc.TypeParams(...)]

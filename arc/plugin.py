@@ -42,7 +42,7 @@ class RESTPluginBase(PluginBase[RESTClientT]):
     is_nsfw : bool | hikari.UndefinedType
         Whether this plugin is only usable in NSFW channels
 
-    Examples
+    Example
     --------
     ```py
     plugin = arc.RESTPlugin("MyPlugin")
@@ -90,7 +90,7 @@ class GatewayPluginBase(PluginBase[GatewayClientT]):
     is_nsfw : bool | hikari.UndefinedType
         Whether this plugin is only usable in NSFW channels
 
-    Examples
+    Example
     --------
     ```py
     plugin = arc.GatewayPlugin("MyPlugin")

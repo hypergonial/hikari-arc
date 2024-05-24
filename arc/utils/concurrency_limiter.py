@@ -256,7 +256,7 @@ def global_concurrency(limit: int) -> CommandConcurrencyLimiter[t.Any]:
     CommandConcurrencyLimiter[t.Any]
         A concurrency limiter for use with a command.
 
-    Examples
+    Example
     --------
     ```py
     @arc.with_concurrency_limit(arc.global_concurrency(1))
@@ -278,7 +278,7 @@ def guild_concurrency(limit: int) -> CommandConcurrencyLimiter[t.Any]:
     CommandConcurrencyLimiter[t.Any]
         A concurrency limiter for use with a command.
 
-    Examples
+    Example
     --------
     ```py
     @arc.with_concurrency_limit(arc.guild_concurrency(1))
@@ -300,7 +300,7 @@ def channel_concurrency(limit: int) -> CommandConcurrencyLimiter[t.Any]:
     CommandConcurrencyLimiter[t.Any]
         A concurrency limiter for use with a command.
 
-    Examples
+    Example
     --------
     ```py
     @arc.with_concurrency_limit(arc.channel_concurrency(1))
@@ -322,7 +322,7 @@ def user_concurrency(limit: int) -> CommandConcurrencyLimiter[t.Any]:
     CommandConcurrencyLimiter[t.Any]
         A concurrency limiter for use with a command.
 
-    Examples
+    Example
     --------
     ```py
     @arc.with_concurrency_limit(arc.user_concurrency(1))
@@ -344,7 +344,7 @@ def member_concurrency(limit: int) -> CommandConcurrencyLimiter[t.Any]:
     CommandConcurrencyLimiter[t.Any]
         A concurrency limiter for use with a command.
 
-    Examples
+    Example
     --------
     ```py
     @arc.with_concurrency_limit(arc.member_concurrency(1))
@@ -370,7 +370,7 @@ def custom_concurrency(
     CommandConcurrencyLimiter[t.Any]
         A concurrency limiter for use with a command.
 
-    Examples
+    Example
     --------
     ```py
     # This is identical to 'arc.guild_concurrency(1)'

@@ -777,7 +777,7 @@ def slash_command(
     !!! note
         Parameters left as `hikari.UNDEFINED` will be inherited from the parent plugin or client.
 
-    Examples
+    Example
     --------
     ```py
     @client.include
@@ -843,7 +843,7 @@ def slash_subcommand(
     !!! note
         Parameters left as `hikari.UNDEFINED` will be inherited from the parent group, plugin or client.
 
-    Examples
+    Example
     --------
     ```py
     group = client.include_slash_group("group", "A group of slash commands.")

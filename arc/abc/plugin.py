@@ -295,7 +295,7 @@ class PluginBase(HasErrorHandler[ClientT], Hookable[ClientT], HasConcurrencyLimi
         !!! note
             Parameters left as `hikari.UNDEFINED` will be inherited from the parent plugin or client.
 
-        Examples
+        Example
         --------
         ```py
         group = client.include_slash_group("Group", "A group of commands.")
@@ -340,7 +340,7 @@ class PluginBase(HasErrorHandler[ClientT], Hookable[ClientT], HasConcurrencyLimi
             Command callbacks are automatically injected with dependencies,
             thus this decorator is not needed for them.
 
-        Examples
+        Example
         --------
         ```py
         class MyDependency:
@@ -439,7 +439,7 @@ class PluginBase(HasErrorHandler[ClientT], Hookable[ClientT], HasConcurrencyLimi
         CommandT[ClientT]
             The next command that matches the given criteria.
 
-        Examples
+        Example
         --------
         ```py
         for cmd in plugin.walk_commands(hikari.CommandType.SLASH):

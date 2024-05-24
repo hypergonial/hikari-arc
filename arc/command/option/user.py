@@ -23,9 +23,6 @@ class UserParams(OptionParams[hikari.User]):
     ----------
     description : str
         The description of the option
-
-    Other Parameters
-    ----------------
     name : str
         The name of the option. If not provided, the name of the parameter will be used.
     name_localizations : Mapping[hikari.Locale, str] | None

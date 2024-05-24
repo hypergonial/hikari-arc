@@ -39,7 +39,7 @@ class HasErrorHandler(abc.ABC, t.Generic[ClientT]):
 
         This function will be called when an exception is raised during the invocation of a command.
 
-        Examples
+        Example
         --------
         ```py
         @client.include

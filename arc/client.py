@@ -344,7 +344,7 @@ class GatewayClient(GatewayClientBase[hikari.GatewayBotAware]):
         If you already have an injector instance, you may pass it here.
         Otherwise, a new one will be created by default.
 
-    Examples
+    Example
     --------
     ```py
     import hikari
@@ -390,7 +390,7 @@ class RESTClient(RESTClientBase[hikari.RESTBotAware]):
         Otherwise, a new one will be created by default.
 
 
-    Examples
+    Example
     --------
     ```py
     import hikari

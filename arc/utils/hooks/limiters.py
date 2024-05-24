@@ -82,7 +82,7 @@ def global_limiter(period: float, limit: int) -> LimiterHook[t.Any]:
     RateLimiterExhaustedError
         If the limiter is exhausted.
 
-    Examples
+    Example
     --------
     ```py
     @arc.with_hook(arc.global_limiter(5.0, 1))
@@ -108,7 +108,7 @@ def guild_limiter(period: float, limit: int) -> LimiterHook[t.Any]:
     RateLimiterExhaustedError
         If the limiter is exhausted.
 
-    Examples
+    Example
     --------
     ```py
     @arc.with_hook(arc.guild_limiter(5.0, 1))
@@ -134,7 +134,7 @@ def channel_limiter(period: float, limit: int) -> LimiterHook[t.Any]:
     RateLimiterExhaustedError
         If the limiter is exhausted.
 
-    Examples
+    Example
     --------
     ```py
     @arc.with_hook(arc.channel_limiter(5.0, 1))
@@ -160,7 +160,7 @@ def user_limiter(period: float, limit: int) -> LimiterHook[t.Any]:
     RateLimiterExhaustedError
         If the limiter is exhausted.
 
-    Examples
+    Example
     --------
     ```py
     @arc.with_hook(arc.user_limiter(5.0, 1))
@@ -187,7 +187,7 @@ def member_limiter(period: float, limit: int) -> LimiterHook[t.Any]:
     RateLimiterExhaustedError
         If the limiter is exhausted.
 
-    Examples
+    Example
     --------
     ```py
     @arc.with_hook(arc.member_limiter(5.0, 1))
@@ -215,7 +215,7 @@ def custom_limiter(period: float, limit: int, get_key_with: t.Callable[[Context[
     RateLimiterExhaustedError
         If the limiter is exhausted.
 
-    Examples
+    Example
     --------
     ```py
     # This is identical to 'arc.guild_limiter(5.0, 1)'

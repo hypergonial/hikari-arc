@@ -20,7 +20,7 @@ if t.TYPE_CHECKING:
 def guild_only(ctx: Context[t.Any]) -> HookResult:
     """A pre-execution hook that aborts the execution of a command if it is invoked outside of a guild.
 
-    Examples
+    Example
     --------
     ```py
     @arc.with_hook(arc.guild_only)
@@ -39,7 +39,7 @@ def guild_only(ctx: Context[t.Any]) -> HookResult:
 def dm_only(ctx: Context[t.Any]) -> HookResult:
     """A pre-execution hook that aborts the execution of a command if it is invoked outside of a DM.
 
-    Examples
+    Example
     --------
     ```py
     @arc.with_hook(arc.dm_only)
@@ -58,7 +58,7 @@ def dm_only(ctx: Context[t.Any]) -> HookResult:
 def owner_only(ctx: Context[t.Any]) -> HookResult:
     """A pre-execution hook that aborts the execution of a command if it is invoked by a non-owner.
 
-    Examples
+    Example
     --------
     ```py
     @arc.with_hook(arc.owner_only)
@@ -105,7 +105,7 @@ def has_permissions(perms: hikari.Permissions) -> t.Callable[[Context[t.Any]], H
     InvokerMissingPermissionsError
         If the invoker is missing some of the specified permissions.
 
-    Examples
+    Example
     --------
     ```py
     @arc.with_hook(arc.has_permissions(hikari.Permissions.MANAGE_CHANNELS | hikari.Permissions.MANAGE_GUILD))
@@ -149,7 +149,7 @@ def bot_has_permissions(perms: hikari.Permissions) -> t.Callable[[Context[t.Any]
     BotMissingPermissionsError
         If the bot is missing some of the specified permissions.
 
-    Examples
+    Example
     --------
     ```py
     @arc.with_hook(arc.bot_has_permissions(hikari.Permissions.MANAGE_CHANNELS | hikari.Permissions.MANAGE_GUILD))

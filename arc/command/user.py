@@ -99,7 +99,7 @@ def user_command(
     name_localizations : t.Mapping[hikari.Locale, str] | None
         The localizations for this command's name.
 
-    Examples
+    Example
     --------
     ```py
     @client.include

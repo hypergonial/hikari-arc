@@ -86,7 +86,7 @@ def with_concurrency_limit(
     t.Callable[[HasConcurrencyLimiterT], HasConcurrencyLimiterT]
         The object with the concurrency limiter set.
 
-    Examples
+    Example
     --------
     ```py
     @client.include

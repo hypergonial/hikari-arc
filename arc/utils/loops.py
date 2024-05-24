@@ -152,7 +152,7 @@ class IntervalLoop(_LoopBase[P]):
     TypeError
         If the passed function is not a coroutine function.
 
-    Examples
+    Example
     --------
     ```py
     loop = IntervalLoop(my_coro, seconds=5)
@@ -213,7 +213,7 @@ class IntervalLoop(_LoopBase[P]):
         days : float | None, optional
             The number of days to wait before running the coroutine again.
 
-        Examples
+        Example
         --------
         ```py
         loop = IntervalLoop(my_coro, seconds=5)
@@ -262,7 +262,7 @@ class CronLoop(_LoopBase[P]):
     TypeError
         If the passed function is not a coroutine function.
 
-    Examples
+    Example
     --------
     ```py
     loop = CronLoop(my_coro, "*/5 * * * *")
@@ -335,7 +335,7 @@ def interval_loop(
     TypeError
         If the decorated function is not a coroutine function.
 
-    Examples
+    Example
     --------
     ```py
     import arc
@@ -390,7 +390,7 @@ def cron_loop(
     TypeError
         If the decorated function is not a coroutine function.
 
-    Examples
+    Example
     --------
     ```py
     import arc

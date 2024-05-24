@@ -97,7 +97,7 @@ def with_hook(hook: HookT[ClientT]) -> t.Callable[[HookableT], HookableT]:
     and returns either a [`HookResult`][arc.abc.hookable.HookResult] or
     `None` can be used as a hook.
 
-    Examples
+    Example
     --------
     ```py
     @client.include
@@ -127,7 +127,7 @@ def with_post_hook(hook: PostHookT[ClientT]) -> t.Callable[[HookableT], Hookable
         Post-execution hooks **are** called even if the command callback raises an exception.
         You can see if the command callback failed by checking [`Context.has_command_failed`][arc.context.base.Context.has_command_failed].
 
-    Examples
+    Example
     --------
     ```py
     @client.include

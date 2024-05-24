@@ -483,7 +483,7 @@ class Client(t.Generic[AppT], abc.ABC):
         CommandT[te.Self]
             The next command that matches the given criteria.
 
-        Examples
+        Example
         --------
         ```py
         for cmd in plugin.walk_commands(hikari.CommandType.SLASH):
@@ -561,7 +561,7 @@ class Client(t.Generic[AppT], abc.ABC):
         RuntimeError
             If the command is already added to a plugin.
 
-        Examples
+        Example
         --------
         ```py
         @client.include # Add the command to the client.
@@ -637,7 +637,7 @@ class Client(t.Generic[AppT], abc.ABC):
         !!! note
             Parameters left as `hikari.UNDEFINED` will be inherited from the parent client.
 
-        Examples
+        Example
         --------
         ```py
         group = client.include_slash_group("Group", "A group of commands.")
@@ -891,7 +891,7 @@ class Client(t.Generic[AppT], abc.ABC):
         te.Self
             The client for chaining calls.
 
-        Examples
+        Example
         --------
         ```py
         @client.set_error_handler
@@ -942,7 +942,7 @@ class Client(t.Generic[AppT], abc.ABC):
         te.Self
             The client for chaining calls.
 
-        Examples
+        Example
         --------
         ```py
         @client.add_startup_hook
@@ -989,7 +989,7 @@ class Client(t.Generic[AppT], abc.ABC):
         te.Self
             The client for chaining calls.
 
-        Examples
+        Example
         --------
         ```py
         @client.add_shutdown_hook
@@ -1040,7 +1040,7 @@ class Client(t.Generic[AppT], abc.ABC):
         te.Self
             The client for chaining calls.
 
-        Examples
+        Example
         --------
         ```py
         @client.set_startup_hook
@@ -1092,7 +1092,7 @@ class Client(t.Generic[AppT], abc.ABC):
         te.Self
             The client for chaining calls.
 
-        Examples
+        Example
         --------
         ```py
         @client.set_shutdown_hook
@@ -1140,7 +1140,7 @@ class Client(t.Generic[AppT], abc.ABC):
         te.Self
             The client for chaining calls.
 
-        Examples
+        Example
         --------
         ```py
         @client.set_command_locale_provider
@@ -1187,7 +1187,7 @@ class Client(t.Generic[AppT], abc.ABC):
         te.Self
             The client for chaining calls.
 
-        Examples
+        Example
         --------
         ```py
         @client.set_option_locale_provider
@@ -1229,7 +1229,7 @@ class Client(t.Generic[AppT], abc.ABC):
         provider : CustomLocaleRequestT
             The custom locale provider to set.
 
-        Examples
+        Example
         --------
         ```py
         @client.set_custom_locale_provider
@@ -1272,7 +1272,7 @@ class Client(t.Generic[AppT], abc.ABC):
         ValueError
             If the module does not have a loader.
 
-        Examples
+        Example
         --------
         ```py
         client = arc.GatewayClient(...)
@@ -1337,7 +1337,7 @@ class Client(t.Generic[AppT], abc.ABC):
         ExtensionLoadError
             If a module does not have a loader defined.
 
-        Examples
+        Example
         --------
         ```py
         client = arc.GatewayClient(...)
@@ -1438,7 +1438,7 @@ class Client(t.Generic[AppT], abc.ABC):
         te.Self
             The client for chaining calls.
 
-        Examples
+        Example
         --------
         ```py
         class MyDependency:
@@ -1513,7 +1513,7 @@ class Client(t.Generic[AppT], abc.ABC):
             Command callbacks are automatically injected with dependencies,
             thus this decorator is not needed for them.
 
-        Examples
+        Example
         --------
         ```py
         class MyDependency:
