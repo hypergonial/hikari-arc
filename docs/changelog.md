@@ -9,6 +9,10 @@ hide:
 
 Here you can find all the changelogs for `hikari-arc`.
 
+## v1.3.3
+
+- Fix hooks defined as async callable classes not working. (For instance, limiters)
+
 ## v1.3.2
 
 - Add `IntervalLoop.set_interval()` to change the loop interval after loop creation.
