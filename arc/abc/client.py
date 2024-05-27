@@ -333,10 +333,10 @@ class Client(t.Generic[AppT], abc.ABC):
         inj_ctx = alluka.OverridingContext.from_client(self.injector)
 
         for hook in self._injection_hooks:
-            if inspect.isawaitable(hook):
-                await hook(ctx, inj_ctx)  # type: ignore
-            else:
-                hook(ctx, inj_ctx)
+            res = hook(ctx, inj_ctx)
+
+            if inspect.isawaitable(res):
+                await res
         return inj_ctx
 
     def _provide_command_locale(self, request: CommandLocaleRequest) -> LocaleResponse:
