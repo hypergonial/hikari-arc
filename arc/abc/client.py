@@ -333,8 +333,8 @@ class Client(t.Generic[AppT], abc.ABC):
         inj_ctx = alluka.OverridingContext.from_client(self.injector)
 
         for hook in self._injection_hooks:
-            if inspect.iscoroutinefunction(hook):
-                await hook(ctx, inj_ctx)
+            if inspect.isawaitable(hook):
+                await hook(ctx, inj_ctx)  # type: ignore
             else:
                 hook(ctx, inj_ctx)
         return inj_ctx

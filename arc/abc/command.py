@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import abc
 import asyncio
-import inspect
 import typing as t
 
 import attr
@@ -549,10 +548,7 @@ class CommandBase(
         try:
             hooks = command._resolve_hooks()
             for hook in hooks:
-                if inspect.iscoroutinefunction(hook):
-                    res = await ctx._injection_ctx.call_with_async_di(hook, ctx)
-                else:
-                    res = ctx._injection_ctx.call_with_di(hook, ctx)
+                res = await ctx._injection_ctx.call_with_async_di(hook, ctx)
 
                 res = t.cast(HookResult | None, res)
 
@@ -569,10 +565,7 @@ class CommandBase(
         try:
             post_hooks = command._resolve_post_hooks()
             for hook in post_hooks:
-                if inspect.iscoroutinefunction(hook):
-                    await ctx._injection_ctx.call_with_async_di(hook, ctx)
-                else:
-                    ctx._injection_ctx.call_with_di(hook, ctx)
+                await ctx._injection_ctx.call_with_async_di(hook, ctx)
         except Exception as e:
             await command._handle_exception(ctx, e)
         finally:
