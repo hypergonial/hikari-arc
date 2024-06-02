@@ -5,6 +5,7 @@ import typing as t
 import hikari
 
 from arc.abc.hookable import HookResult
+from arc.context import Context  # noqa: TCH001 Needed for DI to work
 from arc.errors import (
     BotMissingPermissionsError,
     DMOnlyError,
@@ -12,9 +13,6 @@ from arc.errors import (
     InvokerMissingPermissionsError,
     NotOwnerError,
 )
-
-if t.TYPE_CHECKING:
-    from arc.context import Context
 
 
 def guild_only(ctx: Context[t.Any]) -> HookResult:
