@@ -9,6 +9,10 @@ hide:
 
 Here you can find all the changelogs for `hikari-arc`.
 
+## v1.3.4
+
+- Fix included basic hooks not working due to signature parsing.
+
 ## v1.3.3
 
 - Fix hooks defined as async callable classes not working. (For instance, limiters)
