@@ -61,38 +61,39 @@ def build_member(
 def build_inter(
     app: hikari.GatewayBot,
     *,
-    command_name: str = "ping",
+    cmd_name: str,
     options: list[hikari.CommandInteractionOption] | None = None,
     resolved: hikari.ResolvedOptionData | None = None,
     author_id: hikari.Snowflakeish = 123456789,
     author_role_ids: list[hikari.Snowflake] | None = None,
     author_perms: hikari.Permissions | None = None,
 ) -> hikari.CommandInteraction:
-    parts = command_name.split(" ")
+    parts = cmd_name.split(" ")
 
-    if len(parts) == 1:
-        opts = options
-    elif len(parts) == 2:
-        opts = [
-            hikari.CommandInteractionOption(
-                name=parts[1], type=hikari.OptionType.SUB_COMMAND, value=None, options=options
-            )
-        ]
-    elif len(parts) == 3:
-        opts = [
-            hikari.CommandInteractionOption(
-                name=parts[1],
-                type=hikari.OptionType.SUB_COMMAND_GROUP,
-                value=None,
-                options=[
-                    hikari.CommandInteractionOption(
-                        name=parts[2], type=hikari.OptionType.SUB_COMMAND, value=None, options=options
-                    )
-                ],
-            )
-        ]
-    else:
-        raise ValueError("Invalid command name")
+    match len(parts):
+        case 1:
+            pass
+        case 2:
+            options = [
+                hikari.CommandInteractionOption(
+                    name=parts[1], type=hikari.OptionType.SUB_COMMAND, value=None, options=options
+                )
+            ]
+        case 3:
+            options = [
+                hikari.CommandInteractionOption(
+                    name=parts[1],
+                    type=hikari.OptionType.SUB_COMMAND_GROUP,
+                    value=None,
+                    options=[
+                        hikari.CommandInteractionOption(
+                            name=parts[2], type=hikari.OptionType.SUB_COMMAND, value=None, options=options
+                        )
+                    ],
+                )
+            ]
+        case _:
+            raise ValueError("Invalid command name")
 
     return hikari.CommandInteraction(
         app=app,
@@ -103,7 +104,7 @@ def build_inter(
         command_type=hikari.CommandType.SLASH,
         entitlements=[],
         app_permissions=hikari.Permissions.all_permissions(),
-        options=opts,
+        options=options,
         resolved=resolved,
         type=hikari.InteractionType.APPLICATION_COMMAND,
         token="padoru padoru",
@@ -157,6 +158,12 @@ async def ping_with_hook_err(ctx: MockContext) -> None:
 async def ping_with_hook_err_handler(ctx: MockContext, error: Exception) -> None:
     if isinstance(error, arc.NotOwnerError):
         await ctx.respond("❌ You are not the owner of the bot.")
+
+
+@client.include
+@arc.slash_command("sum")
+async def sum(ctx: MockContext, a: arc.Option[int, arc.IntParams()], b: arc.Option[int, arc.IntParams()]) -> None:
+    await ctx.respond(f"Sum: {a + b}")
 
 
 plugin = MockPlugin("test")
@@ -218,14 +225,29 @@ async def plugin_error_handler(ctx: MockContext, error: Exception) -> None:
 
 @pytest.mark.asyncio
 async def test_ping(app: hikari.GatewayBot) -> None:
-    response = await client.push_inter(build_inter(app, command_name="ping"))
+    response = await client.push_inter(build_inter(app, cmd_name="ping"))
     assert isinstance(response, hikari.impl.InteractionMessageBuilder)
     assert response.content == "Pong!"
 
 
 @pytest.mark.asyncio
+async def test_sum(app: hikari.GatewayBot) -> None:
+    inter = build_inter(
+        app,
+        cmd_name="sum",
+        options=[
+            hikari.CommandInteractionOption(name="a", type=hikari.OptionType.INTEGER, value=3, options=None),
+            hikari.CommandInteractionOption(name="b", type=hikari.OptionType.INTEGER, value=2, options=None),
+        ],
+    )
+    response = await client.push_inter(inter)
+    assert isinstance(response, hikari.impl.InteractionMessageBuilder)
+    assert response.content == "Sum: 5"
+
+
+@pytest.mark.asyncio
 async def test_admin_ping(app: hikari.GatewayBot) -> None:
-    inter = build_inter(app, command_name="admin_ping")
+    inter = build_inter(app, cmd_name="admin_ping")
     response = await client.push_inter(inter)
     assert isinstance(response, hikari.impl.InteractionMessageBuilder)
     assert response.content == "Pong!"
@@ -233,7 +255,7 @@ async def test_admin_ping(app: hikari.GatewayBot) -> None:
 
 @pytest.mark.asyncio
 async def test_admin_ping_unprivileged(app: hikari.GatewayBot) -> None:
-    inter = build_inter(app, author_id=987654321, command_name="admin_ping")
+    inter = build_inter(app, author_id=987654321, cmd_name="admin_ping")
     response = await client.push_inter(inter)
     assert isinstance(response, hikari.impl.InteractionMessageBuilder)
     # Unhandled error
@@ -242,7 +264,7 @@ async def test_admin_ping_unprivileged(app: hikari.GatewayBot) -> None:
 
 @pytest.mark.asyncio
 async def test_admin_ping_errhandler(app: hikari.GatewayBot) -> None:
-    inter = build_inter(app, author_id=987654321, command_name="admin_ping_err")
+    inter = build_inter(app, author_id=987654321, cmd_name="admin_ping_err")
     response = await client.push_inter(inter)
     assert isinstance(response, hikari.impl.InteractionMessageBuilder)
     # Handled error
@@ -251,7 +273,7 @@ async def test_admin_ping_errhandler(app: hikari.GatewayBot) -> None:
 
 @pytest.mark.asyncio
 async def test_nested_errhandler_ok(app: hikari.GatewayBot) -> None:
-    inter = build_inter(app, author_id=0, command_name="group subgroup nested")
+    inter = build_inter(app, author_id=0, cmd_name="group subgroup nested")
     response = await client.push_inter(inter)
     assert isinstance(response, hikari.impl.InteractionMessageBuilder)
     assert response.content == "Nested command!"
@@ -259,7 +281,7 @@ async def test_nested_errhandler_ok(app: hikari.GatewayBot) -> None:
 
 @pytest.mark.asyncio
 async def test_nested_errhandler_cmdhandler(app: hikari.GatewayBot) -> None:
-    inter = build_inter(app, author_id=1, command_name="group subgroup nested")
+    inter = build_inter(app, author_id=1, cmd_name="group subgroup nested")
     response = await client.push_inter(inter)
     assert isinstance(response, hikari.impl.InteractionMessageBuilder)
     assert response.content == "Command handled error"
@@ -267,7 +289,7 @@ async def test_nested_errhandler_cmdhandler(app: hikari.GatewayBot) -> None:
 
 @pytest.mark.asyncio
 async def test_nested_errhandler_subghandler(app: hikari.GatewayBot) -> None:
-    inter = build_inter(app, author_id=2, command_name="group subgroup nested")
+    inter = build_inter(app, author_id=2, cmd_name="group subgroup nested")
     response = await client.push_inter(inter)
     assert isinstance(response, hikari.impl.InteractionMessageBuilder)
     assert response.content == "Subgroup handled error"
@@ -275,7 +297,7 @@ async def test_nested_errhandler_subghandler(app: hikari.GatewayBot) -> None:
 
 @pytest.mark.asyncio
 async def test_nested_errhandler_grphandler(app: hikari.GatewayBot) -> None:
-    inter = build_inter(app, author_id=3, command_name="group subgroup nested")
+    inter = build_inter(app, author_id=3, cmd_name="group subgroup nested")
     response = await client.push_inter(inter)
     assert isinstance(response, hikari.impl.InteractionMessageBuilder)
     assert response.content == "Group handled error"
@@ -283,7 +305,7 @@ async def test_nested_errhandler_grphandler(app: hikari.GatewayBot) -> None:
 
 @pytest.mark.asyncio
 async def test_nested_errhandler_plghandler(app: hikari.GatewayBot) -> None:
-    inter = build_inter(app, author_id=4, command_name="group subgroup nested")
+    inter = build_inter(app, author_id=4, cmd_name="group subgroup nested")
     response = await client.push_inter(inter)
     assert isinstance(response, hikari.impl.InteractionMessageBuilder)
     assert response.content == "Plugin handled error"
@@ -291,7 +313,7 @@ async def test_nested_errhandler_plghandler(app: hikari.GatewayBot) -> None:
 
 @pytest.mark.asyncio
 async def test_nested_errhandler_unhandled(app: hikari.GatewayBot) -> None:
-    inter = build_inter(app, author_id=5, command_name="group subgroup nested")
+    inter = build_inter(app, author_id=5, cmd_name="group subgroup nested")
     response = await client.push_inter(inter)
     assert isinstance(response, hikari.impl.InteractionMessageBuilder)
     assert response.content == "❌ Something went wrong. Please contact the bot developer."
