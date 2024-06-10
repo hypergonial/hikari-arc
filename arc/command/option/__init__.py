@@ -1,7 +1,16 @@
 from .attachment import AttachmentOption, AttachmentParams
 from .bool import BoolOption, BoolParams
 from .channel import ChannelOption, ChannelParams
-from .custom import ColorOption, ColorParams, ColourOption, ColourParams, MemberOption, MemberParams
+from .custom import (
+    ColorOption,
+    ColorParams,
+    ColourOption,
+    ColourParams,
+    EmojiOption,
+    EmojiParams,
+    MemberOption,
+    MemberParams,
+)
 from .float import FloatOption, FloatParams
 from .int import IntOption, IntParams
 from .mentionable import MentionableOption, MentionableParams
@@ -34,6 +43,8 @@ __all__ = (
     "ColorParams",
     "ColourOption",
     "ColourParams",
+    "EmojiOption",
+    "EmojiParams",
 )
 
 # MIT License

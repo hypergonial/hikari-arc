@@ -23,6 +23,7 @@ OPTIONTYPE_TO_TYPE: dict[OptionType, type[t.Any]] = {
     OptionType.ATTACHMENT: hikari.Attachment,
     OptionType.COLOR: hikari.Color,
     OptionType.MEMBER: hikari.Member,
+    OptionType.EMOJI: hikari.Emoji,
 }
 """Used for runtime type checking in Context.get_option, not much else at the moment."""
 

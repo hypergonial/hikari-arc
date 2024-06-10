@@ -102,6 +102,9 @@ class OptionType(enum.IntEnum):
     COLOR = 10002
     """Denotes a command option where the value will be a color."""
 
+    EMOJI = 10003
+    """Denotes a command option where the value will be an emoji."""
+
     @classmethod
     def from_hikari(cls, option_type: hikari.OptionType) -> OptionType:
         """Convert a hikari.OptionType to an OptionType."""

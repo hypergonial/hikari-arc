@@ -9,6 +9,10 @@ hide:
 
 Here you can find all the changelogs for `hikari-arc`.
 
+## 1.4.0
+
+- Add new optiontype with converter for `hikari.Emoji`.
+
 ## v1.3.4
 
 - Fix included basic hooks not working due to signature parsing.

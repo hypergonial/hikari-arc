@@ -419,6 +419,9 @@ class Context(t.Generic[ClientT]):
         return self._interaction.get_channel()
 
     @t.overload
+    def get_option(self, name: str, opt_type: t.Literal[OptionType.EMOJI]) -> hikari.Emoji | None: ...
+
+    @t.overload
     def get_option(self, name: str, opt_type: t.Literal[OptionType.COLOR]) -> hikari.Color | None: ...
 
     @t.overload

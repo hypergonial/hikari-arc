@@ -17,6 +17,8 @@ from arc.command.option import (
     ChannelParams,
     ColorOption,
     ColorParams,
+    EmojiOption,
+    EmojiParams,
     FloatOption,
     FloatParams,
     IntOption,
@@ -53,6 +55,7 @@ TYPE_TO_OPTION_MAPPING: dict[type[t.Any], type[CommandOptionBase[t.Any, t.Any, t
     hikari.Member: MemberOption,
     hikari.InteractionMember: MemberOption,
     hikari.Color: ColorOption,
+    hikari.Emoji: EmojiOption,
     hikari.User: UserOption,
 }
 
@@ -68,6 +71,7 @@ OPT_TO_PARAMS_MAPPING: dict[type[CommandOptionBase[t.Any, t.Any, t.Any]], type[t
     AttachmentOption: AttachmentParams,
     MemberOption: MemberParams,
     ColorOption: ColorParams,
+    EmojiOption: EmojiParams,
 }
 
 BASE_CHANNEL_TYPE_MAP: dict[type[hikari.PartialChannel], hikari.ChannelType] = {

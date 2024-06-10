@@ -58,6 +58,24 @@ def build_member(
     )
 
 
+def build_resolved(
+    members: dict[hikari.Snowflake, hikari.InteractionMember] | None = None,
+    roles: dict[hikari.Snowflake, hikari.Role] | None = None,
+    channels: dict[hikari.Snowflake, hikari.InteractionChannel] | None = None,
+    users: dict[hikari.Snowflake, hikari.User] | None = None,
+    attachments: dict[hikari.Snowflake, hikari.Attachment] | None = None,
+    messages: dict[hikari.Snowflake, hikari.Message] | None = None,
+) -> hikari.ResolvedOptionData:
+    return hikari.ResolvedOptionData(
+        members=members or {},
+        roles=roles or {},
+        channels=channels or {},
+        users=users or {},
+        attachments=attachments or {},
+        messages=messages or {},
+    )
+
+
 def build_inter(
     app: hikari.GatewayBot,
     *,
@@ -223,6 +241,20 @@ async def plugin_error_handler(ctx: MockContext, error: Exception) -> None:
     raise error
 
 
+@client.include
+@arc.slash_command("converters")
+async def converters(
+    ctx: MockContext,
+    user: arc.Option[hikari.Member, arc.MemberParams()],
+    color: arc.Option[hikari.Color, arc.ColorParams()],
+    emoji: arc.Option[hikari.Emoji, arc.EmojiParams()],
+) -> None:
+    assert isinstance(user, hikari.InteractionMember)
+    assert isinstance(color, hikari.Color)
+    assert isinstance(emoji, hikari.Emoji)
+    await ctx.respond("All is well!")
+
+
 @pytest.mark.asyncio
 async def test_ping(app: hikari.GatewayBot) -> None:
     response = await client.push_inter(build_inter(app, cmd_name="ping"))
@@ -317,3 +349,26 @@ async def test_nested_errhandler_unhandled(app: hikari.GatewayBot) -> None:
     response = await client.push_inter(inter)
     assert isinstance(response, hikari.impl.InteractionMessageBuilder)
     assert response.content == "❌ Something went wrong. Please contact the bot developer."
+
+
+@pytest.mark.asyncio
+async def test_converters(app: hikari.GatewayBot) -> None:
+    inter = build_inter(
+        app,
+        cmd_name="converters",
+        resolved=build_resolved(members={hikari.Snowflake(123456789): build_member(app, 123456789)}),
+        options=[
+            hikari.CommandInteractionOption(
+                name="user", type=hikari.OptionType.USER, value=hikari.Snowflake(123456789), options=None
+            ),
+            hikari.CommandInteractionOption(
+                name="color", type=hikari.OptionType.STRING, value="123 123 123", options=None
+            ),
+            hikari.CommandInteractionOption(
+                name="emoji", type=hikari.OptionType.STRING, value="<:padoru:123456789>", options=None
+            ),
+        ],
+    )
+    response = await client.push_inter(inter)
+    assert isinstance(response, hikari.impl.InteractionMessageBuilder)
+    assert response.content == "All is well!"
