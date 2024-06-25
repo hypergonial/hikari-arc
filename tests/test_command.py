@@ -118,6 +118,7 @@ def build_inter(
         id=hikari.Snowflake(123456789),
         application_id=hikari.Snowflake(123456789),
         command_id=hikari.Snowflake(123456789),
+        registered_guild_id=hikari.Snowflake(123456789),
         command_name=parts[0],
         command_type=hikari.CommandType.SLASH,
         entitlements=[],
