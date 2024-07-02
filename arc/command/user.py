@@ -48,7 +48,7 @@ class UserCommand(CallableCommandBase[ClientT, hikari.api.ContextMenuCommandBuil
             default_member_permissions=self.default_permissions,
             is_dm_enabled=self.is_dm_enabled,
             is_nsfw=self.is_nsfw,
-            name_localizations=self.name_localizations,  # pyright: ignore reportGeneralTypeIssues
+            name_localizations={str(key): value for key, value in self.name_localizations.items()},
         )
 
     async def invoke(

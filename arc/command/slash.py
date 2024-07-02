@@ -110,8 +110,8 @@ class SlashCommand(CallableCommandBase[ClientT, hikari.api.SlashCommandBuilder])
             default_member_permissions=self.default_permissions,
             is_dm_enabled=self.is_dm_enabled,
             is_nsfw=self.is_nsfw,
-            name_localizations=self.name_localizations,  # pyright: ignore reportGeneralTypeIssues
-            description_localizations=self.description_localizations,  # pyright: ignore reportGeneralTypeIssues
+            name_localizations={str(key): value for key, value in self.name_localizations.items()},
+            description_localizations={str(key): value for key, value in self.description_localizations.items()},
         )
 
     async def invoke(
@@ -265,8 +265,8 @@ class SlashGroup(CommandBase[ClientT, hikari.api.SlashCommandBuilder]):
             default_member_permissions=self.default_permissions,
             is_dm_enabled=self.is_dm_enabled,
             is_nsfw=self.is_nsfw,
-            name_localizations=self.name_localizations,  # pyright: ignore reportGeneralTypeIssues
-            description_localizations=self.description_localizations,  # pyright: ignore reportGeneralTypeIssues
+            name_localizations={str(key): value for key, value in self.name_localizations.items()},
+            description_localizations={str(key): value for key, value in self.description_localizations.items()},
         )
 
     async def _invoke_subcmd(

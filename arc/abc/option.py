@@ -251,8 +251,8 @@ class OptionBase(abc.ABC, t.Generic[T]):
             "name": self.name,
             "description": self.description,
             "autocomplete": False,
-            "name_localizations": self.name_localizations,
-            "description_localizations": self.description_localizations,
+            "name_localizations": {str(key): value for key, value in self.name_localizations.items()},
+            "description_localizations": {str(key): value for key, value in self.description_localizations.items()},
         }
 
     def to_command_option(self) -> hikari.CommandOption:
