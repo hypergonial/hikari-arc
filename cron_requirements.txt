@@ -1,2 +1,2 @@
-croniter==2.0.5
+croniter==2.0.7
 types-croniter==2.0.0.20240423
