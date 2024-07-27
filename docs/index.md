@@ -9,6 +9,12 @@ hide:
 # Home
 
 <figure markdown>
+  ![The arc logo](./assets/branding/composed-darkmode.svg#only-dark){ width="80%" .no-lightbox }
+  ![The arc logo](./assets/branding/composed-lightmode.svg#only-light){ width="80%" .no-lightbox }
+  <figcaption></figcaption>
+</figure>
+
+<figure markdown>
   ![App Commands](./assets/app_commands.webp){ .no-lightbox }
   <figcaption></figcaption>
 </figure>

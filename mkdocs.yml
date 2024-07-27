@@ -8,8 +8,8 @@ theme:
   name: material
   font:
     code: JetBrains Mono
+  logo: assets/branding/logo-darkmode.svg
   icon:
-    logo: material/lightning-bolt
     repo: fontawesome/brands/github
     edit: material/pencil
     view: material/eye
