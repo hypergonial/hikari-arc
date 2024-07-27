@@ -6,11 +6,18 @@ hide:
   - toc
 ---
 
+<style>
+  .md-typeset h1,
+  .md-content__button {
+    display: none;
+  }
+</style>
+
 # Home
 
 <figure markdown>
-  ![The arc logo](./assets/branding/composed-darkmode.svg#only-dark){ width="80%" .no-lightbox }
-  ![The arc logo](./assets/branding/composed-lightmode.svg#only-light){ width="80%" .no-lightbox }
+  ![The arc logo](./assets/branding/composed-darkmode.svg#only-dark){ width="90%" .no-lightbox }
+  ![The arc logo](./assets/branding/composed-lightmode.svg#only-light){ width="90%" .no-lightbox }
   <figcaption></figcaption>
 </figure>
 
