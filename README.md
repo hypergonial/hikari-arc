@@ -2,7 +2,7 @@
     <picture>
         <source media="(prefers-color-scheme: dark)" srcset="./docs/assets/branding/composed-darkmode.svg">
         <source media="(prefers-color-scheme: light)" srcset="./docs/assets/branding/composed-lightmode.svg">
-        <img alt="The arc logo" src="./docs/assets/branding/composed-lightmode.svg" style="max-width: 10%;">
+        <img alt="The arc logo" src="./docs/assets/branding/composed-lightmode.svg" width="30%">
     </picture>
 </div>
 
