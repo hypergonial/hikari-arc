@@ -1,4 +1,12 @@
-# hikari-arc
+<div align="center">
+    <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="./docs/assets/branding/composed-darkmode.svg">
+        <source media="(prefers-color-scheme: light)" srcset="./docs/assets/branding/composed-lightmode.svg">
+        <img alt="The arc logo" src="./docs/assets/branding/composed-lightmode.svg" width="30%">
+    </picture>
+</div>
+
+---
 
 <div align="center">
 
@@ -70,6 +78,8 @@ See [Contributing](./CONTRIBUTING.md).
 - [`Tanjun`](https://github.com/FasterSpeeding/Tanjun) - For the idea of using `typing.Annotated` and [dependency injection](https://arc.hypergonial.com/guides/dependency_injection/) in a command handler. `arc` also uses the same dependency injection library, [`Alluka`](https://github.com/FasterSpeeding/Alluka), under the hood.
 - [`hikari-crescent`](https://github.com/hikari-crescent/hikari-crescent) The design of [hooks](https://arc.hypergonial.com/guides/hooks/) is largely inspired by `crescent`.
 - [`FastAPI`](https://github.com/tiangolo/fastapi) - Some design ideas and most of the [documentation](https://arc.hypergonial.com/) [configuration](https://github.com/hypergonial/hikari-arc/blob/main/mkdocs.yml) derives from `FastAPI`.
+- The `arc` logo was made by [@PythonTryHard](https://github.com/PythonTryHard).
+
 
 ## Links
 
