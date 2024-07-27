@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 599.32 228.84">
+  <defs>
+    <style>
+      .cls-1, .cls-2, .cls-3 {
+        stroke-width: 20px;
+      }
+
+      .cls-1, .cls-3 {
+        fill: none;
+        stroke: #1e2129;
+        stroke-miterlimit: 10;
+      }
+
+      .cls-2 {
+        fill: #fff;
+        stroke: #009485;
+        stroke-linejoin: round;
+      }
+
+      .cls-2, .cls-3 {
+        stroke-linecap: round;
+      }
+    </style>
+  </defs>
+  <g id="Logo">
+    <path class="cls-2" d="M68.6,17.36L12.15,111.72c-5.98,10,1.22,22.7,12.87,22.7h23.55l-14.24,66.2c-3.57,16.59,18.83,25.42,27.54,10.85l56.45-94.35c5.98-10-1.22-22.7-12.87-22.7h-23.55l14.24-66.2c3.57-16.59-18.83-25.42-27.54-10.85Z"/>
+  </g>
+  <g id="arc">
+    <g id="a">
+      <ellipse class="cls-1" cx="273.24" cy="114.37" rx="60" ry="65"/>
+      <line class="cls-3" x1="333.24" y1="179.37" x2="333.24" y2="49.37"/>
+    </g>
+    <g id="r">
+      <line class="cls-3" x1="373.24" y1="179.37" x2="373.24" y2="49.37"/>
+      <path class="cls-3" d="M373.24,114.37c0-35.66,27.08-65,60-65,11.25,0,22.28,3.43,31.82,9.89"/>
+    </g>
+    <g id="c">
+      <path class="cls-3" d="M589.32,158.46c-11.35,13.32-27.35,20.91-44.09,20.91-32.92,0-60-29.34-60-65s27.08-65,60-65c16.74,0,32.74,7.59,44.09,20.91"/>
+    </g>
+  </g>
+</svg>

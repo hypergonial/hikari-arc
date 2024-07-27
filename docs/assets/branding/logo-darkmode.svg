@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 130.47 228.84">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #009485;
+        stroke: #fff;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 20px;
+      }
+    </style>
+  </defs>
+  <g id="Logo">
+    <path class="cls-1" d="M68.6,17.36L12.15,111.72c-5.98,10,1.22,22.7,12.87,22.7h23.55l-14.24,66.2c-3.57,16.59,18.83,25.42,27.54,10.85l56.45-94.35c5.98-10-1.22-22.7-12.87-22.7h-23.55l14.24-66.2c3.57-16.59-18.83-25.42-27.54-10.85Z"/>
+  </g>
+</svg>
