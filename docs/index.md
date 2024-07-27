@@ -35,11 +35,6 @@ Welcome to the documentation for `hikari-arc`, an extensible command handler bui
 
 </div>
 
-
-
-
-
-
 ## Helpful Resources
 
 - [**GitHub**](https://github.com/hypergonial/hikari-arc)
@@ -49,5 +44,7 @@ Welcome to the documentation for `hikari-arc`, an extensible command handler bui
 - [**Discord Developer Documentation**](https://discord.com/developers/docs/intro)
 
 ### Acknowledgements
+
+The `arc` logo was made by [@PythonTryHard](https://github.com/PythonTryHard).
 
 Some illustrations used in this documentation are from the [Discord Developer Documentation](https://discord.com/developers/docs/intro).
