@@ -107,8 +107,8 @@ class InteractionResponse:
 
     __slots__ = ("_context", "_message", "_delete_after_task")
 
-    def __init__(self, context: Context[ClientT], message: hikari.Message | None = None) -> None:
-        self._context: Context[ClientT] = context
+    def __init__(self, context: Context[t.Any], message: hikari.Message | None = None) -> None:
+        self._context: Context[t.Any] = context
         self._message: hikari.Message | None = message
         self._delete_after_task: asyncio.Task[None] | None = None
 
