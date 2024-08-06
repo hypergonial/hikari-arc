@@ -1354,7 +1354,7 @@ class Client(t.Generic[AppT], abc.ABC):
             dir_path = pathlib.Path(dir_path)
 
         try:
-            dir_path.resolve().relative_to(pathlib.Path.cwd())
+            dir_path.absolute().relative_to(pathlib.Path.cwd())
         except ValueError:
             raise ExtensionLoadError("dir_path must be relative to the current working directory.")
 
