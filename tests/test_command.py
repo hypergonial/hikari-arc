@@ -1,4 +1,5 @@
 import datetime
+import typing as t
 
 import hikari
 import pytest
@@ -55,6 +56,7 @@ def build_member(
         permissions=permissions or hikari.Permissions.NONE,
         premium_since=None,
         user=build_user(app, id),
+        guild_flags=hikari.GuildMemberFlags.NONE,
     )
 
 
@@ -80,7 +82,7 @@ def build_inter(
     app: hikari.GatewayBot,
     *,
     cmd_name: str,
-    options: list[hikari.CommandInteractionOption] | None = None,
+    options: t.Sequence[hikari.CommandInteractionOption] | None = None,
     resolved: hikari.ResolvedOptionData | None = None,
     author_id: hikari.Snowflakeish = 123456789,
     author_role_ids: list[hikari.Snowflake] | None = None,
@@ -123,7 +125,7 @@ def build_inter(
         command_type=hikari.CommandType.SLASH,
         entitlements=[],
         app_permissions=hikari.Permissions.all_permissions(),
-        options=options,
+        options=options or [],
         resolved=resolved,
         type=hikari.InteractionType.APPLICATION_COMMAND,
         token="padoru padoru",
@@ -132,7 +134,7 @@ def build_inter(
         guild_id=hikari.Snowflake(123456789),
         guild_locale="en-US",
         user=build_user(app, author_id),
-        member=build_member(app, author_id, role_ids=author_role_ids, permissions=author_perms),
+        member=build_member(app, author_id, role_ids=author_role_ids or [], permissions=author_perms),
         locale="en-US",
     )
 

@@ -13,6 +13,8 @@ Here you can find all the changelogs for `hikari-arc`.
 
 - Add new optiontype with converter for `hikari.Emoji`.
 - Work around `hikari` bug to solve command sync failing when a command has localizations.
+- Bump `hikari` to `v2.0.0`.
+- Add Python 3.13 support.
 
 ## v1.3.4
 

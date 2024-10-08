@@ -61,7 +61,7 @@ setup(
         "rest": parse_requirements_file("rest_requirements.txt"),
         "cron": parse_requirements_file("cron_requirements.txt"),
     },
-    python_requires=">=3.10.0,<3.13",
+    python_requires=">=3.10.0,<3.14",
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Framework :: AsyncIO",
@@ -71,6 +71,7 @@ setup(
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.13",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: 3 :: Only",
         "Topic :: Software Development :: Libraries",

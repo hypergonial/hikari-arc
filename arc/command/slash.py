@@ -291,7 +291,7 @@ class SlashGroup(CommandBase[ClientT, hikari.api.SlashCommandBuilder]):
     async def invoke(
         self, interaction: hikari.CommandInteraction, *args: t.Any, **kwargs: t.Any
     ) -> Future[ResponseBuilderT] | None:
-        if interaction.options is None:
+        if not interaction.options:
             raise CommandInvokeError("Cannot invoke slash group with empty options.")
 
         # Get first-order subcommand
