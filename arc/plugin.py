@@ -11,7 +11,7 @@ from arc.internal.types import EventCallbackT, EventT, GatewayClientT, RESTClien
 if t.TYPE_CHECKING:
     from arc.context.base import AutodeferMode
 
-__all__ = ("RESTPluginBase", "GatewayPluginBase")
+__all__ = ("GatewayPluginBase", "RESTPluginBase")
 
 P = t.ParamSpec("P")
 T = t.TypeVar("T")

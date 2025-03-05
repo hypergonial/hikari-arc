@@ -7,8 +7,8 @@ __all__ = (
     "ColorParams",
     "ColourOption",
     "ColourParams",
-    "MemberOption",
-    "MemberParams",
     "EmojiOption",
     "EmojiParams",
+    "MemberOption",
+    "MemberParams",
 )

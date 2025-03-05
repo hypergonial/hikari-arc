@@ -1,7 +1,7 @@
 from .autocomplete import AutocompleteData
 from .base import AutodeferMode, Context, InteractionResponse
 
-__all__ = ("Context", "InteractionResponse", "AutocompleteData", "AutodeferMode")
+__all__ = ("AutocompleteData", "AutodeferMode", "Context", "InteractionResponse")
 
 # MIT License
 #

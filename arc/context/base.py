@@ -11,7 +11,7 @@ import alluka
 import attr
 import hikari
 
-from arc.abc.option import OptionType  # noqa: TCH001 Needed for tests
+from arc.abc.option import OptionType  # noqa: TC001 Needed for tests
 from arc.errors import NoResponseIssuedError, ResponseAlreadyIssuedError
 from arc.internal.options import OPTIONTYPE_TO_TYPE, resolve_snowflake_value
 from arc.internal.types import ClientT, ResponseBuilderT
@@ -20,7 +20,7 @@ from arc.locale import CustomLocaleRequest
 if t.TYPE_CHECKING:
     from arc.abc.command import CallableCommandProto
 
-__all__ = ("Context", "InteractionResponse", "AutodeferMode")
+__all__ = ("AutodeferMode", "Context", "InteractionResponse")
 
 logger = logging.getLogger(__name__)
 
@@ -105,7 +105,7 @@ class InteractionResponse:
     when a message response is issued.
     """
 
-    __slots__ = ("_context", "_message", "_delete_after_task")
+    __slots__ = ("_context", "_delete_after_task", "_message")
 
     def __init__(self, context: Context[t.Any], message: hikari.Message | None = None) -> None:
         self._context: Context[t.Any] = context
@@ -247,18 +247,18 @@ class Context(t.Generic[ClientT]):
     """A context object that is proxying a Discord command interaction."""
 
     __slots__ = (
+        "_autodefer_task",
         "_client",
         "_command",
-        "_interaction",
-        "_responses",
-        "_resp_builder",
-        "_issued_response",
-        "_response_lock",
-        "_autodefer_task",
         "_created_at",
         "_has_command_failed",
-        "_options",
         "_injection_ctx",
+        "_interaction",
+        "_issued_response",
+        "_options",
+        "_resp_builder",
+        "_response_lock",
+        "_responses",
     )
 
     def __init__(

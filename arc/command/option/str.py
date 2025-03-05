@@ -44,7 +44,7 @@ class StrParams(OptionWithChoicesParams[str, ClientT]):
         The callback that is invoked when the user autocompletes the option
     """
 
-    __slots__: t.Sequence[str] = ("_min_length", "_max_length")
+    __slots__: t.Sequence[str] = ("_max_length", "_min_length")
 
     def __init__(
         self,

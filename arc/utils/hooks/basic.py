@@ -5,7 +5,7 @@ import typing as t
 import hikari
 
 from arc.abc.hookable import HookResult
-from arc.context import Context  # noqa: TCH001 Needed for DI to work
+from arc.context import Context  # noqa: TC001 Needed for DI to work
 from arc.errors import (
     BotMissingPermissionsError,
     DMOnlyError,
