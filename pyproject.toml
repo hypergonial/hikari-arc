@@ -26,7 +26,7 @@ requires-python = ">=3.10"
 dependencies = [
     "alluka>=0.3.3,<0.4",
     "attrs>=25.1.0",
-    "hikari @ git+https://github.com/hikari-py/hikari@c9fe5d134a4ed4183472cec63d3e47f41cf3b6af",
+    "hikari @ git+https://github.com/hikari-py/hikari@542c018d521ac6226ec6cf224ba2a010a4a036b3",
 ]
 
 [project.optional-dependencies]
