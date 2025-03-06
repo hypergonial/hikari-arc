@@ -76,7 +76,7 @@ from .errors import (
 )
 from .events import ArcEvent, CommandErrorEvent, StartedEvent, StoppingEvent
 from .extension import loader, unloader
-from .internal.about import __author__, __author_email__, __license__, __maintainer__, __url__, __version__
+from .internal.about import __version__
 from .locale import (
     CommandLocaleRequest,
     CustomLocaleRequest,
@@ -177,11 +177,6 @@ __all__ = (
     "UnderCooldownError",
     "UserCommand",
     "UserParams",
-    "__author__",
-    "__author_email__",
-    "__license__",
-    "__maintainer__",
-    "__url__",
     "__version__",
     "abc",
     "bot_has_permissions",

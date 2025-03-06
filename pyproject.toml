@@ -1,6 +1,6 @@
 [project]
 name = "hikari-arc"
-version = "1.5.0"
+dynamic = ["version"]
 description = "A command handler for hikari with a focus on type-safety and correctness."
 readme = "README.md"
 license = "MIT"
@@ -122,3 +122,7 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel]
 packages = ["arc"]
 artifacts = ["pyproject.toml", "README.md", "LICENSE"]
+
+[tool.hatch.version]
+path = "arc/internal/about.py"
+pattern = '__version__: t\.Final\[str\] = \"(?P<version>[^\"]+)\"'
