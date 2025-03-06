@@ -17,14 +17,14 @@ if t.TYPE_CHECKING:
     from arc.abc.command import CommandProto
 
 __all__ = (
-    "Option",
-    "OptionParams",
-    "OptionWithChoices",
-    "OptionWithChoicesParams",
-    "OptionBase",
     "CommandOptionBase",
     "ConverterOption",
+    "Option",
+    "OptionBase",
+    "OptionParams",
     "OptionType",
+    "OptionWithChoices",
+    "OptionWithChoicesParams",
 )
 
 T = t.TypeVar("T")
@@ -136,7 +136,7 @@ class OptionParams(t.Generic[T]):
         The description of the option in different locales
     """
 
-    __slots__: t.Sequence[str] = ("_name", "_description", "_name_localizations", "_description_localizations")
+    __slots__: t.Sequence[str] = ("_description", "_description_localizations", "_name", "_name_localizations")
 
     def __init__(
         self,
@@ -194,7 +194,7 @@ class OptionWithChoicesParams(OptionParams[ChoiceT], t.Generic[ChoiceT, ClientT]
         The callback for autocompleting the option.
     """
 
-    __slots__: t.Sequence[str] = ("_choices", "_autocomplete_with")
+    __slots__: t.Sequence[str] = ("_autocomplete_with", "_choices")
 
     def __init__(
         self,

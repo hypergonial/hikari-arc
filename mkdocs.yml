@@ -58,58 +58,57 @@ theme:
     - toc.follow
 
 nav:
-    - Home: index.md
-    - Getting Started: getting_started.md
-    - Guides:
-        - guides/index.md
-        - guides/typing.md
-        - guides/hikari_fundamentals.md
-        - guides/interactions.md
-        - guides/options.md
-        - guides/command_groups.md
-        - guides/context_menu.md
-        - guides/startup_shutdown.md
-        - guides/hooks.md
-        - guides/error_handling.md
-        - guides/plugins_extensions.md
-        - guides/dependency_injection.md
-        - guides/loops.md
-        - guides/concurrency_limiting.md
-        - guides/events.md
-    - API Reference:
-        - api_reference/index.md
-        - api_reference/client.md
-        - Command:
+  - Home: index.md
+  - Getting Started: getting_started.md
+  - Guides:
+      - guides/index.md
+      - guides/typing.md
+      - guides/hikari_fundamentals.md
+      - guides/interactions.md
+      - guides/options.md
+      - guides/command_groups.md
+      - guides/context_menu.md
+      - guides/startup_shutdown.md
+      - guides/hooks.md
+      - guides/error_handling.md
+      - guides/plugins_extensions.md
+      - guides/dependency_injection.md
+      - guides/loops.md
+      - guides/concurrency_limiting.md
+      - guides/events.md
+  - API Reference:
+      - api_reference/index.md
+      - api_reference/client.md
+      - Command:
           - api_reference/command/index.md
           - api_reference/command/slash.md
           - api_reference/command/option.md
           - api_reference/command/message.md
           - api_reference/command/user.md
-        - api_reference/context.md
-        - api_reference/errors.md
-        - api_reference/events.md
-        - api_reference/plugin.md
-        - api_reference/localization.md
-        - Utils:
-            - api_reference/utils/index.md
-            - Hooks:
-                - api_reference/utils/hooks/basic.md
-                - api_reference/utils/hooks/limiters.md
-            - api_reference/utils/loops.md
-            - api_reference/utils/ratelimiter.md
-            - api_reference/utils/concurrency_limiter.md
-        - ABC:
-            - api_reference/abc/index.md
-            - api_reference/abc/client.md
-            - api_reference/abc/command.md
-            - api_reference/abc/option.md
-            - api_reference/abc/plugin.md
-            - api_reference/abc/hooks.md
-            - api_reference/abc/limiter.md
-            - api_reference/abc/concurrency_limiting.md
-            - api_reference/abc/error_handler.md
-    - Changelog: changelog.md
-
+      - api_reference/context.md
+      - api_reference/errors.md
+      - api_reference/events.md
+      - api_reference/plugin.md
+      - api_reference/localization.md
+      - Utils:
+          - api_reference/utils/index.md
+          - Hooks:
+              - api_reference/utils/hooks/basic.md
+              - api_reference/utils/hooks/limiters.md
+          - api_reference/utils/loops.md
+          - api_reference/utils/ratelimiter.md
+          - api_reference/utils/concurrency_limiter.md
+      - ABC:
+          - api_reference/abc/index.md
+          - api_reference/abc/client.md
+          - api_reference/abc/command.md
+          - api_reference/abc/option.md
+          - api_reference/abc/plugin.md
+          - api_reference/abc/hooks.md
+          - api_reference/abc/limiter.md
+          - api_reference/abc/concurrency_limiting.md
+          - api_reference/abc/error_handler.md
+  - Changelog: changelog.md
 
 markdown_extensions:
   - admonition
@@ -156,14 +155,14 @@ plugins:
       auto_caption: false
       caption_position: bottom
       skip_classes:
-         - no-lightbox
+        - no-lightbox
   - mkdocstrings:
       default_handler: python
       handlers:
         python:
           import:
             - https://docs.python.org/3.10/objects.inv
-            - https://docs.hikari-py.dev/en/latest/objects.inv
+            - https://docs.hikari-py.dev/en/stable/objects.inv
             - https://alluka.cursed.solutions/objects.inv
           options:
             heading_level: 3
@@ -181,11 +180,10 @@ plugins:
             show_symbol_type_toc: true
             line_length: 80
             extensions:
-                - griffe_inherited_docstrings
+              - griffe_inherited_docstrings
 watch:
   - docs
   - README.md
   - arc
 extra_css:
   - stylesheets/additional_coloring.css
-

@@ -6,7 +6,7 @@ import sys
 import traceback
 import typing as t
 
-__all__ = ("IntervalLoop", "CronLoop", "interval_loop", "cron_loop")
+__all__ = ("CronLoop", "IntervalLoop", "cron_loop", "interval_loop")
 
 P = t.ParamSpec("P")
 
@@ -25,7 +25,7 @@ class _LoopBase(abc.ABC, t.Generic[P]):
     - [`CronLoop`][arc.utils.loops.CronLoop]
     """
 
-    __slots__ = ("_coro", "_task", "_failed", "_stop_next", "_run_on_start")
+    __slots__ = ("_coro", "_failed", "_run_on_start", "_stop_next", "_task")
 
     def __init__(self, callback: t.Callable[P, t.Awaitable[None]], *, run_on_start: bool = True) -> None:
         self._coro = callback

@@ -1,16 +1,7 @@
-from .about import __author__, __author_email__, __maintainer__, __version__
 from .deprecation import warn_deprecate
 from .version import CURRENT_VERSION, Version
 
-__all__ = (
-    "warn_deprecate",
-    "Version",
-    "CURRENT_VERSION",
-    "__author__",
-    "__author_email__",
-    "__maintainer__",
-    "__version__",
-)
+__all__ = ("CURRENT_VERSION", "Version", "warn_deprecate")
 
 # MIT License
 #

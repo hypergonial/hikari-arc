@@ -117,7 +117,7 @@ class RateLimiter(t.Generic[KeyT]):
         A callable that returns a key for the ratelimiter bucket.
     """
 
-    __slots__ = ("period", "limit", "_buckets", "_get_key", "_gc_task")
+    __slots__ = ("_buckets", "_gc_task", "_get_key", "limit", "period")
 
     def __init__(self, period: float, limit: int, *, get_key_with: t.Callable[[KeyT], str]) -> None:
         self.period: float = period

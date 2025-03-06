@@ -53,16 +53,16 @@ class PluginBase(HasErrorHandler[ClientT], Hookable[ClientT], HasConcurrencyLimi
 
     __slots__: t.Sequence[str] = (
         "_client",
-        "_name",
-        "_default_enabled_guilds",
         "_cmd_settings",
-        "_slash_commands",
-        "_user_commands",
-        "_message_commands",
+        "_concurrency_limiter",
+        "_default_enabled_guilds",
         "_error_handler",
         "_hooks",
+        "_message_commands",
+        "_name",
         "_post_hooks",
-        "_concurrency_limiter",
+        "_slash_commands",
+        "_user_commands",
     )
 
     def __init__(

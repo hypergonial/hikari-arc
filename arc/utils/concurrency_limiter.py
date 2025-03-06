@@ -9,14 +9,14 @@ from arc.context.base import Context
 from arc.internal.types import ClientT
 
 __all__ = (
-    "ConcurrencyLimiter",
     "CommandConcurrencyLimiter",
+    "ConcurrencyLimiter",
+    "channel_concurrency",
+    "custom_concurrency",
     "global_concurrency",
     "guild_concurrency",
-    "channel_concurrency",
-    "user_concurrency",
     "member_concurrency",
-    "custom_concurrency",
+    "user_concurrency",
 )
 
 KeyT = t.TypeVar("KeyT")
@@ -32,7 +32,7 @@ class _BoundedSemaphore(asyncio.BoundedSemaphore):
 class _Bucket(t.Generic[KeyT]):
     """Handles the concurrency limiting of a single item. (E.g. a single user or a channel)."""
 
-    __slots__ = ("_key", "_max_concurrent", "_semaphore", "_limiter")
+    __slots__ = ("_key", "_limiter", "_max_concurrent", "_semaphore")
 
     def __init__(self, key: str, max_concurrent: int, limiter: ConcurrencyLimiter[KeyT]) -> None:
         self._key = key
@@ -74,7 +74,7 @@ class _Bucket(t.Generic[KeyT]):
 
 
 class _ConcurrencyLimiterContextManager(t.Generic[KeyT]):
-    __slots__ = ("_limiter", "_item")
+    __slots__ = ("_item", "_limiter")
 
     def __init__(self, limiter: ConcurrencyLimiter[KeyT], item: KeyT) -> None:
         self._limiter = limiter
@@ -122,7 +122,7 @@ class ConcurrencyLimiter(t.Generic[KeyT]):
     - [`custom_concurrency()`][arc.utils.concurrency_limiter.custom_concurrency]
     """
 
-    __slots__: t.Sequence[str] = ("_capacity", "_buckets", "_get_key")
+    __slots__: t.Sequence[str] = ("_buckets", "_capacity", "_get_key")
 
     def __init__(self, capacity: int, *, get_key_with: t.Callable[[KeyT], str]) -> None:
         self._capacity = capacity

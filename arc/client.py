@@ -21,14 +21,14 @@ if t.TYPE_CHECKING:
     from arc.internal.types import EventCallbackT, EventT, ResponseBuilderT
 
 __all__ = (
-    "GatewayClientBase",
-    "RESTClientBase",
     "GatewayClient",
-    "RESTClient",
+    "GatewayClientBase",
     "GatewayContext",
+    "GatewayPlugin",
+    "RESTClient",
+    "RESTClientBase",
     "RESTContext",
     "RESTPlugin",
-    "GatewayPlugin",
 )
 
 

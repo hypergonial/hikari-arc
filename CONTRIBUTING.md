@@ -10,16 +10,22 @@ If your contribution is **not** a bugfix or small change, please [open an issue]
 
 ### Installing dependencies
 
-Use the command below to install all the tooling required to develop arc:
+`arc` uses [`uv`](https://github.com/astral-sh/uv) for dependency management, you should [install it](https://docs.astral.sh/uv/getting-started/installation/#installing-uv) if you haven't already.
+
+Use the command below to install all the tooling required to develop arc in a virtual environment:
 
 ```sh
-$ pip install -r requirements.txt -r dev_requirements.txt
+$ uv sync --all-extras --dev
 ```
 
 ### Running nox
 
 Before submitting your changes, you should run [`nox`](https://pypi.org/project/nox/) and ensure all the pipelines pass successfully.
 This checks the code for typing errors, antipatterns & bad practices, along with formatting it & running all tests.
+
+```sh
+uv run nox
+```
 
 GitHub CI runs on every pull request to verify that `nox` passes.
 

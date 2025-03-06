@@ -43,7 +43,7 @@ class IntParams(OptionWithChoicesParams[int, ClientT]):
         The callback that is invoked when the user autocompletes the option
     """
 
-    __slots__: t.Sequence[str] = ("_min", "_max")
+    __slots__: t.Sequence[str] = ("_max", "_min")
 
     def __init__(
         self,

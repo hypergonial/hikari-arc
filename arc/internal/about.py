@@ -1,11 +1,6 @@
 import typing as t
 
-__author__: t.Final[str] = "hypergonial"
-__author_email__: t.Final[str] = "git@hypergonial.com"
-__maintainer__: t.Final[str] = "hypergonial"
-__license__: t.Final[str] = "MIT"
-__url__: t.Final[str] = "https://github.com/hypergonial/hikari-arc"
-__version__: t.Final[str] = "1.4.0"
+__version__: t.Final[str] = "1.5.0"
 
 # MIT License
 #

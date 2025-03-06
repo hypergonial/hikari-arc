@@ -25,8 +25,8 @@ if t.TYPE_CHECKING:
     from arc.abc.plugin import PluginBase
 
 __all__ = (
-    "SlashCommandLike",
     "SlashCommand",
+    "SlashCommandLike",
     "SlashGroup",
     "SlashSubCommand",
     "SlashSubGroup",
@@ -363,7 +363,7 @@ class SlashGroup(CommandBase[ClientT, hikari.api.SlashCommandBuilder]):
             opt = next(o for o in subsub.options if o.name in subsubcmd.options and o.is_focused)
             local_opt = subsubcmd.options[opt.name]
 
-        if not isinstance(local_opt, OptionWithChoices) or not local_opt.autocomplete_with:
+        if not isinstance(local_opt, OptionWithChoices) or not local_opt.autocomplete_with:  # pyright: ignore reportUnknownMemberType
             raise AutocompleteError(
                 f"Slash option got autocomplete interaction without autocomplete callback: '{local_opt.name}'."
             )

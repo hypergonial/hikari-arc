@@ -90,30 +90,30 @@ class Client(t.Generic[AppT], abc.ABC):
 
     __slots__: t.Sequence[str] = (
         "_app",
-        "_default_enabled_guilds",
         "_application",
-        "_slash_commands",
-        "_message_commands",
-        "_user_commands",
-        "_injector",
         "_autosync",
-        "_plugins",
-        "_loaded_extensions",
-        "_hooks",
-        "_post_hooks",
-        "_injection_hooks",
-        "_owner_ids",
-        "_error_handler",
-        "_startup_hooks",
-        "_shutdown_hooks",
-        "_provided_locales",
-        "_command_locale_provider",
-        "_option_locale_provider",
-        "_custom_locale_provider",
         "_cmd_settings",
+        "_command_locale_provider",
         "_concurrency_limiter",
-        "_tasks",
+        "_custom_locale_provider",
+        "_default_enabled_guilds",
+        "_error_handler",
+        "_hooks",
+        "_injection_hooks",
+        "_injector",
+        "_loaded_extensions",
+        "_message_commands",
+        "_option_locale_provider",
+        "_owner_ids",
+        "_plugins",
+        "_post_hooks",
+        "_provided_locales",
+        "_shutdown_hooks",
+        "_slash_commands",
         "_started",
+        "_startup_hooks",
+        "_tasks",
+        "_user_commands",
     )
 
     def __init__(
@@ -461,7 +461,7 @@ class Client(t.Generic[AppT], abc.ABC):
 
     @t.overload
     def walk_commands(
-        self, command_type: t.Literal[hikari.CommandType.SLASH], *, callable_only: t.Literal[True] = True
+        self, command_type: t.Literal[hikari.CommandType.SLASH], *, callable_only: t.Literal[True]
     ) -> t.Iterator[SlashCommand[te.Self] | SlashSubCommand[te.Self]]: ...
 
     def walk_commands(  # noqa: C901
