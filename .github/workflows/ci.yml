@@ -32,7 +32,6 @@ jobs:
 
       - name: Run pyright via nox
         run: |
-          uv sync --only-dev
           uv run nox -s pyright
 
   slotscheck:
