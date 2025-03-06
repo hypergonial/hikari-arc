@@ -24,13 +24,14 @@ Here you can find all the changelogs for `hikari-arc`.
 
 ```py
 # Before 2.0
-client = arc.Client(is_dm_enabled=False)
+client = arc.GatewayClient(..., is_dm_enabled=False)
 
 # After 2.0
 
 # Omit hikari.ApplicationContextType.BOT_DM to disable DMs
 # You may also want to remove PRIVATE_CHANNEL if you don't want to support group DMs
-client = arc.Client(
+client = arc.GatewayClient(
+    ...,
     context_types=[
         hikari.ApplicationContextType.GUILD,
         hikari.ApplicationContextType.PRIVATE_CHANNEL
@@ -43,10 +44,6 @@ This applies similarly to command or plugin-level use of this setting.
 #### `set_startup_hook` and `set_shutdown_hook` removal
 
 ```py
-
-bot = hikari.RESTBot("...")
-client = arc.RESTClient(bot)
-
 # Before 2.0
 
 @client.set_startup_hook
