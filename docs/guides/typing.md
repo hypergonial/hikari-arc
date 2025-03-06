@@ -363,9 +363,9 @@ The important thing to remember is that **the first *type parameter*** you pass 
 
 You may encounter some types when using [`hikari`](https://github.com/hikari-py/hikari) that aren't present in the standard library:
 
-- [`hikari.Snowflake`](https://docs.hikari-py.dev/en/latest/reference/hikari/snowflakes/#hikari.snowflakes.Snowflake) - This is an ID of an object on Discord, for most purposes you can treat this type as an `int`.
-- [`hikari.Snowflakeish`](https://docs.hikari-py.dev/en/latest/reference/hikari/snowflakes/#hikari.snowflakes.Snowflakeish) - This is just an alias for `int | hikari.Snowflake`.
-- [`hikari.UndefinedType`](https://docs.hikari-py.dev/en/latest/reference/hikari/snowflakes/#hikari.snowflakes.Snowflakeish) and it's value [`hikari.UNDEFINED`](https://docs.hikari-py.dev/en/latest/reference/hikari/undefined/#hikari.undefined.UNDEFINED) - These are used when not providing a value would be semantically different from providing `None`. For example, when [editing a message](https://docs.hikari-py.dev/en/latest/reference/hikari/api/rest/#hikari.api.rest.RESTClient.edit_message), leaving `embeds=` as `UNDEFINED` will leave them as is, but providing `None` will clear all embeds from a message.
+- [`hikari.Snowflake`](https://docs.hikari-py.dev/en/stable/reference/hikari/snowflakes/#hikari.snowflakes.Snowflake) - This is an ID of an object on Discord, for most purposes you can treat this type as an `int`.
+- [`hikari.Snowflakeish`](https://docs.hikari-py.dev/en/stable/reference/hikari/snowflakes/#hikari.snowflakes.Snowflakeish) - This is just an alias for `int | hikari.Snowflake`.
+- [`hikari.UndefinedType`](https://docs.hikari-py.dev/en/stable/reference/hikari/snowflakes/#hikari.snowflakes.Snowflakeish) and it's value [`hikari.UNDEFINED`](https://docs.hikari-py.dev/en/stable/reference/hikari/undefined/#hikari.undefined.UNDEFINED) - These are used when not providing a value would be semantically different from providing `None`. For example, when [editing a message](https://docs.hikari-py.dev/en/stable/reference/hikari/api/rest/#hikari.api.rest.RESTClient.edit_message), leaving `embeds=` as `UNDEFINED` will leave them as is, but providing `None` will clear all embeds from a message.
 
 ## Finishing up
 

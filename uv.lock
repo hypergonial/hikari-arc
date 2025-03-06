@@ -612,6 +612,7 @@ rest = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "colorama", marker = "sys_platform == 'win32'" },
     { name = "nox" },
     { name = "pyright" },
     { name = "pytest" },
@@ -643,6 +644,7 @@ provides-extras = ["cron", "rest"]
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "colorama", marker = "sys_platform == 'win32'", specifier = ">=0.4.6" },
     { name = "nox", specifier = ">=2025.2.9" },
     { name = "pyright", specifier = ">=1.1.396" },
     { name = "pytest", specifier = ">=8.3" },

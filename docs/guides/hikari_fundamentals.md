@@ -50,17 +50,17 @@ The most common use for interacting with the REST API directly is if you want to
         await ctx.respond("Channel created!")
     ```
 
-In this snippet, we use [rest.create_guild_text_channel()](https://docs.hikari-py.dev/en/latest/reference/hikari/api/rest/#hikari.api.rest.RESTClient.create_guild_text_channel) to create a new text channel in the guild the command is invoked in, with the given name.
+In this snippet, we use [rest.create_guild_text_channel()](https://docs.hikari-py.dev/en/stable/reference/hikari/api/rest/#hikari.api.rest.RESTClient.create_guild_text_channel) to create a new text channel in the guild the command is invoked in, with the given name.
 
 !!! tip
-    For a full list of all REST API requests you can make, see the [hikari reference](https://docs.hikari-py.dev/en/latest/reference/hikari/api/rest/). This list may be daunting at first, as it lists every single endpoint and their parameters.
+    For a full list of all REST API requests you can make, see the [hikari reference](https://docs.hikari-py.dev/en/stable/reference/hikari/api/rest/). This list may be daunting at first, as it lists every single endpoint and their parameters.
 
 ## Using your client's cache
 
 !!! info "Gateway only"
     This section is only relevant to those using a **Gateway** client, as REST bots **do not have a cache**.
 
-While the REST API [can be used](https://docs.hikari-py.dev/en/latest/reference/hikari/api/rest/#hikari.api.rest.RESTClient.fetch_channel) to fetch data from Discord directly, this is generally **not recommended**, as it is very slow, consumes [ratelimits](https://discord.com/developers/docs/topics/rate-limits) and is generally inefficient. Instead, you should use your client's cache implementation. To access objects stored in the cache, you need to access your gateway client's [`cache`][arc.client.GatewayClientBase.cache] module.
+While the REST API [can be used](https://docs.hikari-py.dev/en/stable/reference/hikari/api/rest/#hikari.api.rest.RESTClient.fetch_channel) to fetch data from Discord directly, this is generally **not recommended**, as it is very slow, consumes [ratelimits](https://discord.com/developers/docs/topics/rate-limits) and is generally inefficient. Instead, you should use your client's cache implementation. To access objects stored in the cache, you need to access your gateway client's [`cache`][arc.client.GatewayClientBase.cache] module.
 
 ```py hl_lines="5"
 @client.include
@@ -77,4 +77,4 @@ async def channel_info(ctx: arc.GatewayContext) -> None:
 Here, we get all roles that exist in the guild the command was invoked in, then respond with their mentions.
 
 !!! tip
-    For a full list of all cache methods, see the [hikari reference](https://docs.hikari-py.dev/en/latest/reference/hikari/api/cache/#hikari.api.cache.Cache).
+    For a full list of all cache methods, see the [hikari reference](https://docs.hikari-py.dev/en/stable/reference/hikari/api/cache/#hikari.api.cache.Cache).

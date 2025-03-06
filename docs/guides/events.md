@@ -46,4 +46,4 @@ async def on_message(event: hikari.MessageCreateEvent) -> None:
     await plugin.client.rest.create_message(event.channel_id, "Hi!")
 ```
 
-For a list of all available events, see the [hikari documentation](https://docs.hikari-py.dev/en/latest/reference/hikari/events/).
+For a list of all available events, see the [hikari documentation](https://docs.hikari-py.dev/en/stable/reference/hikari/events/).
