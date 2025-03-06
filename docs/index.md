@@ -39,7 +39,7 @@ Welcome to the documentation for `hikari-arc`, an extensible command handler bui
 
 - [**GitHub**](https://github.com/hypergonial/hikari-arc)
 - [**Examples**](https://github.com/hypergonial/hikari-arc/tree/main/examples)
-- [**Hikari Documentation**](https://docs.hikari-py.dev/en/latest/)
+- [**Hikari Documentation**](https://docs.hikari-py.dev/en/stable/)
 - [**Hikari Discord**](https://discord.gg/hikari)
 - [**Discord Developer Documentation**](https://discord.com/developers/docs/intro)
 
