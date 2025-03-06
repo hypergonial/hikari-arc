@@ -39,6 +39,7 @@ dev = [
     "slotscheck>=0.19",
     "typing-extensions>=4.12",
     "uv>=0.6",
+    "colorama>=0.4.6; sys_platform == 'win32'",
 ]
 docs = [
     "black>=25.1.0",
