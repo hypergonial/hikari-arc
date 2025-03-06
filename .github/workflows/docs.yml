@@ -35,7 +35,6 @@ jobs:
 
       - name: Build docs via nox
         run: |
-          uv sync --only-dev
           uv run nox -s docs
 
       - name: Upload artifact

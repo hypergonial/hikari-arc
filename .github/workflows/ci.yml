@@ -16,7 +16,6 @@ jobs:
 
       - name: Run ruff via nox
         run: |
-          uv sync --only-dev
           uv run nox -s format
 
   pyright:
@@ -47,7 +46,6 @@ jobs:
 
         - name: Run slotscheck via nox
           run: |
-            uv sync --only-dev
             uv run nox -s slotscheck
 
   pytest:
@@ -66,5 +64,4 @@ jobs:
         version: "0.6.4"
         python-version: ${{ matrix.python-version }}
     - run: |
-        uv sync --only-dev
         uv run nox -s pytest
