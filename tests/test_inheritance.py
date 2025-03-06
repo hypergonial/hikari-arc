@@ -7,7 +7,7 @@ client = arc.GatewayClient(
     bot,
     autodefer=arc.AutodeferMode.EPHEMERAL,
     default_permissions=hikari.Permissions.MANAGE_GUILD,
-    context_types=[hikari.ApplicationContextType.GUILD],
+    invocation_contexts=[hikari.ApplicationContextType.GUILD],
     integration_types=[hikari.ApplicationIntegrationType.GUILD_INSTALL],
 )
 
@@ -15,7 +15,7 @@ plugin = arc.GatewayPlugin(
     "foo",
     default_permissions=hikari.Permissions.NONE,
     integration_types=[hikari.ApplicationIntegrationType.GUILD_INSTALL, hikari.ApplicationIntegrationType.USER_INSTALL],
-    context_types=[
+    invocation_contexts=[
         hikari.ApplicationContextType.BOT_DM,
         hikari.ApplicationContextType.GUILD,
         hikari.ApplicationContextType.PRIVATE_CHANNEL,
@@ -24,7 +24,7 @@ plugin = arc.GatewayPlugin(
 
 
 @plugin.include
-@arc.slash_command("foo", context_types=[hikari.ApplicationContextType.GUILD])
+@arc.slash_command("foo", invocation_contexts=[hikari.ApplicationContextType.GUILD])
 async def foo(ctx: arc.GatewayContext) -> None:
     await ctx.respond("foo")
 
@@ -59,14 +59,14 @@ def test_settings_inheritance() -> None:
         hikari.ApplicationIntegrationType.GUILD_INSTALL,
         hikari.ApplicationIntegrationType.USER_INSTALL,
     ]
-    assert list(foo.context_types) == [hikari.ApplicationContextType.GUILD]
+    assert list(foo.invocation_contexts) == [hikari.ApplicationContextType.GUILD]
     assert foo.autodefer is arc.AutodeferMode.EPHEMERAL
 
     assert list(bar.integration_types) == [
         hikari.ApplicationIntegrationType.GUILD_INSTALL,
         hikari.ApplicationIntegrationType.USER_INSTALL,
     ]
-    assert list(bar.context_types) == [
+    assert list(bar.invocation_contexts) == [
         hikari.ApplicationContextType.BOT_DM,
         hikari.ApplicationContextType.GUILD,
         hikari.ApplicationContextType.PRIVATE_CHANNEL,
@@ -76,7 +76,7 @@ def test_settings_inheritance() -> None:
 
     assert baz.default_permissions == hikari.Permissions.MANAGE_GUILD
     assert list(baz.integration_types) == [hikari.ApplicationIntegrationType.GUILD_INSTALL]
-    assert list(baz.context_types) == [hikari.ApplicationContextType.GUILD]
+    assert list(baz.invocation_contexts) == [hikari.ApplicationContextType.GUILD]
     assert baz.autodefer is arc.AutodeferMode.ON
 
     assert qux.autodefer is arc.AutodeferMode.OFF

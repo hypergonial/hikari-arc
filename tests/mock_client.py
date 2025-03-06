@@ -21,7 +21,7 @@ class MockClient(arc.abc.Client[t.Any]):
         integration_types: t.Sequence[hikari.ApplicationIntegrationType] = [
             hikari.ApplicationIntegrationType.GUILD_INSTALL
         ],
-        context_types: t.Sequence[hikari.ApplicationContextType] = [
+        invocation_contexts: t.Sequence[hikari.ApplicationContextType] = [
             hikari.ApplicationContextType.BOT_DM,
             hikari.ApplicationContextType.GUILD,
             hikari.ApplicationContextType.PRIVATE_CHANNEL,
@@ -37,7 +37,7 @@ class MockClient(arc.abc.Client[t.Any]):
             default_permissions=default_permissions,
             is_nsfw=is_nsfw,
             integration_types=integration_types,
-            context_types=context_types,
+            invocation_contexts=invocation_contexts,
             provided_locales=provided_locales,
             injector=injector,
         )

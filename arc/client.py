@@ -64,7 +64,7 @@ class GatewayClientBase(Client[GatewayBotT]):
     integration_types : t.Sequence[hikari.ApplicationIntegrationType]
         The integration types that commands will support the installation of
         This applies to all commands, and can be overridden on a per-command basis.
-    context_types : t.Sequence[hikari.ApplicationContextType]
+    invocation_contexts : t.Sequence[hikari.ApplicationContextType]
         The context types that commands can be invoked in
         This applies to all commands, and can be overridden on a per-command basis
     provided_locales : t.Sequence[hikari.Locale] | None
@@ -89,7 +89,7 @@ class GatewayClientBase(Client[GatewayBotT]):
         integration_types: t.Sequence[hikari.ApplicationIntegrationType] = [
             hikari.ApplicationIntegrationType.GUILD_INSTALL
         ],
-        context_types: t.Sequence[hikari.ApplicationContextType] = [
+        invocation_contexts: t.Sequence[hikari.ApplicationContextType] = [
             hikari.ApplicationContextType.GUILD,
             hikari.ApplicationContextType.PRIVATE_CHANNEL,
             hikari.ApplicationContextType.BOT_DM,
@@ -105,7 +105,7 @@ class GatewayClientBase(Client[GatewayBotT]):
             default_permissions=default_permissions,
             is_nsfw=is_nsfw,
             integration_types=integration_types,
-            context_types=context_types,
+            invocation_contexts=invocation_contexts,
             provided_locales=provided_locales,
             injector=injector,
         )
@@ -230,7 +230,7 @@ class RESTClientBase(Client[RESTBotT]):
     integration_types : t.Sequence[hikari.ApplicationIntegrationType]
         The integration types that commands will support the installation of
         This applies to all commands, and can be overridden on a per-command basis.
-    context_types : t.Sequence[hikari.ApplicationContextType]
+    invocation_contexts : t.Sequence[hikari.ApplicationContextType]
         The context types that commands can be invoked in
         This applies to all commands, and can be overridden on a per-command basis
     provided_locales : t.Sequence[hikari.Locale] | None
@@ -254,7 +254,7 @@ class RESTClientBase(Client[RESTBotT]):
         integration_types: t.Sequence[hikari.ApplicationIntegrationType] = [
             hikari.ApplicationIntegrationType.GUILD_INSTALL
         ],
-        context_types: t.Sequence[hikari.ApplicationContextType] = [
+        invocation_contexts: t.Sequence[hikari.ApplicationContextType] = [
             hikari.ApplicationContextType.GUILD,
             hikari.ApplicationContextType.PRIVATE_CHANNEL,
             hikari.ApplicationContextType.BOT_DM,
@@ -271,7 +271,7 @@ class RESTClientBase(Client[RESTBotT]):
             default_permissions=default_permissions,
             is_nsfw=is_nsfw,
             integration_types=integration_types,
-            context_types=context_types,
+            invocation_contexts=invocation_contexts,
             provided_locales=provided_locales,
             injector=injector,
         )
@@ -360,7 +360,7 @@ class GatewayClient(GatewayClientBase[hikari.GatewayBotAware]):
     integration_types : t.Sequence[hikari.ApplicationIntegrationType]
         The integration types that commands will support the installation of
         This applies to all commands, and can be overridden on a per-command basis.
-    context_types : t.Sequence[hikari.ApplicationContextType]
+    invocation_contexts : t.Sequence[hikari.ApplicationContextType]
         The context types that commands can be invoked in
         This applies to all commands, and can be overridden on a per-command basis
     provided_locales : t.Sequence[hikari.Locale] | None
@@ -408,7 +408,7 @@ class RESTClient(RESTClientBase[hikari.RESTBotAware]):
     integration_types : t.Sequence[hikari.ApplicationIntegrationType]
         The integration types that commands will support the installation of
         This applies to all commands, and can be overridden on a per-command basis.
-    context_types : t.Sequence[hikari.ApplicationContextType]
+    invocation_contexts : t.Sequence[hikari.ApplicationContextType]
         The context types that commands can be invoked in
         This applies to all commands, and can be overridden on a per-command basis
     provided_locales : t.Sequence[hikari.Locale] | None

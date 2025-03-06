@@ -11,10 +11,10 @@ Here you can find all the changelogs for `hikari-arc`.
 
 ## 2.0.0
 
-- **Breaking:** Remove `is_dm_enabled` from all command, plugin, and client types. Use the newly added `context_types` instead.
+- **Breaking:** Remove `is_dm_enabled` from all command, plugin, and client types. Use the newly added `invocation_contexts` instead.
 - **Breaking:** Remove deprecated `Client.set_startup_hook` and `Client.set_shutdown_hook`. Use the newly added `Client.add_startup_hook` and `Client.add_shutdown_hook` instead.
 - Add support for **user installations** of commands.
-  - Add `context_types` and `integration_types` to all command, plugin, and client types.
+  - Add `invocation_contexts` and `integration_types` to all command, plugin, and client types.
   - Add `invocation_context` and `authorizing_integration_owners` to `Context` and `AutocompleteData`.
 - Bump `hikari` to `v2.2.0`.
 
@@ -32,7 +32,7 @@ client = arc.GatewayClient(..., is_dm_enabled=False)
 # You may also want to remove PRIVATE_CHANNEL if you don't want to support group DMs
 client = arc.GatewayClient(
     ...,
-    context_types=[
+    invocation_contexts=[
         hikari.ApplicationContextType.GUILD,
         hikari.ApplicationContextType.PRIVATE_CHANNEL
     ]

@@ -36,7 +36,7 @@ class RESTPluginBase(PluginBase[RESTClientT]):
     integration_types : t.Sequence[hikari.ApplicationIntegrationType] | hikari.UndefinedType
         The integration types that commands will support the installation of
         This can be overridden on a per-command basis.
-    context_types : t.Sequence[hikari.ApplicationContextType] | hikari.UndefinedType
+    invocation_contexts : t.Sequence[hikari.ApplicationContextType] | hikari.UndefinedType
         The context types that commands can be invoked in
         This can be overridden on a per-command basis.
     default_permissions : hikari.Permissions | hikari.UndefinedType
@@ -87,7 +87,7 @@ class GatewayPluginBase(PluginBase[GatewayClientT]):
     integration_types : t.Sequence[hikari.ApplicationIntegrationType] | hikari.UndefinedType
         The integration types that commands will support the installation of
         This can be overridden on a per-command basis.
-    context_types : t.Sequence[hikari.ApplicationContextType] | hikari.UndefinedType
+    invocation_contexts : t.Sequence[hikari.ApplicationContextType] | hikari.UndefinedType
         The context types that commands can be invoked in
         This can be overridden on a per-command basis.
     default_permissions : hikari.Permissions | hikari.UndefinedType
@@ -122,7 +122,7 @@ class GatewayPluginBase(PluginBase[GatewayClientT]):
         | hikari.UndefinedType = hikari.UNDEFINED,
         autodefer: bool | AutodeferMode | hikari.UndefinedType = hikari.UNDEFINED,
         integration_types: t.Sequence[hikari.ApplicationIntegrationType] | hikari.UndefinedType = hikari.UNDEFINED,
-        context_types: t.Sequence[hikari.ApplicationContextType] | hikari.UndefinedType = hikari.UNDEFINED,
+        invocation_contexts: t.Sequence[hikari.ApplicationContextType] | hikari.UndefinedType = hikari.UNDEFINED,
         default_permissions: hikari.Permissions | hikari.UndefinedType = hikari.UNDEFINED,
         is_nsfw: bool | hikari.UndefinedType = hikari.UNDEFINED,
     ) -> None:
@@ -131,7 +131,7 @@ class GatewayPluginBase(PluginBase[GatewayClientT]):
             default_enabled_guilds=default_enabled_guilds,
             autodefer=autodefer,
             integration_types=integration_types,
-            context_types=context_types,
+            invocation_contexts=invocation_contexts,
             default_permissions=default_permissions,
             is_nsfw=is_nsfw,
         )

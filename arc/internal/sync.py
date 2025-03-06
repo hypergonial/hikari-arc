@@ -95,8 +95,8 @@ def _compare_commands(arc_command: CommandBase[t.Any, t.Any], hk_command: hikari
         and arc_command.name == hk_command.name
         and cmd_dict.get("description") == getattr(hk_command, "description", None)
         and arc_command.is_nsfw == hk_command.is_nsfw
-        and arc_command.context_types == hk_command.context_types
-        and arc_command.integration_types == hk_command.integration_types
+        and set(arc_command.invocation_contexts) == set(hk_command.context_types)
+        and set(arc_command.integration_types) == set(hk_command.integration_types)
         and (
             hk_command.guild_id in arc_command.guilds
             if hk_command.guild_id is not None and arc_command.guilds is not hikari.UNDEFINED

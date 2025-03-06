@@ -187,7 +187,7 @@ class _CommandSettings:
     default_permissions: hikari.Permissions | hikari.UndefinedType
     is_nsfw: bool | hikari.UndefinedType
     integration_types: t.Sequence[hikari.ApplicationIntegrationType] | hikari.UndefinedType
-    context_types: t.Sequence[hikari.ApplicationContextType] | hikari.UndefinedType
+    invocation_contexts: t.Sequence[hikari.ApplicationContextType] | hikari.UndefinedType
 
     def apply(self, other: te.Self) -> te.Self:
         """Apply 'other' to this, copying all the non-undefined settings to it."""
@@ -200,7 +200,9 @@ class _CommandSettings:
             integration_types=other.integration_types
             if other.integration_types is not hikari.UNDEFINED
             else self.integration_types,
-            context_types=other.context_types if other.context_types is not hikari.UNDEFINED else self.context_types,
+            invocation_contexts=other.invocation_contexts
+            if other.invocation_contexts is not hikari.UNDEFINED
+            else self.invocation_contexts,
         )
 
     @classmethod
@@ -211,7 +213,7 @@ class _CommandSettings:
             default_permissions=hikari.UNDEFINED,
             is_nsfw=False,
             integration_types=[hikari.ApplicationIntegrationType.GUILD_INSTALL],
-            context_types=[
+            invocation_contexts=[
                 hikari.ApplicationContextType.GUILD,
                 hikari.ApplicationContextType.BOT_DM,
                 hikari.ApplicationContextType.PRIVATE_CHANNEL,
@@ -242,8 +244,8 @@ class CommandBase(
     )
     """A list of integration types where the command can be installed in."""
 
-    _context_types: t.Sequence[hikari.ApplicationContextType] | hikari.UndefinedType = attr.field(
-        default=hikari.UNDEFINED, alias="context_types"
+    _invocation_contexts: t.Sequence[hikari.ApplicationContextType] | hikari.UndefinedType = attr.field(
+        default=hikari.UNDEFINED, alias="invocation_contexts"
     )
     """A list of context types where the command can be used in."""
 
@@ -351,12 +353,12 @@ class CommandBase(
         )
 
     @property
-    def context_types(self) -> t.Sequence[hikari.ApplicationContextType]:
+    def invocation_contexts(self) -> t.Sequence[hikari.ApplicationContextType]:
         """A list of context types where the command can be used in."""
         settings = self._resolve_settings()
         return (
-            settings.context_types
-            if settings.context_types is not hikari.UNDEFINED
+            settings.invocation_contexts
+            if settings.invocation_contexts is not hikari.UNDEFINED
             else [
                 hikari.ApplicationContextType.GUILD,
                 hikari.ApplicationContextType.BOT_DM,
@@ -423,7 +425,7 @@ class CommandBase(
                 default_permissions=self._default_permissions,
                 is_nsfw=self._is_nsfw,
                 integration_types=self._integration_types,
-                context_types=self._context_types,
+                invocation_contexts=self._invocation_contexts,
             )
         )
 
@@ -529,7 +531,7 @@ class CommandBase(
             "default_member_permissions": self.default_permissions,
             "name_localizations": self.name_localizations,
             "integration_types": self.integration_types,
-            "context_types": self.context_types,
+            "invocation_contexts": self.invocation_contexts,
         }
 
     @abc.abstractmethod

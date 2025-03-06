@@ -97,7 +97,7 @@ To alter installations for a specific command, see the following snippet:
 
 ## Invocation Context Types
 
-On top of installation contexts, you can also customize where a command can be invoked. This is controlled via the `context_types` parameter on commands, command groups, plugins, and the client.
+On top of installation contexts, you can also customize where a command can be invoked. This is controlled via the `invocation_contexts` parameter on commands, command groups, plugins, and the client.
 
 For instance, to create a command that can only be invoked in a guild, and only installable by users, see the following snippet:
 
@@ -107,7 +107,7 @@ For instance, to create a command that can only be invoked in a guild, and only 
     @arc.slash_command(
         "my_command",
         "My command description",
-        context_types=[hikari.ApplicationContextType.GUILD],
+        invocation_contexts=[hikari.ApplicationContextType.GUILD],
         integration_types=[hikari.ApplicationIntegrationType.USER_INSTALL]
     )
     async def my_command(ctx: arc.GatewayContext) -> None:
@@ -120,7 +120,7 @@ For instance, to create a command that can only be invoked in a guild, and only 
     @arc.slash_command(
         "my_command",
         "My command description",
-        context_types=[hikari.ApplicationContextType.GUILD],
+        invocation_contexts=[hikari.ApplicationContextType.GUILD],
         integration_types=[hikari.ApplicationIntegrationType.USER_INSTALL]
     )
     async def my_command(ctx: arc.RESTContext) -> None:
@@ -128,7 +128,7 @@ For instance, to create a command that can only be invoked in a guild, and only 
     ```
 
 !!! tip
-    Both parameters are inherited from the parent group, plugin or client. This means that if you set the `context_types` parameter on the client, all commands, command groups, and plugins will inherit
+    Both parameters are inherited from the parent group, plugin or client. This means that if you set the `invocation_contexts` parameter on the client, all commands, command groups, and plugins will inherit
     the same value unless overridden at the plugin or command level. This can help reduce code duplication and ensure consistency across your bot.
 
 ## Querying Installation & Invocation Contexts at Runtime
@@ -157,16 +157,9 @@ To figure out how your command was installed and where it was invoked, you can u
                 await ctx.respond("Hello from a group DM!")
 
         # Figure out how the command was installed
-        user_who_installed_me = ctx.authorizing_integration_owners.get(
-            hikari.ApplicationIntegrationType.USER_INSTALL
-        )
-        guild_who_installed_me = ctx.authorizing_integration_owners.get(
-            hikari.ApplicationIntegrationType.GUILD_INSTALL
-        )
-
         await ctx.respond(
-            f"User who installed me: {user_who_installed_me or 'Not installed by user'}\n"
-            f"Guild who installed me: {guild_who_installed_me or 'Not installed in guild'}"
+            f"User who installed me: {ctx.authorizing_user_id or 'Not installed by user'}\n"
+            f"Guild who installed me: {ctx.authorizing_guild_id or 'Not installed in guild'}"
         )
     ```
 
@@ -192,15 +185,8 @@ To figure out how your command was installed and where it was invoked, you can u
                 await ctx.respond("Hello from a group DM!")
 
         # Figure out how the command was installed
-        user_who_installed_me = ctx.authorizing_integration_owners.get(
-            hikari.ApplicationIntegrationType.USER_INSTALL
-        )
-        guild_who_installed_me = ctx.authorizing_integration_owners.get(
-            hikari.ApplicationIntegrationType.GUILD_INSTALL
-        )
-
         await ctx.respond(
-            f"User who installed me: {user_who_installed_me or 'Not installed by user'}\n"
-            f"Guild who installed me: {guild_who_installed_me or 'Not installed in guild'}"
+            f"User who installed me: {ctx.authorizing_user_id or 'Not installed by user'}\n"
+            f"Guild who installed me: {ctx.authorizing_guild_id or 'Not installed in guild'}"
         )
     ```

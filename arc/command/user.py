@@ -46,7 +46,7 @@ class UserCommand(CallableCommandBase[ClientT, hikari.api.ContextMenuCommandBuil
             type=self.command_type,
             id=id,
             default_member_permissions=self.default_permissions,
-            context_types=self.context_types,
+            context_types=self.invocation_contexts,
             integration_types=self.integration_types,
             is_nsfw=self.is_nsfw,
             name_localizations={str(key): value for key, value in self.name_localizations.items()},
@@ -71,7 +71,7 @@ def user_command(
     name: str,
     *,
     guilds: t.Sequence[hikari.PartialGuild | hikari.Snowflakeish] | hikari.UndefinedType = hikari.UNDEFINED,
-    context_types: t.Sequence[hikari.ApplicationContextType] | hikari.UndefinedType = hikari.UNDEFINED,
+    invocation_contexts: t.Sequence[hikari.ApplicationContextType] | hikari.UndefinedType = hikari.UNDEFINED,
     integration_types: t.Sequence[hikari.ApplicationIntegrationType] | hikari.UndefinedType = hikari.UNDEFINED,
     is_nsfw: bool | hikari.UndefinedType = hikari.UNDEFINED,
     autodefer: bool | AutodeferMode | hikari.UndefinedType = hikari.UNDEFINED,
@@ -91,7 +91,7 @@ def user_command(
         The guilds this command should be enabled in, if left as undefined, the command is global
     integration_types : t.Sequence[hikari.ApplicationIntegrationType] | hikari.UndefinedType
         The integration types this command supports the installation of
-    context_types : t.Sequence[hikari.ApplicationContextType] | hikari.UndefinedType
+    invocation_contexts : t.Sequence[hikari.ApplicationContextType] | hikari.UndefinedType
         The context types this command can be invoked in
     is_nsfw : bool | hikari.UndefinedType
         Whether this command is NSFW.
@@ -121,7 +121,7 @@ def user_command(
             name=name,
             autodefer=AutodeferMode(autodefer) if isinstance(autodefer, bool) else autodefer,
             guilds=guild_ids,
-            context_types=context_types,
+            invocation_contexts=invocation_contexts,
             integration_types=integration_types,
             is_nsfw=is_nsfw,
             default_permissions=default_permissions,

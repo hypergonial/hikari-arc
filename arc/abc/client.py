@@ -79,7 +79,7 @@ class Client(t.Generic[AppT], abc.ABC):
     integration_types : t.Sequence[hikari.ApplicationIntegrationType] | hikari.UndefinedType
         The integration types that commands will support the installation of
         This applies to all commands, and can be overridden on a per-command basis.
-    context_types : t.Sequence[hikari.ApplicationContextType] | hikari.UndefinedType
+    invocation_contexts : t.Sequence[hikari.ApplicationContextType] | hikari.UndefinedType
         The context types that commands can be invoked in
         This applies to all commands, and can be overridden on a per-command basis
     provided_locales : t.Sequence[hikari.Locale] | None
@@ -130,7 +130,7 @@ class Client(t.Generic[AppT], abc.ABC):
         integration_types: t.Sequence[hikari.ApplicationIntegrationType] = [
             hikari.ApplicationIntegrationType.GUILD_INSTALL
         ],
-        context_types: t.Sequence[hikari.ApplicationContextType] = [
+        invocation_contexts: t.Sequence[hikari.ApplicationContextType] = [
             hikari.ApplicationContextType.GUILD,
             hikari.ApplicationContextType.PRIVATE_CHANNEL,
             hikari.ApplicationContextType.BOT_DM,
@@ -149,7 +149,7 @@ class Client(t.Generic[AppT], abc.ABC):
         self._cmd_settings = _CommandSettings(
             autodefer=AutodeferMode(autodefer),
             default_permissions=default_permissions,
-            context_types=context_types,
+            invocation_contexts=invocation_contexts,
             integration_types=integration_types,
             is_nsfw=is_nsfw,
         )
@@ -606,7 +606,7 @@ class Client(t.Generic[AppT], abc.ABC):
         *,
         guilds: t.Sequence[hikari.Snowflakeish | hikari.PartialGuild] | hikari.UndefinedType = hikari.UNDEFINED,
         autodefer: bool | AutodeferMode | hikari.UndefinedType = hikari.UNDEFINED,
-        context_types: t.Sequence[hikari.ApplicationContextType] | hikari.UndefinedType = hikari.UNDEFINED,
+        invocation_contexts: t.Sequence[hikari.ApplicationContextType] | hikari.UndefinedType = hikari.UNDEFINED,
         integration_types: t.Sequence[hikari.ApplicationIntegrationType] | hikari.UndefinedType = hikari.UNDEFINED,
         default_permissions: hikari.Permissions | hikari.UndefinedType = hikari.UNDEFINED,
         name_localizations: t.Mapping[hikari.Locale, str] | None = None,
@@ -628,7 +628,7 @@ class Client(t.Generic[AppT], abc.ABC):
             This can be overridden on a per-subcommand basis.
         integration_types : t.Sequence[hikari.ApplicationIntegrationType] | hikari.UndefinedType
             The integration types this group supports the installation of
-        context_types : t.Sequence[hikari.ApplicationContextType] | hikari.UndefinedType
+        invocation_contexts : t.Sequence[hikari.ApplicationContextType] | hikari.UndefinedType
             The context types this group can be invoked in
         default_permissions : hikari.Permissions | hikari.UndefinedType
             The default permissions for the slash command group
@@ -665,7 +665,7 @@ class Client(t.Generic[AppT], abc.ABC):
             description=description,
             guilds=guild_ids,
             autodefer=AutodeferMode(autodefer) if isinstance(autodefer, bool) else autodefer,
-            context_types=context_types,
+            invocation_contexts=invocation_contexts,
             integration_types=integration_types,
             default_permissions=default_permissions,
             name_localizations=name_localizations or {},

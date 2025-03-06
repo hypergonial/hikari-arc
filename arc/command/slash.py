@@ -109,7 +109,7 @@ class SlashCommand(CallableCommandBase[ClientT, hikari.api.SlashCommandBuilder])
             options=[option.to_command_option() for option in self.options.values()],
             default_member_permissions=self.default_permissions,
             integration_types=self.integration_types,
-            context_types=self.context_types,
+            context_types=self.invocation_contexts,
             is_nsfw=self.is_nsfw,
             name_localizations={str(key): value for key, value in self.name_localizations.items()},
             description_localizations={str(key): value for key, value in self.description_localizations.items()},
@@ -265,7 +265,7 @@ class SlashGroup(CommandBase[ClientT, hikari.api.SlashCommandBuilder]):
             options=[subcmd.to_command_option() for subcmd in self.children.values()],
             default_member_permissions=self.default_permissions,
             integration_types=self.integration_types,
-            context_types=self.context_types,
+            context_types=self.invocation_contexts,
             is_nsfw=self.is_nsfw,
             name_localizations={str(key): value for key, value in self.name_localizations.items()},
             description_localizations={str(key): value for key, value in self.description_localizations.items()},
@@ -525,7 +525,7 @@ class SlashSubGroup(SubCommandBase[ClientT, SlashGroup[ClientT]]):
                 default_permissions=hikari.UNDEFINED,
                 is_nsfw=hikari.UNDEFINED,
                 integration_types=hikari.UNDEFINED,
-                context_types=hikari.UNDEFINED,
+                invocation_contexts=hikari.UNDEFINED,
             )
         )
 
@@ -679,7 +679,7 @@ class SlashSubCommand(
                 default_permissions=hikari.UNDEFINED,
                 is_nsfw=hikari.UNDEFINED,
                 integration_types=hikari.UNDEFINED,
-                context_types=hikari.UNDEFINED,
+                invocation_contexts=hikari.UNDEFINED,
             )
         )
 
@@ -744,7 +744,7 @@ def slash_command(
     *,
     guilds: t.Sequence[hikari.PartialGuild | hikari.Snowflakeish] | hikari.UndefinedType = hikari.UNDEFINED,
     integration_types: t.Sequence[hikari.ApplicationIntegrationType] | hikari.UndefinedType = hikari.UNDEFINED,
-    context_types: t.Sequence[hikari.ApplicationContextType] | hikari.UndefinedType = hikari.UNDEFINED,
+    invocation_contexts: t.Sequence[hikari.ApplicationContextType] | hikari.UndefinedType = hikari.UNDEFINED,
     is_nsfw: bool | hikari.UndefinedType = hikari.UNDEFINED,
     autodefer: bool | AutodeferMode | hikari.UndefinedType = hikari.UNDEFINED,
     default_permissions: hikari.Permissions | hikari.UndefinedType = hikari.UNDEFINED,
@@ -763,7 +763,7 @@ def slash_command(
         The guilds this command should be enabled in, if left as undefined, the command is global
     integration_types : t.Sequence[hikari.ApplicationIntegrationType] | hikari.UndefinedType
         The integration types this command supports the installation of
-    context_types : t.Sequence[hikari.ApplicationContextType] | hikari.UndefinedType
+    invocation_contexts : t.Sequence[hikari.ApplicationContextType] | hikari.UndefinedType
         The context types this command can be invoked in
     is_nsfw : bool | hikari.UndefinedType
         If True, the command is only usable in NSFW channels
@@ -812,7 +812,7 @@ def slash_command(
             default_permissions=default_permissions,
             guilds=guild_ids,
             integration_types=integration_types,
-            context_types=context_types,
+            invocation_contexts=invocation_contexts,
             is_nsfw=is_nsfw,
         )
 

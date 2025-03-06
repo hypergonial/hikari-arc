@@ -172,7 +172,7 @@ Only top-level commands & groups can have the following defined:
 
 - `default_permissions`
 - `is_nsfw`
-- `context_types`
+- `invocation_contexts`
 - `integration_types`
 - `guilds`
 

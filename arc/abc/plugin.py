@@ -44,7 +44,7 @@ class PluginBase(HasErrorHandler[ClientT], Hookable[ClientT], HasConcurrencyLimi
     integration_types : t.Sequence[hikari.ApplicationIntegrationType] | hikari.UndefinedType
         The integration types that commands will support the installation of
         This can be overridden on a per-command basis.
-    context_types : t.Sequence[hikari.ApplicationContextType] | hikari.UndefinedType
+    invocation_contexts : t.Sequence[hikari.ApplicationContextType] | hikari.UndefinedType
         The context types that commands can be invoked in
         This can be overridden on a per-command basis.
     default_permissions : hikari.Permissions | hikari.UndefinedType
@@ -76,7 +76,7 @@ class PluginBase(HasErrorHandler[ClientT], Hookable[ClientT], HasConcurrencyLimi
         | hikari.UndefinedType = hikari.UNDEFINED,
         autodefer: bool | AutodeferMode | hikari.UndefinedType = hikari.UNDEFINED,
         integration_types: t.Sequence[hikari.ApplicationIntegrationType] | hikari.UndefinedType = hikari.UNDEFINED,
-        context_types: t.Sequence[hikari.ApplicationContextType] | hikari.UndefinedType = hikari.UNDEFINED,
+        invocation_contexts: t.Sequence[hikari.ApplicationContextType] | hikari.UndefinedType = hikari.UNDEFINED,
         default_permissions: hikari.Permissions | hikari.UndefinedType = hikari.UNDEFINED,
         is_nsfw: bool | hikari.UndefinedType = hikari.UNDEFINED,
     ) -> None:
@@ -92,7 +92,7 @@ class PluginBase(HasErrorHandler[ClientT], Hookable[ClientT], HasConcurrencyLimi
             autodefer=AutodeferMode(autodefer) if isinstance(autodefer, bool) else autodefer,
             default_permissions=default_permissions,
             integration_types=integration_types,
-            context_types=context_types,
+            invocation_contexts=invocation_contexts,
             is_nsfw=is_nsfw,
         )
 
@@ -264,7 +264,7 @@ class PluginBase(HasErrorHandler[ClientT], Hookable[ClientT], HasConcurrencyLimi
         guilds: t.Sequence[hikari.Snowflakeish | hikari.PartialGuild] | hikari.UndefinedType = hikari.UNDEFINED,
         autodefer: bool | AutodeferMode | hikari.UndefinedType = hikari.UNDEFINED,
         integration_types: t.Sequence[hikari.ApplicationIntegrationType] | hikari.UndefinedType = hikari.UNDEFINED,
-        context_types: t.Sequence[hikari.ApplicationContextType] | hikari.UndefinedType = hikari.UNDEFINED,
+        invocation_contexts: t.Sequence[hikari.ApplicationContextType] | hikari.UndefinedType = hikari.UNDEFINED,
         is_nsfw: bool | hikari.UndefinedType = hikari.UNDEFINED,
         default_permissions: hikari.Permissions | hikari.UndefinedType = hikari.UNDEFINED,
         name_localizations: t.Mapping[hikari.Locale, str] | None = None,
@@ -283,7 +283,7 @@ class PluginBase(HasErrorHandler[ClientT], Hookable[ClientT], HasConcurrencyLimi
         autodefer : bool | AutodeferMode
             If True, all commands in this group will automatically defer if it is taking longer than 2 seconds to respond.
             This can be overridden on a per-subcommand basis.
-        context_types : t.Sequence[hikari.ApplicationContextType]
+        invocation_contexts : t.Sequence[hikari.ApplicationContextType]
             The context types to enable the slash command group in
         integration_types : t.Sequence[hikari.ApplicationIntegrationType]
             The integration types to enable the slash command group in
@@ -322,7 +322,7 @@ class PluginBase(HasErrorHandler[ClientT], Hookable[ClientT], HasConcurrencyLimi
             description=description,
             guilds=guild_ids,
             autodefer=AutodeferMode(autodefer) if isinstance(autodefer, bool) else autodefer,
-            context_types=context_types,
+            invocation_contexts=invocation_contexts,
             integration_types=integration_types,
             default_permissions=default_permissions,
             name_localizations=name_localizations or {},
