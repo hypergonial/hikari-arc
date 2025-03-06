@@ -49,7 +49,6 @@ docs = [
     "mkdocstrings-python>=1.16.2",
 ]
 
-
 [project.urls]
 Homepage = "https://arc.hypergonial.com"
 Documentation = "https://arc.hypergonial.com"
