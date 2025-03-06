@@ -265,9 +265,6 @@ The recommended type-checker for `arc` is [pyright](https://github.com/microsoft
 === ":octicons-code-square-16: Other editors & CLI"
     See the [installation instructions](https://github.com/microsoft/pyright/blob/main/docs/installation.md) on how to set up pyright.
 
-    !!! failure ""
-        It is worth noting that **PyCharm's free version doesn't support pyright** due to [lacking LSP support](https://blog.jetbrains.com/platform/2023/07/lsp-for-plugin-developers/#supported-ides). You may use pyright from the command line as an alternative, or switch to another editor that [supports LSP](https://microsoft.github.io/language-server-protocol/implementors/tools/) properly.
-
 ## So I have a bot, now what?
 
 You made it! Congratulations on creating your first Discord bot with `arc`! Check out the [guides page](./guides/index.md) and decide where to go next. If you feel lost, or have questions to ask, you may join the [hikari Discord server](https://discord.gg/hikari) and ask for help in the `#arc` channel.
