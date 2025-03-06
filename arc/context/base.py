@@ -371,7 +371,7 @@ class Context(t.Generic[ClientT]):
 
         This is a shorthand for
 
-        ```py
+        ```
         authorizing_integration_owners.get(hikari.ApplicationIntegrationType.GUILD_INSTALL)
         ```
 
@@ -387,7 +387,9 @@ class Context(t.Generic[ClientT]):
 
         This will be `None` if the command was not installed by a user.
 
-        ```py
+        This is a shorthand for
+
+        ```
         authorizing_integration_owners.get(hikari.ApplicationIntegrationType.USER_INSTALL)
         ```
 
