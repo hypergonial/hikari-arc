@@ -114,9 +114,8 @@ reportUnnecessaryTypeIgnoreComment = "warning"
 reportUninitializedInstanceVariable = "error"
 reportShadowedImports = "warning"
 
-[build-system]
-requires = ["hatchling>=1.14"]
-build-backend = "hatchling.build"
+[tool.pytest.ini_options]
+asyncio_default_fixture_loop_scope = "function"
 
 [tool.hatch.build.targets.wheel]
 packages = ["arc"]
@@ -125,3 +124,7 @@ artifacts = ["pyproject.toml", "README.md", "LICENSE"]
 [tool.hatch.version]
 path = "arc/internal/about.py"
 pattern = '__version__: t\.Final\[str\] = \"(?P<version>[^\"]+)\"'
+
+[build-system]
+requires = ["hatchling>=1.14"]
+build-backend = "hatchling.build"
