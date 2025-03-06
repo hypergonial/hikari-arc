@@ -50,8 +50,9 @@ def _rebuild_hikari_command(
             description=command.description,
             options=list(command.options) if command.options else [],
             default_member_permissions=command.default_member_permissions,
-            is_dm_enabled=command.is_dm_enabled,
             is_nsfw=command.is_nsfw,
+            integration_types=command.integration_types,
+            context_types=command.context_types,
             name_localizations=command.name_localizations,
             description_localizations=command.description_localizations,
         )
@@ -61,8 +62,9 @@ def _rebuild_hikari_command(
             id=command.id,
             type=command.type,
             default_member_permissions=command.default_member_permissions,
-            is_dm_enabled=command.is_dm_enabled,
             is_nsfw=command.is_nsfw,
+            integration_types=command.integration_types,
+            context_types=command.context_types,
             name_localizations=command.name_localizations,
         )
     else:
@@ -93,7 +95,8 @@ def _compare_commands(arc_command: CommandBase[t.Any, t.Any], hk_command: hikari
         and arc_command.name == hk_command.name
         and cmd_dict.get("description") == getattr(hk_command, "description", None)
         and arc_command.is_nsfw == hk_command.is_nsfw
-        and arc_command.is_dm_enabled == hk_command.is_dm_enabled
+        and set(arc_command.invocation_contexts) == set(hk_command.context_types)
+        and set(arc_command.integration_types) == set(hk_command.integration_types)
         and (
             hk_command.guild_id in arc_command.guilds
             if hk_command.guild_id is not None and arc_command.guilds is not hikari.UNDEFINED

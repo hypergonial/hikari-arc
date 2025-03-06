@@ -23,7 +23,7 @@ async def another_loop() -> None:
 loop = arc.utils.IntervalLoop(another_loop, seconds=60.0)
 
 
-@client.set_startup_hook
+@client.add_startup_hook
 async def startup(client: arc.RESTClient) -> None:
     # Start the loop by passing all the parameters it needs
     loopy_loop.start(value=10)

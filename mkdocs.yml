@@ -68,6 +68,7 @@ nav:
       - guides/options.md
       - guides/command_groups.md
       - guides/context_menu.md
+      - guides/installation_contexts.md
       - guides/startup_shutdown.md
       - guides/hooks.md
       - guides/error_handling.md

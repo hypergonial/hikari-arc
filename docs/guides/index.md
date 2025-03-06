@@ -67,6 +67,15 @@ If you think something is missing or inaccurate, please [open an issue](https://
 
     [:octicons-arrow-right-24: Learn more](./context_menu.md)
 
+-   :octicons-download-16:{ .lg .middle } **Installation & Invocation**
+
+    ---
+
+    Learn how you can make your commands installable by
+    guilds and users alike, and how you can query this information at runtime!
+
+    [:octicons-arrow-right-24: Learn more](./installation_contexts.md)
+
 -   :material-power:{ .lg .middle } **Startup & Shutdown**
 
     ---

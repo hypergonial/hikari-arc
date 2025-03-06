@@ -18,7 +18,14 @@ class MockClient(arc.abc.Client[t.Any]):
         autodefer: bool | arc.AutodeferMode = True,
         default_permissions: hikari.Permissions | hikari.UndefinedType = hikari.UNDEFINED,
         is_nsfw: bool = False,
-        is_dm_enabled: bool = True,
+        integration_types: t.Sequence[hikari.ApplicationIntegrationType] = [
+            hikari.ApplicationIntegrationType.GUILD_INSTALL
+        ],
+        invocation_contexts: t.Sequence[hikari.ApplicationContextType] = [
+            hikari.ApplicationContextType.BOT_DM,
+            hikari.ApplicationContextType.GUILD,
+            hikari.ApplicationContextType.PRIVATE_CHANNEL,
+        ],
         provided_locales: t.Sequence[hikari.Locale] | None = None,
         injector: alluka.abc.Client | None = None,
     ) -> None:
@@ -29,7 +36,8 @@ class MockClient(arc.abc.Client[t.Any]):
             autodefer=autodefer,
             default_permissions=default_permissions,
             is_nsfw=is_nsfw,
-            is_dm_enabled=is_dm_enabled,
+            integration_types=integration_types,
+            invocation_contexts=invocation_contexts,
             provided_locales=provided_locales,
             injector=injector,
         )

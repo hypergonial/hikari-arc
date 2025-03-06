@@ -58,7 +58,6 @@ def test_my_command() -> None:
     assert command.name == "test"
     assert command.description == "No description provided."
     assert command.default_permissions == hikari.Permissions.ADMINISTRATOR
-    assert command.is_dm_enabled is True
     assert command.is_nsfw is False
     assert command.name_localizations == {}
     assert command.description_localizations == {}
@@ -132,7 +131,6 @@ def test_my_group() -> None:
     assert group.name == "my_group"
     assert group.description == "My group description"
     assert group.default_permissions == hikari.Permissions.ADMINISTRATOR
-    assert group.is_dm_enabled is True
     assert group.is_nsfw is False
     assert group.name_localizations == {}
     assert group.description_localizations == {}

@@ -172,7 +172,8 @@ Only top-level commands & groups can have the following defined:
 
 - `default_permissions`
 - `is_nsfw`
-- `is_dm_enabled`
+- `invocation_contexts`
+- `integration_types`
 - `guilds`
 
 Subcommands & subgroups inherit these settings from the parent group. This is due to how Discord represents subcommands & subgroups in the API.
