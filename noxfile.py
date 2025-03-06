@@ -8,7 +8,7 @@ PATH_TO_PROJECT = os.path.join(".", "arc")
 EXAMPLES_PATH = os.path.join(".", "examples")
 SCRIPT_PATHS = [PATH_TO_PROJECT, EXAMPLES_PATH, "noxfile.py", os.path.join(".", "tests")]
 
-options.default_venv_backend = "uv|virtualenv"
+options.default_venv_backend = "uv"
 options.sessions = ["format_fix", "slotscheck", "pyright", "pytest", "docs"]
 
 
