@@ -45,7 +45,8 @@ class MessageCommand(CallableCommandBase[ClientT, hikari.api.ContextMenuCommandB
             id=id,
             type=self.command_type,
             default_member_permissions=self.default_permissions,
-            is_dm_enabled=self.is_dm_enabled,
+            context_types=self.context_types,
+            integration_types=self.integration_types,
             is_nsfw=self.is_nsfw,
             name_localizations={str(key): value for key, value in self.name_localizations.items()},
         )
@@ -67,7 +68,8 @@ def message_command(
     name: str,
     *,
     guilds: t.Sequence[hikari.PartialGuild | hikari.Snowflakeish] | hikari.UndefinedType = hikari.UNDEFINED,
-    is_dm_enabled: bool | hikari.UndefinedType = hikari.UNDEFINED,
+    integration_types: t.Sequence[hikari.ApplicationIntegrationType] | hikari.UndefinedType = hikari.UNDEFINED,
+    context_types: t.Sequence[hikari.ApplicationContextType] | hikari.UndefinedType = hikari.UNDEFINED,
     is_nsfw: bool | hikari.UndefinedType = hikari.UNDEFINED,
     autodefer: bool | AutodeferMode | hikari.UndefinedType = hikari.UNDEFINED,
     default_permissions: hikari.Permissions | hikari.UndefinedType = hikari.UNDEFINED,
@@ -84,8 +86,10 @@ def message_command(
         The name of the command.
     guilds : t.Sequence[hikari.PartialGuild | hikari.Snowflakeish] | hikari.UndefinedType
         The guilds this command should be enabled in, if left as undefined, the command is global
-    is_dm_enabled : bool | hikari.UndefinedType
-        Whether this command is enabled in DMs.
+    integration_types : t.Sequence[hikari.ApplicationIntegrationType] | hikari.UndefinedType
+        The integration types this command supports the installation of
+    context_types : t.Sequence[hikari.ApplicationContextType] | hikari.UndefinedType
+        The context types this command can be invoked in
     is_nsfw : bool | hikari.UndefinedType
         Whether this command is NSFW.
     autodefer : bool | AutodeferMode | hikari.UndefinedType
@@ -116,7 +120,8 @@ def message_command(
             name=name,
             autodefer=AutodeferMode(autodefer) if isinstance(autodefer, bool) else autodefer,
             guilds=guild_ids,
-            is_dm_enabled=is_dm_enabled,
+            integration_types=integration_types,
+            context_types=context_types,
             is_nsfw=is_nsfw,
             default_permissions=default_permissions,
             name_localizations=name_localizations or {},

@@ -23,7 +23,11 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 requires-python = ">=3.10"
-dependencies = ["alluka>=0.3.3,<0.4", "attrs>=25.1.0", "hikari>=2.1.1"]
+dependencies = [
+    "alluka>=0.3.3,<0.4",
+    "attrs>=25.1.0",
+    "hikari @ git+https://github.com/hikari-py/hikari@c9fe5d134a4ed4183472cec63d3e47f41cf3b6af",
+]
 
 [project.optional-dependencies]
 cron = ["croniter==5.0.1", "types-croniter==5.0.1.20241205"]
@@ -125,6 +129,10 @@ artifacts = ["pyproject.toml", "README.md", "LICENSE"]
 [tool.hatch.version]
 path = "arc/internal/about.py"
 pattern = '__version__: t\.Final\[str\] = \"(?P<version>[^\"]+)\"'
+
+# FIXME: Remove this once hikari 2.2 is out
+[tool.hatch.metadata]
+allow-direct-references = true
 
 [build-system]
 requires = ["hatchling>=1.14"]

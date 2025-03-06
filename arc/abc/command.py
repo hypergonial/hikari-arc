@@ -186,7 +186,8 @@ class _CommandSettings:
     autodefer: AutodeferMode | hikari.UndefinedType
     default_permissions: hikari.Permissions | hikari.UndefinedType
     is_nsfw: bool | hikari.UndefinedType
-    is_dm_enabled: bool | hikari.UndefinedType
+    integration_types: t.Sequence[hikari.ApplicationIntegrationType] | hikari.UndefinedType
+    context_types: t.Sequence[hikari.ApplicationContextType] | hikari.UndefinedType
 
     def apply(self, other: te.Self) -> te.Self:
         """Apply 'other' to this, copying all the non-undefined settings to it."""
@@ -196,13 +197,26 @@ class _CommandSettings:
             if other.default_permissions is not hikari.UNDEFINED
             else self.default_permissions,
             is_nsfw=other.is_nsfw if other.is_nsfw is not hikari.UNDEFINED else self.is_nsfw,
-            is_dm_enabled=other.is_dm_enabled if other.is_dm_enabled is not hikari.UNDEFINED else self.is_dm_enabled,
+            integration_types=other.integration_types
+            if other.integration_types is not hikari.UNDEFINED
+            else self.integration_types,
+            context_types=other.context_types if other.context_types is not hikari.UNDEFINED else self.context_types,
         )
 
     @classmethod
     def default(cls) -> te.Self:
         """Get the default command settings."""
-        return cls(autodefer=AutodeferMode.ON, default_permissions=hikari.UNDEFINED, is_nsfw=False, is_dm_enabled=True)
+        return cls(
+            autodefer=AutodeferMode.ON,
+            default_permissions=hikari.UNDEFINED,
+            is_nsfw=False,
+            integration_types=[hikari.ApplicationIntegrationType.GUILD_INSTALL],
+            context_types=[
+                hikari.ApplicationContextType.GUILD,
+                hikari.ApplicationContextType.BOT_DM,
+                hikari.ApplicationContextType.PRIVATE_CHANNEL,
+            ],
+        )
 
 
 @attr.define(slots=True, kw_only=True)
@@ -223,8 +237,15 @@ class CommandBase(
     _autodefer: AutodeferMode | hikari.UndefinedType = attr.field(default=hikari.UNDEFINED, alias="autodefer")
     """If ON, this command will be automatically deferred if it takes longer than 2 seconds to respond."""
 
-    _is_dm_enabled: bool | hikari.UndefinedType = attr.field(default=hikari.UNDEFINED, alias="is_dm_enabled")
-    """Whether this command is enabled in DMs."""
+    _integration_types: t.Sequence[hikari.ApplicationIntegrationType] | hikari.UndefinedType = attr.field(
+        default=hikari.UNDEFINED, alias="integration_types"
+    )
+    """A list of integration types where the command can be installed in."""
+
+    _context_types: t.Sequence[hikari.ApplicationContextType] | hikari.UndefinedType = attr.field(
+        default=hikari.UNDEFINED, alias="context_types"
+    )
+    """A list of context types where the command can be used in."""
 
     _default_permissions: hikari.Permissions | hikari.UndefinedType = attr.field(
         default=hikari.UNDEFINED, alias="default_permissions"
@@ -320,10 +341,28 @@ class CommandBase(
         return settings.autodefer if settings.autodefer is not hikari.UNDEFINED else AutodeferMode.ON
 
     @property
-    def is_dm_enabled(self) -> bool:
-        """Whether this command is enabled in DMs."""
+    def integration_types(self) -> t.Sequence[hikari.ApplicationIntegrationType]:
+        """A list of integration types where the command can be installed in."""
         settings = self._resolve_settings()
-        return settings.is_dm_enabled if settings.is_dm_enabled is not hikari.UNDEFINED else True
+        return (
+            settings.integration_types
+            if settings.integration_types is not hikari.UNDEFINED
+            else [hikari.ApplicationIntegrationType.GUILD_INSTALL]
+        )
+
+    @property
+    def context_types(self) -> t.Sequence[hikari.ApplicationContextType]:
+        """A list of context types where the command can be used in."""
+        settings = self._resolve_settings()
+        return (
+            settings.context_types
+            if settings.context_types is not hikari.UNDEFINED
+            else [
+                hikari.ApplicationContextType.GUILD,
+                hikari.ApplicationContextType.BOT_DM,
+                hikari.ApplicationContextType.PRIVATE_CHANNEL,
+            ]
+        )
 
     @property
     def default_permissions(self) -> hikari.Permissions | hikari.UndefinedType:
@@ -383,7 +422,8 @@ class CommandBase(
                 autodefer=self._autodefer,
                 default_permissions=self._default_permissions,
                 is_nsfw=self._is_nsfw,
-                is_dm_enabled=self._is_dm_enabled,
+                integration_types=self._integration_types,
+                context_types=self._context_types,
             )
         )
 
@@ -488,7 +528,8 @@ class CommandBase(
             "nsfw": self.is_nsfw,
             "default_member_permissions": self.default_permissions,
             "name_localizations": self.name_localizations,
-            "dm_enabled": self.is_dm_enabled,
+            "integration_types": self.integration_types,
+            "context_types": self.context_types,
         }
 
     @abc.abstractmethod

@@ -9,6 +9,66 @@ hide:
 
 Here you can find all the changelogs for `hikari-arc`.
 
+## 2.0.0
+
+- **Breaking:** Remove `is_dm_enabled` from all command, plugin, and client types. Use the newly added `context_types` instead.
+- **Breaking:** Remove deprecated `Client.set_startup_hook` and `Client.set_shutdown_hook`. Use the newly added `Client.add_startup_hook` and `Client.add_shutdown_hook` instead.
+- Add support for **user installations** of commands.
+  - Add `context_types` and `integration_types` to all command, plugin, and client types.
+  - Add `invocation_context` and `authorizing_integration_owners` to `Context` and `AutocompleteData`.
+- Bump `hikari` to `v2.2.0`.
+
+### Migration guide
+
+#### `is_dm_enabled` removal
+
+```py
+# Before 2.0
+client = arc.Client(is_dm_enabled=False)
+
+# After 2.0
+
+# Omit hikari.ApplicationContextType.BOT_DM to disable DMs
+# You may also want to remove PRIVATE_CHANNEL if you don't want to support group DMs
+client = arc.Client(
+    context_types=[
+        hikari.ApplicationContextType.GUILD,
+        hikari.ApplicationContextType.PRIVATE_CHANNEL
+    ]
+)
+```
+
+This applies similarly to command or plugin-level use of this setting.
+
+#### `set_startup_hook` and `set_shutdown_hook` removal
+
+```py
+
+bot = hikari.RESTBot("...")
+client = arc.RESTClient(bot)
+
+# Before 2.0
+
+@client.set_startup_hook
+async def startup_hook(client: arc.GatewayClient) -> None:
+    print("Client started up!")
+
+@client.set_shutdown_hook
+async def shutdown_hook(client: arc.GatewayClient) -> None:
+    print("Client shut down!")
+
+# After 2.0
+
+@client.add_startup_hook
+async def startup_hook(client: arc.GatewayClient) -> None:
+    print("Client started up!")
+
+@client.add_shutdown_hook
+async def shutdown_hook(client: arc.GatewayClient) -> None:
+    print("Client shut down!")
+```
+
+
 ## 1.4.0
 
 - Add new optiontype with converter for `hikari.Emoji`.

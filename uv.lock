@@ -574,17 +574,13 @@ wheels = [
 
 [[package]]
 name = "hikari"
-version = "2.1.1"
-source = { registry = "https://pypi.org/simple" }
+version = "2.1.2.dev0"
+source = { git = "https://github.com/hikari-py/hikari?rev=c9fe5d134a4ed4183472cec63d3e47f41cf3b6af#c9fe5d134a4ed4183472cec63d3e47f41cf3b6af" }
 dependencies = [
     { name = "aiohttp" },
     { name = "attrs" },
     { name = "colorlog" },
     { name = "multidict" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/a1/8a/97d513c8ee6fa94b1a3cc25d2b5e31132987497c72373d888b6e420483a3/hikari-2.1.1.tar.gz", hash = "sha256:70c3987d87a5eb29db9ab448989ae8e2c65d3f2e44a392bc5c6e1d77db8e146c", size = 442935 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/de/53/6e0ee541deb4dcce0790d5f03cfa95a96022b44b29bca12029cb10e5d84b/hikari-2.1.1-py3-none-any.whl", hash = "sha256:9633babb36e7be42db386112ca87a8ef2e1f63ce79a352dcc874147801d29a05", size = 545719 },
 ]
 
 [package.optional-dependencies]
@@ -636,7 +632,7 @@ requires-dist = [
     { name = "alluka", specifier = ">=0.3.3,<0.4" },
     { name = "attrs", specifier = ">=25.1.0" },
     { name = "croniter", marker = "extra == 'cron'", specifier = "==5.0.1" },
-    { name = "hikari", specifier = ">=2.1.1" },
+    { name = "hikari", git = "https://github.com/hikari-py/hikari?rev=c9fe5d134a4ed4183472cec63d3e47f41cf3b6af" },
     { name = "hikari", extras = ["server"], marker = "extra == 'rest'", specifier = ">=2.1.1" },
     { name = "types-croniter", marker = "extra == 'cron'", specifier = "==5.0.1.20241205" },
 ]

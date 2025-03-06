@@ -347,6 +347,20 @@ class Context(t.Generic[ClientT]):
         return self._interaction.guild_id
 
     @property
+    def invocation_context(self) -> hikari.ApplicationContextType:
+        """The context in which the interaction was invoked."""
+        return self._interaction.context
+
+    @property
+    def authorizing_integration_owners(self) -> t.Mapping[hikari.ApplicationIntegrationType, hikari.Snowflake]:
+        """Includes details about the authorizing user or server for the installation(s) relevant to the interaction.
+
+        For apps installed to a user, it can be used to tell the difference between the authorizing user
+        and the user that triggered an interaction (like a message component).
+        """
+        return self._interaction.authorizing_integration_owners
+
+    @property
     def is_valid(self) -> bool:
         """Returns if the underlying interaction expired or not.
         This is not 100% accurate due to API latency, but should be good enough for most use cases.
