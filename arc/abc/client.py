@@ -450,6 +450,66 @@ class Client(t.Generic[AppT], abc.ABC):
         return await command._on_autocomplete(interaction)
 
     @t.overload
+    def find_command(
+        self, command_type: t.Literal[hikari.CommandType.USER], full_name: str
+    ) -> UserCommand[te.Self] | None: ...
+
+    @t.overload
+    def find_command(
+        self, command_type: t.Literal[hikari.CommandType.MESSAGE], full_name: str
+    ) -> MessageCommand[te.Self] | None: ...
+
+    @t.overload
+    def find_command(
+        self, command_type: t.Literal[hikari.CommandType.SLASH], full_name: str
+    ) -> SlashCommand[te.Self] | SlashSubCommand[te.Self] | SlashGroup[te.Self] | SlashSubGroup[te.Self] | None: ...
+
+    def find_command(self, command_type: hikari.CommandType, full_name: str) -> t.Any | None:
+        """Find a given command by it's fully qualified name.
+
+        For instance, to locate a slash subcommand with the name `foo` in a group `bar`, you would pass `bar foo`.
+
+        Parameters
+        ----------
+        command_type : hikari.CommandType
+            The type of command to search for.
+        full_name : str
+            The fully qualified name of the command.
+
+        Returns
+        -------
+        t.Any | None
+            The command if found, otherwise None.
+        """
+        if command_type is hikari.CommandType.MESSAGE:
+            return self._message_commands.get(full_name)
+        if command_type is hikari.CommandType.USER:
+            return self._user_commands.get(full_name)
+
+        if command_type is not hikari.CommandType.SLASH:
+            return None
+
+        command_parts = full_name.split(" ")
+
+        if len(command_parts) == 1:
+            return self._slash_commands.get(command_parts[0])
+
+        base_cmd = self._slash_commands.get(command_parts[0])
+
+        if not isinstance(base_cmd, SlashGroup):
+            return None
+
+        subcmd = base_cmd.children.get(command_parts[1])
+
+        if len(command_parts) == 2:
+            return subcmd
+
+        if not isinstance(subcmd, SlashSubGroup):
+            return None
+
+        return subcmd.children.get(command_parts[2])
+
+    @t.overload
     def walk_commands(
         self, command_type: t.Literal[hikari.CommandType.USER], *, callable_only: bool = False
     ) -> t.Iterator[UserCommand[te.Self]]: ...

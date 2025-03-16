@@ -16,6 +16,7 @@ Here you can find all the changelogs for `hikari-arc`.
 - Add support for **user installations** of commands.
   - Add `invocation_contexts` and `integration_types` to all command, plugin, and client types.
   - Add `invocation_context` and `authorizing_integration_owners` to `Context` and `AutocompleteData`.
+- Add `Client.find_command` and `PluginBase.find_command` to get a command by name.
 - Bump `hikari` to `v2.2.0`.
 
 ### Migration guide
