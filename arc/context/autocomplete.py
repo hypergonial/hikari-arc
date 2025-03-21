@@ -51,7 +51,7 @@ class AutocompleteData(t.Generic[ClientT, ChoiceT]):
         """
         if self.focused_option is None:
             return None
-        return t.cast(ChoiceT | str, self.focused_option.value)
+        return t.cast("ChoiceT | str", self.focused_option.value)
 
     @property
     def guild_id(self) -> hikari.Snowflake | None:
@@ -87,13 +87,13 @@ class AutocompleteData(t.Generic[ClientT, ChoiceT]):
         """The user that triggered the interaction."""
         return self.interaction.user
 
+    @property
+    def channel(self) -> hikari.InteractionChannel:
+        return self.interaction.channel
+
     def get_guild(self) -> hikari.Guild | None:
         """Get the guild that triggered the interaction."""
         return self.interaction.get_guild()
-
-    def get_channel(self) -> hikari.TextableGuildChannel | None:
-        """Get the channel that triggered the interaction."""
-        return self.interaction.get_channel()
 
 
 # MIT License

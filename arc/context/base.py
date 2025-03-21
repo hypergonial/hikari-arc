@@ -342,6 +342,11 @@ class Context(t.Generic[ClientT]):
         return self._interaction.channel_id
 
     @property
+    def channel(self) -> hikari.InteractionChannel:
+        """The channel the context represents."""
+        return self._interaction.channel
+
+    @property
     def guild_id(self) -> hikari.Snowflake | None:
         """The ID of the guild the context represents. Will be None in DMs."""
         return self._interaction.guild_id
@@ -466,10 +471,6 @@ class Context(t.Generic[ClientT]):
     def get_guild(self) -> hikari.GatewayGuild | None:
         """Gets the guild this context represents, if any. Requires application cache."""
         return self._interaction.get_guild()
-
-    def get_channel(self) -> hikari.TextableGuildChannel | None:
-        """Gets the channel this context represents, None if in a DM. Requires application cache."""
-        return self._interaction.get_channel()
 
     @t.overload
     def get_option(self, name: str, opt_type: t.Literal[OptionType.EMOJI]) -> hikari.Emoji | None: ...

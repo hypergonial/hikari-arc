@@ -593,7 +593,7 @@ class CommandBase(
             for hook in hooks:
                 res = await ctx._injection_ctx.call_with_async_di(hook, ctx)
 
-                res = t.cast(HookResult | None, res)
+                res = t.cast("HookResult | None", res)
 
                 if res and res._abort:
                     aborted = True

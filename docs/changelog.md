@@ -13,6 +13,7 @@ Here you can find all the changelogs for `hikari-arc`.
 
 - **Breaking:** Remove `is_dm_enabled` from all command, plugin, and client types. Use the newly added `invocation_contexts` instead.
 - **Breaking:** Remove deprecated `Client.set_startup_hook` and `Client.set_shutdown_hook`. Use the newly added `Client.add_startup_hook` and `Client.add_shutdown_hook` instead.
+- **Breaking:** Remove `Context.get_channel` and `AutocompleteData.get_channel`. Use the newly added `Context.channel` and `AutocompleteData.channel` properties instead.
 - Add support for **user installations** of commands.
   - Add `invocation_contexts` and `integration_types` to all command, plugin, and client types.
   - Add `invocation_context` and `authorizing_integration_owners` to `Context` and `AutocompleteData`.
@@ -64,6 +65,23 @@ async def startup_hook(client: arc.GatewayClient) -> None:
 @client.add_shutdown_hook
 async def shutdown_hook(client: arc.GatewayClient) -> None:
     print("Client shut down!")
+```
+
+## `get_channel` removal
+
+```py
+
+# Before 2.0
+
+@arc.slash_command("test", "Test command")
+async def test(ctx: arc.GatewayContext) -> None:
+    channel = ctx.get_channel()
+
+# After 2.0
+
+@arc.slash_command("test", "Test command")
+async def test(ctx: arc.GatewayContext) -> None:
+    channel = ctx.channel
 ```
 
 
