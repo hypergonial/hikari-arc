@@ -259,14 +259,11 @@ and rely only on users invoking the bot via slash commands. Setting up a RESTBot
 
 The recommended type-checker for `arc` is [pyright](https://github.com/microsoft/pyright).
 
-=== ":simple-visualstudiocode: Visual Studio Code"
+=== ":material-microsoft-visual-studio-code: Visual Studio Code"
     **VS Code** ships **pyright** with the [Python](https://marketplace.visualstudio.com/items?itemName=ms-python.python) extension, however it is **disabled by default**. To enable it, navigate to `File > Preferences > Settings` and search for `python.analysis.typeCheckingMode`. Set this to either "basic" or "strict". For more information on using Python with VS Code, see the [official documentation](https://code.visualstudio.com/docs/languages/python).
 
 === ":octicons-code-square-16: Other editors & CLI"
     See the [installation instructions](https://github.com/microsoft/pyright/blob/main/docs/installation.md) on how to set up pyright.
-
-    !!! failure ""
-        It is worth noting that **PyCharm's free version doesn't support pyright** due to [lacking LSP support](https://blog.jetbrains.com/platform/2023/07/lsp-for-plugin-developers/#supported-ides). You may use pyright from the command line as an alternative, or switch to another editor that [supports LSP](https://microsoft.github.io/language-server-protocol/implementors/tools/) properly.
 
 ## So I have a bot, now what?
 

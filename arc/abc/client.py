@@ -22,7 +22,6 @@ from arc.command.slash import SlashCommand, SlashGroup, SlashSubCommand, SlashSu
 from arc.command.user import UserCommand
 from arc.context import AutodeferMode, Context
 from arc.errors import ExtensionLoadError, ExtensionUnloadError
-from arc.internal.deprecation import warn_deprecate
 from arc.internal.sync import _sync_commands
 from arc.internal.types import (
     AppT,
@@ -37,7 +36,6 @@ from arc.internal.types import (
     PostHookT,
     ResponseBuilderT,
 )
-from arc.internal.version import Version
 from arc.locale import CommandLocaleRequest, LocaleResponse, OptionLocaleRequest
 
 if t.TYPE_CHECKING:
@@ -78,9 +76,12 @@ class Client(t.Generic[AppT], abc.ABC):
     is_nsfw : bool
         Whether to mark commands as NSFW
         This applies to all commands, and can be overridden on a per-command basis.
-    is_dm_enabled : bool
-        Whether to enable commands in DMs
+    integration_types : t.Sequence[hikari.ApplicationIntegrationType] | hikari.UndefinedType
+        The integration types that commands will support the installation of
         This applies to all commands, and can be overridden on a per-command basis.
+    invocation_contexts : t.Sequence[hikari.ApplicationContextType] | hikari.UndefinedType
+        The context types that commands can be invoked in
+        This applies to all commands, and can be overridden on a per-command basis
     provided_locales : t.Sequence[hikari.Locale] | None
         The locales that will be provided to the client by locale provider callbacks
     injector : alluka.Client | None
@@ -126,7 +127,14 @@ class Client(t.Generic[AppT], abc.ABC):
         autodefer: bool | AutodeferMode = True,
         default_permissions: hikari.Permissions | hikari.UndefinedType = hikari.UNDEFINED,
         is_nsfw: bool = False,
-        is_dm_enabled: bool = True,
+        integration_types: t.Sequence[hikari.ApplicationIntegrationType] = [
+            hikari.ApplicationIntegrationType.GUILD_INSTALL
+        ],
+        invocation_contexts: t.Sequence[hikari.ApplicationContextType] = [
+            hikari.ApplicationContextType.GUILD,
+            hikari.ApplicationContextType.PRIVATE_CHANNEL,
+            hikari.ApplicationContextType.BOT_DM,
+        ],
         provided_locales: t.Sequence[hikari.Locale] | None = None,
         injector: alluka.abc.Client | None = None,
     ) -> None:
@@ -141,8 +149,9 @@ class Client(t.Generic[AppT], abc.ABC):
         self._cmd_settings = _CommandSettings(
             autodefer=AutodeferMode(autodefer),
             default_permissions=default_permissions,
+            invocation_contexts=invocation_contexts,
+            integration_types=integration_types,
             is_nsfw=is_nsfw,
-            is_dm_enabled=is_dm_enabled,
         )
 
         self._slash_commands: dict[str, SlashCommandLike[te.Self]] = {}
@@ -160,8 +169,8 @@ class Client(t.Generic[AppT], abc.ABC):
         self._application: hikari.Application | None = None
         self._error_handler: ErrorHandlerCallbackT[te.Self] | None = None
         self._concurrency_limiter: ConcurrencyLimiterProto[te.Self] | None = None
-        self._startup_hooks: list[LifeCycleHookT[te.Self] | None] = [None]
-        self._shutdown_hooks: list[LifeCycleHookT[te.Self] | None] = [None]
+        self._startup_hooks: list[LifeCycleHookT[te.Self]] = []
+        self._shutdown_hooks: list[LifeCycleHookT[te.Self]] = []
         self._command_locale_provider: CommandLocaleRequestT | None = None
         self._option_locale_provider: OptionLocaleRequestT | None = None
         self._custom_locale_provider: CustomLocaleRequestT | None = None
@@ -291,12 +300,11 @@ class Client(t.Generic[AppT], abc.ABC):
 
         try:
             for hook in self._startup_hooks:
-                if hook:
-                    try:
-                        await hook(self)
-                    except Exception as e:
-                        logger.error(f"Error in startup hook '{hook.__name__}': {e}")
-                        traceback.print_exc()
+                try:
+                    await hook(self)
+                except Exception as e:
+                    logger.error(f"Error in startup hook '{hook.__name__}': {e}")
+                    traceback.print_exc()
         finally:
             self._started.set()
 
@@ -305,12 +313,11 @@ class Client(t.Generic[AppT], abc.ABC):
         Reserved for internal shutdown logic.
         """
         for hook in self._shutdown_hooks:
-            if hook:
-                try:
-                    await hook(self)
-                except Exception as e:
-                    logger.error(f"Error in shutdown hook '{hook.__name__}': {e}")
-                    traceback.print_exc()
+            try:
+                await hook(self)
+            except Exception as e:
+                logger.error(f"Error in shutdown hook '{hook.__name__}': {e}")
+                traceback.print_exc()
 
         for task in self._tasks:
             task.cancel()
@@ -441,6 +448,66 @@ class Client(t.Generic[AppT], abc.ABC):
             return
 
         return await command._on_autocomplete(interaction)
+
+    @t.overload
+    def find_command(
+        self, command_type: t.Literal[hikari.CommandType.USER], full_name: str
+    ) -> UserCommand[te.Self] | None: ...
+
+    @t.overload
+    def find_command(
+        self, command_type: t.Literal[hikari.CommandType.MESSAGE], full_name: str
+    ) -> MessageCommand[te.Self] | None: ...
+
+    @t.overload
+    def find_command(
+        self, command_type: t.Literal[hikari.CommandType.SLASH], full_name: str
+    ) -> SlashCommand[te.Self] | SlashSubCommand[te.Self] | SlashGroup[te.Self] | SlashSubGroup[te.Self] | None: ...
+
+    def find_command(self, command_type: hikari.CommandType, full_name: str) -> t.Any | None:
+        """Find a given command by it's fully qualified name.
+
+        For instance, to locate a slash subcommand with the name `foo` in a group `bar`, you would pass `bar foo`.
+
+        Parameters
+        ----------
+        command_type : hikari.CommandType
+            The type of command to search for.
+        full_name : str
+            The fully qualified name of the command.
+
+        Returns
+        -------
+        t.Any | None
+            The command if found, otherwise None.
+        """
+        if command_type is hikari.CommandType.MESSAGE:
+            return self._message_commands.get(full_name)
+        if command_type is hikari.CommandType.USER:
+            return self._user_commands.get(full_name)
+
+        if command_type is not hikari.CommandType.SLASH:
+            return None
+
+        command_parts = full_name.split(" ")
+
+        if len(command_parts) == 1:
+            return self._slash_commands.get(command_parts[0])
+
+        base_cmd = self._slash_commands.get(command_parts[0])
+
+        if not isinstance(base_cmd, SlashGroup):
+            return None
+
+        subcmd = base_cmd.children.get(command_parts[1])
+
+        if len(command_parts) == 2:
+            return subcmd
+
+        if not isinstance(subcmd, SlashSubGroup):
+            return None
+
+        return subcmd.children.get(command_parts[2])
 
     @t.overload
     def walk_commands(
@@ -599,7 +666,8 @@ class Client(t.Generic[AppT], abc.ABC):
         *,
         guilds: t.Sequence[hikari.Snowflakeish | hikari.PartialGuild] | hikari.UndefinedType = hikari.UNDEFINED,
         autodefer: bool | AutodeferMode | hikari.UndefinedType = hikari.UNDEFINED,
-        is_dm_enabled: bool | hikari.UndefinedType = hikari.UNDEFINED,
+        invocation_contexts: t.Sequence[hikari.ApplicationContextType] | hikari.UndefinedType = hikari.UNDEFINED,
+        integration_types: t.Sequence[hikari.ApplicationIntegrationType] | hikari.UndefinedType = hikari.UNDEFINED,
         default_permissions: hikari.Permissions | hikari.UndefinedType = hikari.UNDEFINED,
         name_localizations: t.Mapping[hikari.Locale, str] | None = None,
         description_localizations: t.Mapping[hikari.Locale, str] | None = None,
@@ -618,8 +686,10 @@ class Client(t.Generic[AppT], abc.ABC):
         autodefer : bool | AutodeferMode
             If True, all commands in this group will automatically defer if it is taking longer than 2 seconds to respond.
             This can be overridden on a per-subcommand basis.
-        is_dm_enabled : bool
-            Whether the slash command group is enabled in DMs
+        integration_types : t.Sequence[hikari.ApplicationIntegrationType] | hikari.UndefinedType
+            The integration types this group supports the installation of
+        invocation_contexts : t.Sequence[hikari.ApplicationContextType] | hikari.UndefinedType
+            The context types this group can be invoked in
         default_permissions : hikari.Permissions | hikari.UndefinedType
             The default permissions for the slash command group
         name_localizations : dict[hikari.Locale, str]
@@ -655,7 +725,8 @@ class Client(t.Generic[AppT], abc.ABC):
             description=description,
             guilds=guild_ids,
             autodefer=AutodeferMode(autodefer) if isinstance(autodefer, bool) else autodefer,
-            is_dm_enabled=is_dm_enabled,
+            invocation_contexts=invocation_contexts,
+            integration_types=integration_types,
             default_permissions=default_permissions,
             name_localizations=name_localizations or {},
             description_localizations=description_localizations or {},
@@ -1006,110 +1077,6 @@ class Client(t.Generic[AppT], abc.ABC):
 
         def decorator(handler: LifeCycleHookT[te.Self]) -> te.Self:
             self._shutdown_hooks.append(handler)
-            return self
-
-        if hook is not None:
-            return decorator(hook)
-
-        return decorator
-
-    @t.overload
-    def set_startup_hook(self, hook: LifeCycleHookT[te.Self]) -> te.Self: ...
-
-    @t.overload
-    def set_startup_hook(self) -> t.Callable[[LifeCycleHookT[te.Self]], te.Self]: ...
-
-    def set_startup_hook(
-        self, hook: LifeCycleHookT[te.Self] | None = None
-    ) -> te.Self | t.Callable[[LifeCycleHookT[te.Self]], te.Self]:
-        """Decorator to set the startup hook for this client.
-
-        This will be called when the client starts up.
-
-        !!! warning "Deprecation Notice"
-            This method is deprecated and will be removed in version `2.0.0`.
-            Use [`Client.add_startup_hook`][arc.client.Client.add_startup_hook] instead.
-
-        Parameters
-        ----------
-        hook : LifeCycleHookT[te.Self]
-            The startup hook to set.
-
-        Returns
-        -------
-        te.Self
-            The client for chaining calls.
-
-        Example
-        --------
-        ```py
-        @client.set_startup_hook
-        async def startup_hook(client: arc.GatewayClient) -> None:
-            print("Client started up!")
-        ```
-
-        Or, as a function:
-
-        ```py
-        client.set_startup_hook(startup_hook)
-        ```
-        """
-        warn_deprecate(what="set_startup_hook", when=Version(2, 0, 0), use_instead="add_startup_hook")
-
-        def decorator(handler: LifeCycleHookT[te.Self]) -> te.Self:
-            self._startup_hooks[0] = handler
-            return self
-
-        if hook is not None:
-            return decorator(hook)
-
-        return decorator
-
-    @t.overload
-    def set_shutdown_hook(self, hook: LifeCycleHookT[te.Self]) -> te.Self: ...
-
-    @t.overload
-    def set_shutdown_hook(self) -> t.Callable[[LifeCycleHookT[te.Self]], te.Self]: ...
-
-    def set_shutdown_hook(
-        self, hook: LifeCycleHookT[te.Self] | None = None
-    ) -> te.Self | t.Callable[[LifeCycleHookT[te.Self]], te.Self]:
-        """Decorator to set the shutdown hook for this client.
-
-        This will be called when the client shuts down.
-
-        !!! warning "Deprecation Notice"
-            This method is deprecated and will be removed in version `2.0.0`.
-            Use [`Client.add_shutdown_hook`][arc.client.Client.add_shutdown_hook] instead.
-
-        Parameters
-        ----------
-        hook : LifeCycleHookT[te.Self]
-            The shutdown hook to set.
-
-        Returns
-        -------
-        te.Self
-            The client for chaining calls.
-
-        Example
-        --------
-        ```py
-        @client.set_shutdown_hook
-        async def shutdown_hook(client: arc.GatewayClient) -> None:
-            print("Client shut down!")
-        ```
-
-        Or, as a function:
-
-        ```py
-        client.set_shutdown_hook(shutdown_hook)
-        ```
-        """
-        warn_deprecate(what="set_shutdown_hook", when=Version(2, 0, 0), use_instead="add_shutdown_hook")
-
-        def decorator(handler: LifeCycleHookT[te.Self]) -> te.Self:
-            self._shutdown_hooks[0] = handler
             return self
 
         if hook is not None:

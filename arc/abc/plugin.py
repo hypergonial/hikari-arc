@@ -41,8 +41,11 @@ class PluginBase(HasErrorHandler[ClientT], Hookable[ClientT], HasConcurrencyLimi
     autodefer : bool | AutodeferMode
         If True, all commands in this plugin will automatically defer if it is taking longer than 2 seconds to respond.
         This can be overridden on a per-command basis.
-    is_dm_enabled : bool | hikari.UndefinedType
-        Whether commands in this plugin are enabled in DMs
+    integration_types : t.Sequence[hikari.ApplicationIntegrationType] | hikari.UndefinedType
+        The integration types that commands will support the installation of
+        This can be overridden on a per-command basis.
+    invocation_contexts : t.Sequence[hikari.ApplicationContextType] | hikari.UndefinedType
+        The context types that commands can be invoked in
         This can be overridden on a per-command basis.
     default_permissions : hikari.Permissions | hikari.UndefinedType
         The default permissions for this plugin
@@ -72,7 +75,8 @@ class PluginBase(HasErrorHandler[ClientT], Hookable[ClientT], HasConcurrencyLimi
         default_enabled_guilds: t.Sequence[hikari.Snowflakeish | hikari.PartialGuild]
         | hikari.UndefinedType = hikari.UNDEFINED,
         autodefer: bool | AutodeferMode | hikari.UndefinedType = hikari.UNDEFINED,
-        is_dm_enabled: bool | hikari.UndefinedType = hikari.UNDEFINED,
+        integration_types: t.Sequence[hikari.ApplicationIntegrationType] | hikari.UndefinedType = hikari.UNDEFINED,
+        invocation_contexts: t.Sequence[hikari.ApplicationContextType] | hikari.UndefinedType = hikari.UNDEFINED,
         default_permissions: hikari.Permissions | hikari.UndefinedType = hikari.UNDEFINED,
         is_nsfw: bool | hikari.UndefinedType = hikari.UNDEFINED,
     ) -> None:
@@ -83,10 +87,12 @@ class PluginBase(HasErrorHandler[ClientT], Hookable[ClientT], HasConcurrencyLimi
             if default_enabled_guilds is not hikari.UNDEFINED
             else hikari.UNDEFINED
         )
+
         self._cmd_settings = _CommandSettings(
             autodefer=AutodeferMode(autodefer) if isinstance(autodefer, bool) else autodefer,
-            is_dm_enabled=is_dm_enabled,
             default_permissions=default_permissions,
+            integration_types=integration_types,
+            invocation_contexts=invocation_contexts,
             is_nsfw=is_nsfw,
         )
 
@@ -257,7 +263,8 @@ class PluginBase(HasErrorHandler[ClientT], Hookable[ClientT], HasConcurrencyLimi
         *,
         guilds: t.Sequence[hikari.Snowflakeish | hikari.PartialGuild] | hikari.UndefinedType = hikari.UNDEFINED,
         autodefer: bool | AutodeferMode | hikari.UndefinedType = hikari.UNDEFINED,
-        is_dm_enabled: bool | hikari.UndefinedType = hikari.UNDEFINED,
+        integration_types: t.Sequence[hikari.ApplicationIntegrationType] | hikari.UndefinedType = hikari.UNDEFINED,
+        invocation_contexts: t.Sequence[hikari.ApplicationContextType] | hikari.UndefinedType = hikari.UNDEFINED,
         is_nsfw: bool | hikari.UndefinedType = hikari.UNDEFINED,
         default_permissions: hikari.Permissions | hikari.UndefinedType = hikari.UNDEFINED,
         name_localizations: t.Mapping[hikari.Locale, str] | None = None,
@@ -276,8 +283,10 @@ class PluginBase(HasErrorHandler[ClientT], Hookable[ClientT], HasConcurrencyLimi
         autodefer : bool | AutodeferMode
             If True, all commands in this group will automatically defer if it is taking longer than 2 seconds to respond.
             This can be overridden on a per-subcommand basis.
-        is_dm_enabled : bool
-            Whether the slash command group is enabled in DMs
+        invocation_contexts : t.Sequence[hikari.ApplicationContextType]
+            The context types to enable the slash command group in
+        integration_types : t.Sequence[hikari.ApplicationIntegrationType]
+            The integration types to enable the slash command group in
         default_permissions : hikari.Permissions | hikari.UndefinedType
             The default permissions for the slash command group
         name_localizations : dict[hikari.Locale, str]
@@ -313,7 +322,8 @@ class PluginBase(HasErrorHandler[ClientT], Hookable[ClientT], HasConcurrencyLimi
             description=description,
             guilds=guild_ids,
             autodefer=AutodeferMode(autodefer) if isinstance(autodefer, bool) else autodefer,
-            is_dm_enabled=is_dm_enabled,
+            invocation_contexts=invocation_contexts,
+            integration_types=integration_types,
             default_permissions=default_permissions,
             name_localizations=name_localizations or {},
             description_localizations=description_localizations or {},
@@ -398,6 +408,66 @@ class PluginBase(HasErrorHandler[ClientT], Hookable[ClientT], HasConcurrencyLimi
             return decorator(func)
 
         return decorator
+
+    @t.overload
+    def find_command(
+        self, command_type: t.Literal[hikari.CommandType.USER], full_name: str
+    ) -> UserCommand[ClientT] | None: ...
+
+    @t.overload
+    def find_command(
+        self, command_type: t.Literal[hikari.CommandType.MESSAGE], full_name: str
+    ) -> MessageCommand[ClientT] | None: ...
+
+    @t.overload
+    def find_command(
+        self, command_type: t.Literal[hikari.CommandType.SLASH], full_name: str
+    ) -> SlashCommand[ClientT] | SlashSubCommand[ClientT] | SlashGroup[ClientT] | SlashSubGroup[ClientT] | None: ...
+
+    def find_command(self, command_type: hikari.CommandType, full_name: str) -> t.Any | None:
+        """Find a given command by it's fully qualified name.
+
+        For instance, to locate a slash subcommand with the name `foo` in a group `bar`, you would pass `bar foo`.
+
+        Parameters
+        ----------
+        command_type : hikari.CommandType
+            The type of command to search for.
+        full_name : str
+            The fully qualified name of the command.
+
+        Returns
+        -------
+        t.Any | None
+            The command if found, otherwise None.
+        """
+        if command_type is hikari.CommandType.MESSAGE:
+            return self._message_commands.get(full_name)
+        if command_type is hikari.CommandType.USER:
+            return self._user_commands.get(full_name)
+
+        if command_type is not hikari.CommandType.SLASH:
+            return None
+
+        command_parts = full_name.split(" ")
+
+        if len(command_parts) == 1:
+            return self._slash_commands.get(command_parts[0])
+
+        base_cmd = self._slash_commands.get(command_parts[0])
+
+        if not isinstance(base_cmd, SlashGroup):
+            return None
+
+        subcmd = base_cmd.children.get(command_parts[1])
+
+        if len(command_parts) == 2:
+            return subcmd
+
+        if not isinstance(subcmd, SlashSubGroup):
+            return None
+
+        return subcmd.children.get(command_parts[2])
 
     @t.overload
     def walk_commands(

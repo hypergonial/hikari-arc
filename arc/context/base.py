@@ -342,9 +342,67 @@ class Context(t.Generic[ClientT]):
         return self._interaction.channel_id
 
     @property
+    def channel(self) -> hikari.InteractionChannel:
+        """The channel the context represents."""
+        return self._interaction.channel
+
+    @property
     def guild_id(self) -> hikari.Snowflake | None:
         """The ID of the guild the context represents. Will be None in DMs."""
         return self._interaction.guild_id
+
+    @property
+    def invocation_context(self) -> hikari.ApplicationContextType:
+        """The context in which the interaction was invoked.
+
+        This can be used to determine if the command was invoked in DMs, a guild, or a group DM.
+        """
+        return self._interaction.context
+
+    @property
+    def authorizing_integration_owners(self) -> t.Mapping[hikari.ApplicationIntegrationType, hikari.Snowflake]:
+        """Includes details about the authorizing user or guild for the installation(s) relevant to the interaction.
+
+        For apps installed to a user, it can be used to tell the difference between the authorizing user
+        and the user that triggered an interaction.
+        """
+        return self._interaction.authorizing_integration_owners
+
+    @property
+    def authorizing_guild_id(self) -> hikari.Snowflake | None:
+        """The ID of the guild that this command was installed in.
+
+        This will be `None` if the command was not installed in the guild.
+
+        This is a shorthand for
+
+        ```
+        authorizing_integration_owners.get(hikari.ApplicationIntegrationType.GUILD_INSTALL)
+        ```
+
+        !!! note
+            It is possible for both this value and `authorizing_user_id` to not be `None`, if the command is installed
+            in both a guild and by a user.
+        """
+        return self._interaction.authorizing_integration_owners.get(hikari.ApplicationIntegrationType.GUILD_INSTALL)
+
+    @property
+    def authorizing_user_id(self) -> hikari.Snowflake | None:
+        """The ID of the user that installed this command.
+
+        This will be `None` if the command was not installed by a user.
+
+        This is a shorthand for
+
+        ```
+        authorizing_integration_owners.get(hikari.ApplicationIntegrationType.USER_INSTALL)
+        ```
+
+        !!! note
+            It is possible for both this value and `authorizing_guild_id` to not be `None`, if the command is installed
+            in both a guild and by a user.
+        """
+        return self._interaction.authorizing_integration_owners.get(hikari.ApplicationIntegrationType.USER_INSTALL)
 
     @property
     def is_valid(self) -> bool:
@@ -413,10 +471,6 @@ class Context(t.Generic[ClientT]):
     def get_guild(self) -> hikari.GatewayGuild | None:
         """Gets the guild this context represents, if any. Requires application cache."""
         return self._interaction.get_guild()
-
-    def get_channel(self) -> hikari.TextableGuildChannel | None:
-        """Gets the channel this context represents, None if in a DM. Requires application cache."""
-        return self._interaction.get_channel()
 
     @t.overload
     def get_option(self, name: str, opt_type: t.Literal[OptionType.EMOJI]) -> hikari.Emoji | None: ...

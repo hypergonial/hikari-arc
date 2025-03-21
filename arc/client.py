@@ -61,9 +61,12 @@ class GatewayClientBase(Client[GatewayBotT]):
     is_nsfw : bool
         Whether commands are NSFW
         This applies to all commands, and can be overridden on a per-command basis.
-    is_dm_enabled : bool
-        Whether commands are enabled in DMs
+    integration_types : t.Sequence[hikari.ApplicationIntegrationType]
+        The integration types that commands will support the installation of
         This applies to all commands, and can be overridden on a per-command basis.
+    invocation_contexts : t.Sequence[hikari.ApplicationContextType]
+        The context types that commands can be invoked in
+        This applies to all commands, and can be overridden on a per-command basis
     provided_locales : t.Sequence[hikari.Locale] | None
         The locales that will be provided to the client by locale provider callbacks
     injector : alluka.Client | None
@@ -83,7 +86,14 @@ class GatewayClientBase(Client[GatewayBotT]):
         autodefer: bool | AutodeferMode = True,
         default_permissions: hikari.Permissions | hikari.UndefinedType = hikari.UNDEFINED,
         is_nsfw: bool = False,
-        is_dm_enabled: bool = True,
+        integration_types: t.Sequence[hikari.ApplicationIntegrationType] = [
+            hikari.ApplicationIntegrationType.GUILD_INSTALL
+        ],
+        invocation_contexts: t.Sequence[hikari.ApplicationContextType] = [
+            hikari.ApplicationContextType.GUILD,
+            hikari.ApplicationContextType.PRIVATE_CHANNEL,
+            hikari.ApplicationContextType.BOT_DM,
+        ],
         provided_locales: t.Sequence[hikari.Locale] | None = None,
         injector: alluka.abc.Client | None = None,
     ) -> None:
@@ -94,7 +104,8 @@ class GatewayClientBase(Client[GatewayBotT]):
             autodefer=autodefer,
             default_permissions=default_permissions,
             is_nsfw=is_nsfw,
-            is_dm_enabled=is_dm_enabled,
+            integration_types=integration_types,
+            invocation_contexts=invocation_contexts,
             provided_locales=provided_locales,
             injector=injector,
         )
@@ -216,9 +227,12 @@ class RESTClientBase(Client[RESTBotT]):
     is_nsfw : bool
         Whether commands are NSFW
         This applies to all commands, and can be overridden on a per-command basis.
-    is_dm_enabled : bool
-        Whether commands are enabled in DMs
+    integration_types : t.Sequence[hikari.ApplicationIntegrationType]
+        The integration types that commands will support the installation of
         This applies to all commands, and can be overridden on a per-command basis.
+    invocation_contexts : t.Sequence[hikari.ApplicationContextType]
+        The context types that commands can be invoked in
+        This applies to all commands, and can be overridden on a per-command basis
     provided_locales : t.Sequence[hikari.Locale] | None
         The locales that will be provided to the client by locale provider callbacks
     injector : alluka.abc.Client | None
@@ -237,8 +251,15 @@ class RESTClientBase(Client[RESTBotT]):
         autosync: bool = True,
         autodefer: bool | AutodeferMode = True,
         default_permissions: hikari.Permissions | hikari.UndefinedType = hikari.UNDEFINED,
+        integration_types: t.Sequence[hikari.ApplicationIntegrationType] = [
+            hikari.ApplicationIntegrationType.GUILD_INSTALL
+        ],
+        invocation_contexts: t.Sequence[hikari.ApplicationContextType] = [
+            hikari.ApplicationContextType.GUILD,
+            hikari.ApplicationContextType.PRIVATE_CHANNEL,
+            hikari.ApplicationContextType.BOT_DM,
+        ],
         is_nsfw: bool = False,
-        is_dm_enabled: bool = True,
         provided_locales: t.Sequence[hikari.Locale] | None = None,
         injector: alluka.abc.Client | None = None,
     ) -> None:
@@ -249,7 +270,8 @@ class RESTClientBase(Client[RESTBotT]):
             autodefer=autodefer,
             default_permissions=default_permissions,
             is_nsfw=is_nsfw,
-            is_dm_enabled=is_dm_enabled,
+            integration_types=integration_types,
+            invocation_contexts=invocation_contexts,
             provided_locales=provided_locales,
             injector=injector,
         )
@@ -335,12 +357,15 @@ class GatewayClient(GatewayClientBase[hikari.GatewayBotAware]):
     is_nsfw : bool
         Whether commands are NSFW
         This applies to all commands, and can be overridden on a per-command basis.
-    is_dm_enabled : bool
-        Whether commands are enabled in DMs
+    integration_types : t.Sequence[hikari.ApplicationIntegrationType]
+        The integration types that commands will support the installation of
         This applies to all commands, and can be overridden on a per-command basis.
+    invocation_contexts : t.Sequence[hikari.ApplicationContextType]
+        The context types that commands can be invoked in
+        This applies to all commands, and can be overridden on a per-command basis
     provided_locales : t.Sequence[hikari.Locale] | None
         The locales that will be provided to the client by locale provider callbacks
-    injector : alluka.abc.Client | None
+    injector : alluka.Client | None
         If you already have an injector instance, you may pass it here.
         Otherwise, a new one will be created by default.
 
@@ -380,9 +405,12 @@ class RESTClient(RESTClientBase[hikari.RESTBotAware]):
     is_nsfw : bool
         Whether commands are NSFW
         This applies to all commands, and can be overridden on a per-command basis.
-    is_dm_enabled : bool
-        Whether commands are enabled in DMs
+    integration_types : t.Sequence[hikari.ApplicationIntegrationType]
+        The integration types that commands will support the installation of
         This applies to all commands, and can be overridden on a per-command basis.
+    invocation_contexts : t.Sequence[hikari.ApplicationContextType]
+        The context types that commands can be invoked in
+        This applies to all commands, and can be overridden on a per-command basis
     provided_locales : t.Sequence[hikari.Locale] | None
         The locales that will be provided to the client by locale provider callbacks
     injector : alluka.abc.Client | None

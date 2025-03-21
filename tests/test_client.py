@@ -60,3 +60,15 @@ def test_walk_commands() -> None:
     assert len(cmds) == 1
 
     assert message_cmd in cmds
+
+
+def test_find_command() -> None:
+    assert client.find_command(hikari.CommandType.SLASH, "my_group test_subcommand") == my_subcommand
+    assert client.find_command(hikari.CommandType.SLASH, "my_group my_subgroup test_subsubcommand") == my_subsubcommand
+    assert client.find_command(hikari.CommandType.SLASH, "my_group") == group
+    assert client.find_command(hikari.CommandType.SLASH, "my_group my_subgroup") == subgroup
+    assert client.find_command(hikari.CommandType.MESSAGE, "Message Command") == message_cmd
+    assert client.find_command(hikari.CommandType.SLASH, "non_existent") is None
+    assert client.find_command(hikari.CommandType.SLASH, "my_group non_existent") is None
+    assert client.find_command(hikari.CommandType.SLASH, "my_group my_subgroup non_existent") is None
+    assert client.find_command(hikari.CommandType.MESSAGE, "non_existent") is None

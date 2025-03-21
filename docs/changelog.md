@@ -9,6 +9,82 @@ hide:
 
 Here you can find all the changelogs for `hikari-arc`.
 
+## 2.0.0
+
+- **Breaking:** Remove `is_dm_enabled` from all command, plugin, and client types. Use the newly added `invocation_contexts` instead.
+- **Breaking:** Remove deprecated `Client.set_startup_hook` and `Client.set_shutdown_hook`. Use the newly added `Client.add_startup_hook` and `Client.add_shutdown_hook` instead.
+- **Breaking:** Remove `Context.get_channel` and `AutocompleteData.get_channel`. Use the newly added `Context.channel` and `AutocompleteData.channel` properties instead.
+- Add support for **user installations** of commands.
+  - Add `invocation_contexts` and `integration_types` to all command, plugin, and client types.
+  - Add `invocation_context` and `authorizing_integration_owners` to `Context` and `AutocompleteData`.
+- Add `Client.find_command` and `PluginBase.find_command` to get a command by name.
+- Bump `hikari` to `v2.2.0`.
+
+### Migration guide
+
+#### `is_dm_enabled` removal
+
+```py
+# Before 2.0
+client = arc.GatewayClient(..., is_dm_enabled=False)
+
+# After 2.0
+
+# Omit hikari.ApplicationContextType.BOT_DM to disable DMs
+# You may also want to remove PRIVATE_CHANNEL if you don't want to support group DMs
+client = arc.GatewayClient(
+    ...,
+    invocation_contexts=[
+        hikari.ApplicationContextType.GUILD,
+        hikari.ApplicationContextType.PRIVATE_CHANNEL
+    ]
+)
+```
+
+This applies similarly to command or plugin-level use of this setting.
+
+#### `set_startup_hook` and `set_shutdown_hook` removal
+
+```py
+# Before 2.0
+
+@client.set_startup_hook
+async def startup_hook(client: arc.GatewayClient) -> None:
+    print("Client started up!")
+
+@client.set_shutdown_hook
+async def shutdown_hook(client: arc.GatewayClient) -> None:
+    print("Client shut down!")
+
+# After 2.0
+
+@client.add_startup_hook
+async def startup_hook(client: arc.GatewayClient) -> None:
+    print("Client started up!")
+
+@client.add_shutdown_hook
+async def shutdown_hook(client: arc.GatewayClient) -> None:
+    print("Client shut down!")
+```
+
+#### `get_channel` removal
+
+```py
+
+# Before 2.0
+
+@arc.slash_command("test", "Test command")
+async def test(ctx: arc.GatewayContext) -> None:
+    channel = ctx.get_channel()
+
+# After 2.0
+
+@arc.slash_command("test", "Test command")
+async def test(ctx: arc.GatewayContext) -> None:
+    channel = ctx.channel
+```
+
+
 ## 1.4.0
 
 - Add new optiontype with converter for `hikari.Emoji`.

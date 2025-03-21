@@ -8,7 +8,7 @@ from mock_client import MockClient, MockContext, MockPlugin
 
 import arc
 
-client = MockClient(hikari.GatewayBot(token="amongus"))
+client = MockClient(hikari.GatewayBot(token="amongus", banner=None))
 
 
 @pytest.fixture
@@ -125,12 +125,22 @@ def build_inter(
         command_type=hikari.CommandType.SLASH,
         entitlements=[],
         app_permissions=hikari.Permissions.all_permissions(),
+        authorizing_integration_owners={hikari.ApplicationIntegrationType.GUILD_INSTALL: hikari.Snowflake(123456789)},
+        context=hikari.ApplicationContextType.GUILD,
         options=options or [],
         resolved=resolved,
         type=hikari.InteractionType.APPLICATION_COMMAND,
         token="padoru padoru",
         version=1,
-        channel_id=hikari.Snowflake(123456789),
+        channel=hikari.InteractionChannel(
+            app=app,
+            id=hikari.Snowflake(123456789),
+            name="test",
+            type=hikari.ChannelType.GUILD_TEXT,
+            parent_id=None,
+            permissions=hikari.Permissions.all_permissions(),
+            thread_metadata=None,
+        ),
         guild_id=hikari.Snowflake(123456789),
         guild_locale="en-US",
         user=build_user(app, author_id),

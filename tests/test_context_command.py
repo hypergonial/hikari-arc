@@ -26,7 +26,6 @@ def test_user_command():
     assert command.command_type is hikari.CommandType.USER
     assert command.qualified_name == ("Say Hi",)
     assert command.default_permissions is hikari.UNDEFINED
-    assert command.is_dm_enabled is True
     assert command.is_nsfw is False
     assert command.name_localizations == {}
 
@@ -39,6 +38,5 @@ def test_message_command():
     assert command.command_type is hikari.CommandType.MESSAGE
     assert command.qualified_name == ("Say Hi",)
     assert command.default_permissions is hikari.UNDEFINED
-    assert command.is_dm_enabled is True
     assert command.is_nsfw is False
     assert command.name_localizations == {}
