@@ -332,7 +332,7 @@ class Context(t.Generic[ClientT]):
         return self._interaction.guild_locale
 
     @property
-    def app_permissions(self) -> hikari.Permissions | None:
+    def app_permissions(self) -> hikari.Permissions:
         """The permissions of the bot. Will be None in DMs."""
         return self._interaction.app_permissions
 

@@ -118,9 +118,6 @@ def has_permissions(perms: hikari.Permissions) -> t.Callable[[Context[t.Any]], H
 
 def _bot_has_permissions(ctx: Context[t.Any], perms: hikari.Permissions) -> HookResult:
     """Check if the bot has the specified permissions."""
-    if ctx.app_permissions is None:
-        raise GuildOnlyError("This command can only be used in a guild.")
-
     missing_perms = ~ctx.app_permissions & perms
 
     if missing_perms is not hikari.Permissions.NONE:
