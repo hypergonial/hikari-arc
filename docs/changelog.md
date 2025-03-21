@@ -67,7 +67,7 @@ async def shutdown_hook(client: arc.GatewayClient) -> None:
     print("Client shut down!")
 ```
 
-## `get_channel` removal
+#### `get_channel` removal
 
 ```py
 
