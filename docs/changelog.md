@@ -9,6 +9,10 @@ hide:
 
 Here you can find all the changelogs for `hikari-arc`.
 
+## Unreleased
+
+- Adjust `Context.app_permissions` typing to match hikari, removing `None` from the union type.
+
 ## 2.0.0
 
 - **Breaking:** Remove `is_dm_enabled` from all command, plugin, and client types. Use the newly added `invocation_contexts` instead.
