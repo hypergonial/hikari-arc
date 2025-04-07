@@ -9,9 +9,11 @@ hide:
 
 Here you can find all the changelogs for `hikari-arc`.
 
-## Unreleased
+## 2.1.0
 
+- Add `poll` to `Context.respond`.
 - Adjust `Context.app_permissions` typing to match hikari, removing `None` from the union type.
+- Bump hikari to `v2.2.1`.
 
 ## 2.0.0
 
