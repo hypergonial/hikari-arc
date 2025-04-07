@@ -60,6 +60,7 @@ class _ResponseGlue:
     attachments: t.Sequence[hikari.Resourceish] | hikari.UndefinedType = hikari.UNDEFINED
     embed: hikari.Embed | hikari.UndefinedType = hikari.UNDEFINED
     embeds: t.Sequence[hikari.Embed] | hikari.UndefinedType = hikari.UNDEFINED
+    poll: hikari.UndefinedType | hikari.api.PollBuilder = hikari.UNDEFINED
     mentions_everyone: bool | hikari.UndefinedType = hikari.UNDEFINED
     user_mentions: t.Sequence[hikari.Snowflakeish | hikari.PartialUser] | bool | hikari.UndefinedType = hikari.UNDEFINED
     role_mentions: t.Sequence[hikari.Snowflakeish | hikari.PartialRole] | bool | hikari.UndefinedType = hikari.UNDEFINED
@@ -75,6 +76,7 @@ class _ResponseGlue:
             "attachments": self.attachments,
             "embed": self.embed,
             "embeds": self.embeds,
+            "poll": self.poll,
             "mentions_everyone": self.mentions_everyone,
             "user_mentions": self.user_mentions,
             "role_mentions": self.role_mentions,
@@ -92,6 +94,7 @@ class _ResponseGlue:
             components=components or ([self.component] if self.component else hikari.UNDEFINED),
             attachments=attachments or ([self.attachment] if self.attachment else hikari.UNDEFINED),
             embeds=embeds or ([self.embed] if self.embed else hikari.UNDEFINED),
+            poll=self.poll,
             mentions_everyone=self.mentions_everyone,
             user_mentions=self.user_mentions,
             role_mentions=self.role_mentions,
@@ -655,6 +658,7 @@ class Context(t.Generic[ClientT]):
         components: t.Sequence[hikari.api.ComponentBuilder] | hikari.UndefinedType = hikari.UNDEFINED,
         embed: hikari.Embed | hikari.UndefinedType = hikari.UNDEFINED,
         embeds: t.Sequence[hikari.Embed] | hikari.UndefinedType = hikari.UNDEFINED,
+        poll: hikari.UndefinedType | hikari.api.PollBuilder = hikari.UNDEFINED,
         mentions_everyone: bool | hikari.UndefinedType = hikari.UNDEFINED,
         user_mentions: t.Sequence[hikari.Snowflakeish | hikari.PartialUser]
         | bool
@@ -685,6 +689,8 @@ class Context(t.Generic[ClientT]):
             An embed to add to this message.
         embeds : Sequence[hikari.Embed] | hikari.UndefinedType
             A sequence of embeds to add to this message.
+        poll : hikari.UndefinedType | hikari.api.PollBuilder
+            If provided, the poll to set on the message.
         mentions_everyone : bool | hikari.UndefinedType
             If True, mentioning @everyone will be allowed.
         user_mentions : hikari.SnowflakeishSequence[hikari.PartialUser] | bool | hikari.UndefinedType
@@ -712,6 +718,7 @@ class Context(t.Generic[ClientT]):
                     attachments=attachments,
                     embed=embed,
                     embeds=embeds,
+                    poll=poll,
                     mentions_everyone=mentions_everyone,
                     user_mentions=user_mentions,
                     role_mentions=role_mentions,
@@ -729,6 +736,7 @@ class Context(t.Generic[ClientT]):
                     attachments=attachments,
                     embed=embed,
                     embeds=embeds,
+                    poll=poll,
                     mentions_everyone=mentions_everyone,
                     user_mentions=user_mentions,
                     role_mentions=role_mentions,
