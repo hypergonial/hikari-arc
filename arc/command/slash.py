@@ -13,7 +13,7 @@ from arc.errors import AutocompleteError, CommandInvokeError
 from arc.internal.options import resolve_options
 from arc.internal.sigparse import parse_command_signature
 from arc.internal.types import ClientT, CommandCallbackT, HookT, PostHookT, ResponseBuilderT, SlashCommandLike
-from arc.locale import CommandLocaleRequest, LocaleResponse
+from arc.locale import CommandLocaleRequest
 
 if t.TYPE_CHECKING:
     from asyncio.futures import Future
@@ -195,8 +195,6 @@ class SlashCommand(CallableCommandBase[ClientT, hikari.api.SlashCommandBuilder])
         for locale in self._client._provided_locales:
             request = CommandLocaleRequest(self, locale, self.name)
             resp = self._client._command_locale_provider(request)
-
-            assert isinstance(resp, LocaleResponse)
 
             if resp.name is not None and resp.description is not None:
                 name_locales[locale] = resp.name
@@ -387,6 +385,9 @@ class SlashGroup(CommandBase[ClientT, hikari.api.SlashCommandBuilder]):
         if self.name_localizations or self.description_localizations or self._client is None:
             return
 
+        for sub in self.children.values():
+            sub._request_command_locale(self._client)
+
         if not self._client._provided_locales or not self._client._command_locale_provider:
             return
 
@@ -403,9 +404,6 @@ class SlashGroup(CommandBase[ClientT, hikari.api.SlashCommandBuilder]):
 
         self.name_localizations: t.Mapping[hikari.Locale, str] = name_locales
         self.description_localizations: t.Mapping[hikari.Locale, str] = desc_locales
-
-        for sub in self.children.values():
-            sub._request_option_locale(self._client, self)
 
     @t.overload
     def include(self) -> t.Callable[[SlashSubCommand[ClientT]], SlashSubCommand[ClientT]]: ...
@@ -550,6 +548,30 @@ class SlashSubGroup(SubCommandBase[ClientT, SlashGroup[ClientT]]):
         except Exception as exc:
             assert self._parent is not None
             await self._parent._handle_exception(ctx, exc)
+
+    def _request_command_locale(self, client: Client[t.Any]) -> None:
+        if not client._provided_locales or not client._command_locale_provider:
+            return
+
+        for sub in self.children.values():
+            sub._request_command_locale(client)
+
+        if self.name_localizations or self.description_localizations:
+            return
+
+        name_locales = {}
+        desc_locales = {}
+
+        for locale in client._provided_locales:
+            request = CommandLocaleRequest(self, locale, self.name)
+            resp = client._command_locale_provider(request)
+
+            if resp.name is not None and resp.description is not None:
+                name_locales[locale] = resp.name
+                desc_locales[locale] = resp.description
+
+        self.name_localizations: t.Mapping[hikari.Locale, str] = name_locales
+        self.description_localizations: t.Mapping[hikari.Locale, str] = desc_locales
 
     def _request_option_locale(self, client: Client[t.Any], command: CommandProto) -> None:
         super()._request_option_locale(client, command)
@@ -704,6 +726,30 @@ class SlashSubCommand(
         except Exception as e:
             assert self._parent is not None
             await self._parent._handle_exception(ctx, e)
+
+    def _request_command_locale(self, client: Client[t.Any]) -> None:
+        if not client._provided_locales or not client._command_locale_provider:
+            return
+
+        for option in self.options.values():
+            option._request_option_locale(client, self)
+
+        if self.name_localizations or self.description_localizations:
+            return
+
+        name_locales = {}
+        desc_locales = {}
+
+        for locale in client._provided_locales:
+            request = CommandLocaleRequest(self, locale, self.name)
+            resp = client._command_locale_provider(request)
+
+            if resp.name is not None and resp.description is not None:
+                name_locales[locale] = resp.name
+                desc_locales[locale] = resp.description
+
+        self.name_localizations: t.Mapping[hikari.Locale, str] = name_locales
+        self.description_localizations: t.Mapping[hikari.Locale, str] = desc_locales
 
     def _request_option_locale(self, client: Client[t.Any], command: CommandProto) -> None:
         super()._request_option_locale(client, command)
