@@ -574,10 +574,7 @@ class SlashSubGroup(SubCommandBase[ClientT, SlashGroup[ClientT]]):
         self.description_localizations: t.Mapping[hikari.Locale, str] = desc_locales
 
     def _request_option_locale(self, client: Client[t.Any], command: CommandProto) -> None:
-        super()._request_option_locale(client, command)
-
-        for subcommand in self.children.values():
-            subcommand._request_option_locale(client, command)
+        raise RuntimeError("_request_option_locale should not be called on a subgroup. (This is a bug)")
 
     @t.overload
     def include(self) -> t.Callable[[SlashSubCommand[ClientT]], SlashSubCommand[ClientT]]: ...
@@ -752,10 +749,7 @@ class SlashSubCommand(
         self.description_localizations: t.Mapping[hikari.Locale, str] = desc_locales
 
     def _request_option_locale(self, client: Client[t.Any], command: CommandProto) -> None:
-        super()._request_option_locale(client, command)
-
-        for option in self.options.values():
-            option._request_option_locale(client, command)
+        raise RuntimeError("_request_option_locale should not be called on a subcommand. (This is a bug)")
 
     async def __call__(self, ctx: Context[ClientT], *args: t.Any, **kwargs: t.Any) -> None:
         """Invoke this subcommand with the given context.
