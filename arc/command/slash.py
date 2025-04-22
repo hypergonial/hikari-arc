@@ -183,10 +183,13 @@ class SlashCommand(CallableCommandBase[ClientT, hikari.api.SlashCommandBuilder])
 
     def _request_command_locale(self) -> None:
         """Request the locale for this command."""
-        if self.name_localizations or self.description_localizations or self._client is None:
+        if self._client is None or not self._client._provided_locales or not self._client._command_locale_provider:
             return
 
-        if not self._client._provided_locales or not self._client._command_locale_provider:
+        for option in self.options.values():
+            option._request_option_locale(self._client, self)
+
+        if self.name_localizations or self.description_localizations:
             return
 
         name_locales: dict[hikari.Locale, str] = {}
@@ -202,9 +205,6 @@ class SlashCommand(CallableCommandBase[ClientT, hikari.api.SlashCommandBuilder])
 
         self.name_localizations: t.Mapping[hikari.Locale, str] = name_locales
         self.description_localizations: t.Mapping[hikari.Locale, str] = desc_locales
-
-        for option in self.options.values():
-            option._request_option_locale(self._client, self)
 
 
 @attr.define(slots=True, kw_only=True)
