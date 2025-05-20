@@ -31,14 +31,14 @@ rest = ["hikari[server]>=2.3.3"]
 
 [dependency-groups]
 dev = [
-    "nox>=2025.2.9",
+    "nox>=2025.5.1",
     "pyright==1.1.397",
     "pytest>=8.3",
     "pytest-asyncio>=0.26",
     "ruff>=0.11",
     "slotscheck>=0.19",
     "typing-extensions>=4.13",
-    "uv>=0.6",
+    "uv>=0.7",
     "colorama>=0.4.6; sys_platform == 'win32'",
 ]
 docs = [
@@ -46,7 +46,7 @@ docs = [
     "griffe-inherited-docstrings>=1.1.1",
     "mkdocs>=1.6.1",
     "mkdocs-glightbox>=0.4.0",
-    "mkdocs-material[imaging]>=9.6.11",
+    "mkdocs-material[imaging]>=9.6.14",
     "mkdocstrings-python>=1.16.10",
 ]
 
