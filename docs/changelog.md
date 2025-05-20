@@ -11,6 +11,7 @@ Here you can find all the changelogs for `hikari-arc`.
 
 ## 2.1.1
 
+- Fix breaking change in hikari `v2.3.3` causing events dispatching to fail.
 - Fix option locale provider being invoked for slash subcommands and subgroups instead of the command locale provider.
 
 ## 2.1.0

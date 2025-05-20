@@ -632,8 +632,8 @@ requires-dist = [
     { name = "alluka", specifier = ">=0.3.3,<0.4" },
     { name = "attrs", specifier = ">=25.3.0" },
     { name = "croniter", marker = "extra == 'cron'", specifier = "==5.0.1" },
-    { name = "hikari", specifier = ">=2.2.1" },
-    { name = "hikari", extras = ["server"], marker = "extra == 'rest'", specifier = ">=2.2.1" },
+    { name = "hikari", specifier = ">=2.3.3" },
+    { name = "hikari", extras = ["server"], marker = "extra == 'rest'", specifier = ">=2.3.3" },
     { name = "types-croniter", marker = "extra == 'cron'", specifier = "==5.0.1.20241205" },
 ]
 provides-extras = ["cron", "rest"]
