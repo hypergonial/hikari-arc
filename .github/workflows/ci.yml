@@ -11,7 +11,7 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v5
         with:
-          version: "0.6.4"
+          version: "0.7.6"
           python-version: "3.13"
 
       - name: Run ruff via nox
@@ -26,7 +26,7 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v5
         with:
-          version: "0.6.4"
+          version: "0.7.6"
           python-version: "3.13"
 
       - name: Run pyright via nox
@@ -41,7 +41,7 @@ jobs:
         - name: Install uv
           uses: astral-sh/setup-uv@v5
           with:
-            version: "0.6.4"
+            version: "0.7.6"
             python-version: "3.13"
 
         - name: Run slotscheck via nox
@@ -61,7 +61,7 @@ jobs:
     - name: Install uv with Python ${{ matrix.python-version }}
       uses: astral-sh/setup-uv@v5
       with:
-        version: "0.6.4"
+        version: "0.7.6"
         python-version: ${{ matrix.python-version }}
     - run: |
         uv run nox -s pytest
