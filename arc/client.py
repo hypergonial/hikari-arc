@@ -125,11 +125,11 @@ class GatewayClientBase(Client[GatewayBotT]):
 
     async def _on_gatewaybot_startup(self, event: hikari.StartedEvent) -> None:
         await self._on_startup()
-        await self.app.event_manager.dispatch(StartedEvent(self))
+        self.app.event_manager.dispatch(StartedEvent(self), return_tasks=False)
 
     async def _on_gatewaybot_shutdown(self, event: hikari.StoppingEvent) -> None:
         await self._on_shutdown()
-        await self.app.event_manager.dispatch(StoppingEvent(self))
+        self.app.event_manager.dispatch(StoppingEvent(self), return_tasks=False)
 
     async def _on_gatewaybot_interaction_create(self, event: hikari.InteractionCreateEvent) -> None:
         if isinstance(event.interaction, hikari.CommandInteraction):
@@ -141,7 +141,7 @@ class GatewayClientBase(Client[GatewayBotT]):
         if not self.app.event_manager.get_listeners(CommandErrorEvent):
             return await super()._on_error(ctx, exception)
 
-        self.app.event_manager.dispatch(CommandErrorEvent(self, ctx, exception))
+        self.app.event_manager.dispatch(CommandErrorEvent(self, ctx, exception), return_tasks=False)
 
     def subscribe(self, event_type: type[EventT], callback: EventCallbackT[EventT]) -> None:
         """Subscribe to an event.
