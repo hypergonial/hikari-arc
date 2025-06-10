@@ -55,7 +55,7 @@ class EmojiOption(ConverterOption[hikari.Emoji, ClientT, EmojiParams, str]):
             return hikari.Emoji.parse(value)
         except ValueError as exc:
             raise OptionConverterFailureError(
-                self, value, f"Option '{self.name}' expected a valid color, got {value!r}."
+                self, value, f"Option '{self.name}' expected a valid emoji, got {value!r}."
             ) from exc
 
     @classmethod
