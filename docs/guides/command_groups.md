@@ -75,6 +75,17 @@ hide:
     └─ subcommand
         │
         └─ subgroup
+
+    ----
+
+    INVALID
+    Group cannot contain regular commands, you have to use subcommands when using a group
+
+    group
+    │
+    ├─ command
+    │
+    └─ command
     ```
 
 !!! failure "Caution"
@@ -157,7 +168,7 @@ Subcommands can be included in either top-level groups or subgroups.
     Slash subcommands **must** use the [`@arc.slash_subcommand`][arc.command.slash.slash_subcommand] decorator
     instead of the [`@arc.slash_command`][arc.command.slash.slash_command] decorator.
 
-With the following setup, you should get something similar to this:
+With the following setup, you should get something similar to this. The final command name will automatically combine the name used at each tier:
 
 <figure markdown>
   ![Permissions Subcommands](../assets/subcommands.png){ width="800" }
