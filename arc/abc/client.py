@@ -1220,29 +1220,29 @@ class Client(t.Generic[AppT], abc.ABC):
 
         return decorator
 
-    def _resolve_import_path(self, path: str) -> tuple[str, str]:  
+    def _resolve_import_path(self, path: str) -> tuple[str, str]:
         """Process container directory and resolve real import path."""
-        components = path.split(".")  
-        importable_components: t.List[str] = []  
-        
-        for _, component in enumerate(components):  
-            test_path = ".".join([*importable_components, component])  
-            try:  
-                importlib.import_module(test_path)  
-                importable_components.append(component)  
-            except ImportError:  
-                continue  
-        
-        if not importable_components:  
-            return components[-1], ""  
-        
-        if len(importable_components) > 1:  
-            pkg = ".".join(importable_components[:-1])  
-            import_path = ".".join(importable_components)  
-        else:  
-            pkg = ""  
-            import_path = importable_components[0]  
-        
+        components = path.split(".")
+        importable_components: t.List[str] = []
+
+        for _, component in enumerate(components):
+            test_path = ".".join([*importable_components, component])
+            try:
+                importlib.import_module(test_path)
+                importable_components.append(component)
+            except ImportError:
+                continue
+
+        if not importable_components:
+            return components[-1], ""
+
+        if len(importable_components) > 1:
+            pkg = ".".join(importable_components[:-1])
+            import_path = ".".join(importable_components)
+        else:
+            pkg = ""
+            import_path = importable_components[0]
+
         return import_path, pkg
 
     def load_extension(self, path: str) -> te.Self:
