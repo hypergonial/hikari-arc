@@ -1220,6 +1220,31 @@ class Client(t.Generic[AppT], abc.ABC):
 
         return decorator
 
+    def _resolve_import_path(self, path: str) -> tuple[str, str]:  
+        """Process container directory and resolve real import path."""
+        components = path.split(".")  
+        importable_components: t.List[str] = []  
+        
+        for _, component in enumerate(components):  
+            test_path = ".".join([*importable_components, component])  
+            try:  
+                importlib.import_module(test_path)  
+                importable_components.append(component)  
+            except ImportError:  
+                continue  
+        
+        if not importable_components:  
+            return components[-1], ""  
+        
+        if len(importable_components) > 1:  
+            pkg = ".".join(importable_components[:-1])  
+            import_path = ".".join(importable_components)  
+        else:  
+            pkg = ""  
+            import_path = importable_components[0]  
+        
+        return import_path, pkg
+
     def load_extension(self, path: str) -> te.Self:
         """Load a python module with path `path` as an extension.
         This will import the module, and call it's loader function.
@@ -1260,15 +1285,9 @@ class Client(t.Generic[AppT], abc.ABC):
         - [`Client.load_extensions_from`][arc.client.Client.load_extensions_from]
         - [`Client.unload_extension`][arc.client.Client.unload_extension]
         """
-        parents = path.split(".")
-        name = parents.pop()
+        import_path, pkg = self._resolve_import_path(path)
 
-        pkg = ".".join(parents)
-
-        if pkg:
-            name = "." + name
-
-        module = importlib.import_module(path, package=pkg)
+        module = importlib.import_module(import_path, package=pkg)
 
         loader = getattr(module, "__arc_extension_loader__", None)
 
@@ -1364,13 +1383,7 @@ class Client(t.Generic[AppT], abc.ABC):
         - [`Client.load_extension`][arc.client.Client.load_extension]
         - [`Client.load_extensions_from`][arc.client.Client.load_extensions_from]
         """
-        parents = path.split(".")
-        name = parents.pop()
-
-        pkg = ".".join(parents)
-
-        if pkg:
-            name = "." + name
+        path, pkg = self._resolve_import_path(path)
 
         if path not in self._loaded_extensions:
             raise ExtensionUnloadError(f"Extension '{path}' is not loaded.")
