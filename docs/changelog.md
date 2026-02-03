@@ -9,6 +9,12 @@ hide:
 
 Here you can find all the changelogs for `hikari-arc`.
 
+## 2.2.0
+
+- Add Python 3.14 support.
+- Bump `hikari` to `v2.5+`.
+- Fix inconsistent error message in emoji converter.
+
 ## 2.1.1
 
 - Fix breaking change in hikari `v2.3.3` causing events dispatching to fail.
@@ -94,7 +100,6 @@ async def test(ctx: arc.GatewayContext) -> None:
 async def test(ctx: arc.GatewayContext) -> None:
     channel = ctx.channel
 ```
-
 
 ## 1.4.0
 
@@ -190,7 +195,6 @@ In additon to these changes, the [documentation](https://arc.hypergonial.com) go
 - Add `@GatewayClient.listen`, `GatewayClient.subscribe`, `GatewayClient.unsubscribe`.
 - Add `@GatewayPlugin.listen`, `GatewayPlugin.subscribe`, `GatewayPlugin.unsubscribe`.
 - Make all first-order decorators work as second-order decorators as well.
-
 
 ## v0.3.0
 
