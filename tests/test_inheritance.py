@@ -2,7 +2,7 @@ import hikari
 
 import arc
 
-bot = hikari.GatewayBot("...", banner=None)
+bot = hikari.GatewayBot("MzA4MjkzNjAzNTMxMjkyNjcy.DN9r_A.amogus", banner=None)
 client = arc.GatewayClient(
     bot,
     autodefer=arc.AutodeferMode.EPHEMERAL,

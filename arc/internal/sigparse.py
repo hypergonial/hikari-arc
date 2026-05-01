@@ -86,6 +86,7 @@ BASE_CHANNEL_TYPE_MAP: dict[type[hikari.PartialChannel], hikari.ChannelType] = {
     hikari.GuildPrivateThread: hikari.ChannelType.GUILD_PRIVATE_THREAD,
     hikari.GuildStageChannel: hikari.ChannelType.GUILD_STAGE,
     hikari.GuildForumChannel: hikari.ChannelType.GUILD_FORUM,
+    hikari.GuildMediaChannel: hikari.ChannelType.GUILD_MEDIA,
 }
 
 

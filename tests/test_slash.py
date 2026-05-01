@@ -2,7 +2,7 @@ import hikari
 
 import arc
 
-bot = hikari.GatewayBot("...", banner=None)
+bot = hikari.GatewayBot("MzA4MjkzNjAzNTMxMjkyNjcy.DN9r_A.amogus", banner=None)
 client = arc.GatewayClient(bot)
 
 
@@ -108,6 +108,7 @@ def test_my_command() -> None:
         hikari.ChannelType.GUILD_PUBLIC_THREAD,
         hikari.ChannelType.GUILD_PRIVATE_THREAD,
         hikari.ChannelType.GUILD_STAGE,
+        hikari.ChannelType.GUILD_MEDIA,
     }
 
     assert isinstance(options["f"], arc.command.MentionableOption)

@@ -71,6 +71,7 @@ def test_correct_command() -> None:
         hikari.ChannelType.GUILD_PUBLIC_THREAD,
         hikari.ChannelType.GUILD_PRIVATE_THREAD,
         hikari.ChannelType.GUILD_STAGE,
+        hikari.ChannelType.GUILD_MEDIA,
     }
 
     assert isinstance(options["f"], arc.command.MentionableOption)

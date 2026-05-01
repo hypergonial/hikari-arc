@@ -5,7 +5,7 @@ import pytest
 
 import arc
 
-bot = hikari.GatewayBot("...", banner=None)
+bot = hikari.GatewayBot("MzA4MjkzNjAzNTMxMjkyNjcy.DN9r_A.amogus", banner=None)
 client = arc.GatewayClient(bot)
 
 

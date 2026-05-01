@@ -8,7 +8,7 @@ from mock_client import MockClient, MockContext, MockPlugin
 
 import arc
 
-client = MockClient(hikari.GatewayBot(token="amongus", banner=None))
+client = MockClient(hikari.GatewayBot(token="MzA4MjkzNjAzNTMxMjkyNjcy.DN9r_A.amogus", banner=None))
 
 
 @pytest.fixture
@@ -17,13 +17,14 @@ def app() -> hikari.GatewayBot:
 
 
 def build_app() -> hikari.GatewayBot:
-    return hikari.GatewayBot(token="amongus")
+    return hikari.GatewayBot(token="MzA4MjkzNjAzNTMxMjkyNjcy.DN9r_A.amogus", banner=None)
 
 
 def build_user(app: hikari.GatewayBot, id: hikari.Snowflakeish = 123456789) -> hikari.User:
     return UserImpl(
         app=app,
         id=hikari.Snowflake(id),
+        primary_guild=None,
         avatar_hash=None,
         banner_hash=None,
         global_name="Padoru",
