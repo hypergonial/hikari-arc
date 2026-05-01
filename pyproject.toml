@@ -11,7 +11,6 @@ classifiers = [
     "Framework :: AsyncIO",
     "Intended Audience :: Developers",
     "Natural Language :: English",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
@@ -22,12 +21,12 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Application Frameworks",
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
-requires-python = ">=3.10"
-dependencies = ["alluka>=0.3.3,<0.4", "attrs>=25.3.0", "hikari>=2.3.3"]
+requires-python = ">=3.11"
+dependencies = ["alluka>=0.3.3,<0.4", "attrs>=25.3.0", "hikari>=2.5.0"]
 
 [project.optional-dependencies]
 cron = ["croniter==5.0.1", "types-croniter==5.0.1.20241205"]
-rest = ["hikari[server]>=2.3.3"]
+rest = ["hikari[server]>=2.5.0"]
 
 [dependency-groups]
 dev = [
@@ -60,7 +59,7 @@ Changelog = "https://arc.hypergonial.com/changelog/"
 [tool.ruff]
 exclude = ["examples", "docs", "build"]
 line-length = 120
-target-version = "py310"
+target-version = "py311"
 
 [tool.ruff.lint]
 select = [
@@ -104,10 +103,10 @@ exclude-classes = ":.*(Exception|Error|Proto|AutocompleteData)"
 ignore_errors = true
 
 [tool.uv]
-required-version = "~=0.6"
+required-version = "~=0.11"
 
 [tool.pyright]
-pythonVersion = "3.10"
+pythonVersion = "3.11"
 typeCheckingMode = "strict"
 reportPrivateUsage = false
 reportMissingTypeStubs = true
@@ -125,10 +124,6 @@ artifacts = ["pyproject.toml", "README.md", "LICENSE"]
 [tool.hatch.version]
 path = "arc/internal/about.py"
 pattern = '__version__: t\.Final\[str\] = \"(?P<version>[^\"]+)\"'
-
-# FIXME: Remove this once hikari 2.2 is out
-[tool.hatch.metadata]
-allow-direct-references = true
 
 [build-system]
 requires = ["hatchling>=1.14"]

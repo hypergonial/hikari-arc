@@ -2,7 +2,7 @@ name: publish
 
 on:
   release:
-    types: [published]
+    types: [ published ]
 
 jobs:
   publish:
@@ -11,9 +11,13 @@ jobs:
       - uses: actions/checkout@v6
       - uses: astral-sh/setup-uv@v7
         with:
-          version: "0.9"
+          version: "0.11"
           python-version: "3.14"
       - name: publish
         run: |
           uv build --no-sources
           uv publish --token ${{ secrets.PYPI_TOKEN }}
+
+  update-docs:
+    needs: publish
+    uses: ./.github/workflows/docs.yml

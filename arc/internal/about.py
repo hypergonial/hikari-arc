@@ -1,6 +1,6 @@
 import typing as t
 
-__version__: t.Final[str] = "2.2.0"
+__version__: t.Final[str] = "2.3.0"
 
 # MIT License
 #
