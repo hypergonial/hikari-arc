@@ -9,6 +9,13 @@ hide:
 
 Here you can find all the changelogs for `hikari-arc`.
 
+## 2.3.0
+
+- Fix `load_extensions_from` incorrectly resolving module names.
+- Raise minimum supported Python version to `3.11+`.
+- Raise minimum supported hikari version to `2.5+`.
+- Update dependencies.
+
 ## 2.2.0
 
 - Add Python 3.14 support.
