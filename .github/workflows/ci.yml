@@ -11,7 +11,7 @@ on:
 jobs:
   formatting:
     runs-on: ubuntu-slim
-    name: "Run ruff via nox"
+    name: "Run ruff"
     steps:
       - uses: actions/checkout@v6
       - name: Install uv
@@ -26,7 +26,7 @@ jobs:
 
   pyright:
     runs-on: ubuntu-latest
-    name: "Run pyright via nox"
+    name: "Run pyright"
     steps:
       - uses: actions/checkout@v6
       - name: Install uv
@@ -41,7 +41,7 @@ jobs:
 
   slotscheck:
     runs-on: ubuntu-latest
-    name: "Run slotscheck via nox"
+    name: "Run slotscheck"
     steps:
       - uses: actions/checkout@v6
       - name: Install uv
@@ -61,7 +61,7 @@ jobs:
         python-version: [ "3.11", "3.12", "3.13", "3.14" ]
       fail-fast: false
 
-    name: Run pytest via nox on Python ${{ matrix.python-version }}
+    name: Run pytest (${{ matrix.python-version }})
     steps:
       - uses: actions/checkout@v6
       - name: Install uv with Python ${{ matrix.python-version }}
