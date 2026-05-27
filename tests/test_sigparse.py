@@ -1,4 +1,6 @@
+import contextlib
 import inspect
+import typing as t
 
 import hikari
 import pytest
@@ -177,6 +179,33 @@ def test_ensure_parse_channel_types_has_every_channel_class() -> None:
 def test_ensure_base_channels_has_every_channel_type() -> None:
     for channel_type in hikari.ChannelType:
         assert channel_type in BASE_CHANNEL_TYPE_MAP.values()
+
+
+type_statement_command: t.Callable[t.Concatenate[arc.GatewayContext, ...], t.Awaitable[None]] | None = None
+
+with contextlib.suppress(SyntaxError):
+    exec("""
+type FooOption = arc.Option[str, arc.StrParams("foo")]
+
+async def type_statement_command(
+    ctx: arc.GatewayContext,
+    a: FooOption = "bar"
+) -> None:
+    pass
+""")
+
+
+def test_type_statement_annotation() -> None:
+    if type_statement_command is None:
+        pytest.skip("type statement requires Python 3.12 or newer")
+
+    options = parse_command_signature(type_statement_command)
+    assert len(options) == 1
+
+    assert isinstance(options["a"], arc.command.StrOption)
+    assert options["a"].name == "a"
+    assert options["a"].description == "foo"
+    assert not options["a"].is_required
 
 
 # MIT License

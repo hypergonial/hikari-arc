@@ -5,6 +5,11 @@ import sys
 import types
 import typing as t
 
+try:
+    from typing import TypeAliasType  # type: ignore
+except ImportError:
+    TypeAliasType = None
+
 import hikari
 
 from arc.abc.option import OptionParams
@@ -273,6 +278,10 @@ def parse_command_signature(  # noqa: C901
 
     for arg_name, hint in hints.items():
         hint: t.Any
+
+        # Resolve hints defined in type statements (available in Python 3.12+)
+        if TypeAliasType is not None and isinstance(hint, TypeAliasType):
+            hint = hint.__value__
 
         # Ignore non-annotated type hints
         if t.get_origin(hint) is not t.Annotated:
