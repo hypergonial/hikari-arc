@@ -182,7 +182,7 @@ class IntervalLoop(_LoopBase[P]):
             seconds = seconds or 0
             minutes = minutes or 0
             hours = hours or 0
-            days = hours or 0
+            days = days or 0
 
         self._sleep: float = seconds + minutes * 60 + hours * 3600 + days * 24 * 3600
 
@@ -229,7 +229,7 @@ class IntervalLoop(_LoopBase[P]):
             seconds = seconds or 0
             minutes = minutes or 0
             hours = hours or 0
-            days = hours or 0
+            days = days or 0
 
         self._sleep: float = seconds + minutes * 60 + hours * 3600 + days * 24 * 3600
 
