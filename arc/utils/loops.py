@@ -179,12 +179,12 @@ class IntervalLoop(_LoopBase[P]):
         if not seconds and not minutes and not hours and not days:
             raise ValueError("At least one of 'seconds', 'minutes', 'hours' or 'days' must be not None.")
         else:
-            seconds = seconds or 0
-            minutes = minutes or 0
-            hours = hours or 0
-            days = days or 0
+            seconds = seconds or 0.0
+            minutes = minutes or 0.0
+            hours = hours or 0.0
+            days = days or 0.0
 
-        self._sleep: float = seconds + minutes * 60 + hours * 3600 + days * 24 * 3600
+        self._sleep: float = seconds + minutes * 60.0 + hours * 3600.0 + days * 24.0 * 3600.0
 
     def _get_next_run(self) -> float:
         return self._sleep
@@ -226,12 +226,12 @@ class IntervalLoop(_LoopBase[P]):
         if not seconds and not minutes and not hours and not days:
             raise ValueError("At least one of 'seconds', 'minutes', 'hours' or 'days' must be not None.")
         else:
-            seconds = seconds or 0
-            minutes = minutes or 0
-            hours = hours or 0
-            days = days or 0
+            seconds = seconds or 0.0
+            minutes = minutes or 0.0
+            hours = hours or 0.0
+            days = days or 0.0
 
-        self._sleep: float = seconds + minutes * 60 + hours * 3600 + days * 24 * 3600
+        self._sleep = seconds + minutes * 60.0 + hours * 3600.0 + days * 24.0 * 3600.0
 
 
 class CronLoop(_LoopBase[P]):
