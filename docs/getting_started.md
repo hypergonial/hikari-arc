@@ -51,7 +51,7 @@ To make sure `arc` installed correctly, run the following command:
 If successful, it should output basic information about the library.
 
 !!! note
-    Please note that `arc` requires a Python version of **at least 3.10**.
+    Please note that `arc` requires a Python version of **at least 3.11**.
 
 ## Setting up a Discord Bot
 

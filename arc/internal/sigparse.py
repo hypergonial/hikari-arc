@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import inspect
-import sys
 import types
 import typing as t
 
@@ -148,16 +147,6 @@ def _is_union(hint: t.Any) -> bool:
     return t.get_origin(hint) is t.Union or t.get_origin(hint) is types.UnionType
 
 
-def _is_optional_union(hint: t.Any) -> bool:
-    """Return True if the type hint is a typing.Union[T, None], also known as typing.Optional[T]."""
-    return t.get_origin(hint) is t.Union and len(t.get_args(hint)) == 2 and type(None) in t.get_args(hint)
-
-
-def _extract_optional_type(hint: t.Any) -> type[t.Any]:
-    """Convert typing.Optional[T] to T."""
-    return next(arg for arg in t.get_args(hint) if arg is not type(None))
-
-
 def _is_mentionable_union(hint: t.Any) -> bool:
     """Check if a type hint is a union that represents a MentionableOption.
 
@@ -236,7 +225,7 @@ def _parse_channel_union_type_hint(hint: t.Any) -> list[hikari.ChannelType]:
     return _channels_to_channel_types(arg for arg in args if arg is not type(None))
 
 
-def parse_command_signature(  # noqa: C901
+def parse_command_signature(
     func: t.Callable[t.Concatenate[Context[ClientT], ...], t.Awaitable[None]],
 ) -> dict[str, CommandOptionBase[t.Any, t.Any, t.Any]]:
     """Parse a command callback function's signature and return a list of options.
@@ -276,16 +265,7 @@ def parse_command_signature(  # noqa: C901
 
         # Ignore non-annotated type hints
         if t.get_origin(hint) is not t.Annotated:
-            # Python 3.10 has this funny behaviour where if you default a parameter to `None`,
-            # it will automatically wrap it in `typing.Optional` because fuck you.
-            # So we will just get the value out of the Optional if it is in one
-            if tuple(sys.version_info)[:2] == (3, 10) and _is_optional_union(hint):
-                hint = _extract_optional_type(hint)
-
-                if t.get_origin(hint) is not t.Annotated:
-                    continue
-            else:
-                continue
+            continue
 
         if len(hint.__metadata__) != 1:
             continue

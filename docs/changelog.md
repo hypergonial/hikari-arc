@@ -14,6 +14,7 @@ Here you can find all the changelogs for `hikari-arc`.
 - Fix `load_extensions_from` incorrectly resolving module names.
 - Raise minimum supported Python version to `3.11+`.
 - Raise minimum supported hikari version to `2.5+`.
+- Bump `alluka` to `0.4+`.
 - Update dependencies.
 
 ## 2.2.0
