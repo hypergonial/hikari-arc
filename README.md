@@ -36,7 +36,7 @@ py -m arc
 ```
 
 > [!NOTE]
-> `hikari-arc` requires a Python version of *at least* 3.10.
+> `hikari-arc` requires a Python version of *at least* 3.11.
 
 If you're just getting started, you may also use the [template repository](https://github.com/hypergonial/arc-template) to get started with.
 
