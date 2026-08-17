@@ -11,6 +11,7 @@ Here you can find all the changelogs for `hikari-arc`.
 
 ## Unreleased
 
+- Fix hours also setting days in `IntervalLoop`.
 - Bump `alluka` to `0.4+`.
 
 ## 2.3.0
