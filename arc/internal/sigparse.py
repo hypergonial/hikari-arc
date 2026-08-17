@@ -4,6 +4,11 @@ import inspect
 import types
 import typing as t
 
+try:
+    from typing import TypeAliasType  # type: ignore
+except ImportError:
+    TypeAliasType = None
+
 import hikari
 
 from arc.abc.option import OptionParams
@@ -225,7 +230,7 @@ def _parse_channel_union_type_hint(hint: t.Any) -> list[hikari.ChannelType]:
     return _channels_to_channel_types(arg for arg in args if arg is not type(None))
 
 
-def parse_command_signature(
+def parse_command_signature(  # noqa: C901
     func: t.Callable[t.Concatenate[Context[ClientT], ...], t.Awaitable[None]],
 ) -> dict[str, CommandOptionBase[t.Any, t.Any, t.Any]]:
     """Parse a command callback function's signature and return a list of options.
@@ -262,6 +267,10 @@ def parse_command_signature(
 
     for arg_name, hint in hints.items():
         hint: t.Any
+
+        # Resolve hints defined in type statements (available in Python 3.12+)
+        if TypeAliasType is not None and isinstance(hint, TypeAliasType):
+            hint = hint.__value__
 
         # Ignore non-annotated type hints
         if t.get_origin(hint) is not t.Annotated:

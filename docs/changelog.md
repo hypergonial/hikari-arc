@@ -11,6 +11,7 @@ Here you can find all the changelogs for `hikari-arc`.
 
 ## Unreleased
 
+- Add support for using Python 3.12+ `type` aliases as option types.
 - Fix hours also setting days in `IntervalLoop`.
 - Bump `alluka` to `0.4+`.
 
