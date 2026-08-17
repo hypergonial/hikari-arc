@@ -230,7 +230,7 @@ def _parse_channel_union_type_hint(hint: t.Any) -> list[hikari.ChannelType]:
     return _channels_to_channel_types(arg for arg in args if arg is not type(None))
 
 
-def parse_command_signature(
+def parse_command_signature( # noqa: C901
     func: t.Callable[t.Concatenate[Context[ClientT], ...], t.Awaitable[None]],
 ) -> dict[str, CommandOptionBase[t.Any, t.Any, t.Any]]:
     """Parse a command callback function's signature and return a list of options.
