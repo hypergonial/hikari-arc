@@ -9,6 +9,10 @@ hide:
 
 Here you can find all the changelogs for `hikari-arc`.
 
+## Unreleased
+
+- Bump `alluka` to `0.4+`.
+
 ## 2.3.0
 
 - Fix `load_extensions_from` incorrectly resolving module names.

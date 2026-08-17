@@ -322,7 +322,7 @@ Instead, you can alias `list[dict[str, set[int]]]` to a nicer name you can actua
     ```
 
 
-=== "Python 3.10 & 3.11"
+=== "Python 3.11"
 
     Simply assign the type to a new variable to create an alias:
 
