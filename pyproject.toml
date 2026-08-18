@@ -22,7 +22,7 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 requires-python = ">=3.11"
-dependencies = ["alluka>=0.4,<0.5", "attrs>=25.1", "hikari>=2.5.0"]
+dependencies = ["alluka>=0.4,<0.5", "attrs>=25.3", "hikari>=2.5.0"]
 
 [project.optional-dependencies]
 cron = ["croniter==6.2.4", "types-croniter==6.2.4.20260711"]

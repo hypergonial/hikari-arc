@@ -840,7 +840,7 @@ docs = [
 [package.metadata]
 requires-dist = [
     { name = "alluka", specifier = ">=0.4,<0.5" },
-    { name = "attrs", specifier = ">=25.1" },
+    { name = "attrs", specifier = ">=25.3" },
     { name = "croniter", marker = "extra == 'cron'", specifier = "==6.2.4" },
     { name = "hikari", specifier = ">=2.5.0" },
     { name = "hikari", extras = ["server"], marker = "extra == 'rest'", specifier = ">=2.5.0" },
