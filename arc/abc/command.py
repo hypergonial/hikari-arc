@@ -130,7 +130,7 @@ class CallableCommandProto(CommandProto, t.Protocol[ClientT]):
     @abc.abstractmethod
     async def invoke(
         self, interaction: hikari.CommandInteraction, *args: t.Any, **kwargs: t.Any
-    ) -> None | asyncio.Future[ResponseBuilderT]:
+    ) -> asyncio.Future[ResponseBuilderT] | None:
         """Invoke this command with the given context.
 
         Parameters
@@ -501,7 +501,7 @@ class CommandBase(
     @abc.abstractmethod
     async def invoke(
         self, interaction: hikari.CommandInteraction, *args: t.Any, **kwargs: t.Any
-    ) -> None | asyncio.Future[ResponseBuilderT]:
+    ) -> asyncio.Future[ResponseBuilderT] | None:
         """Invoke this command with the given interaction.
 
         Parameters
@@ -676,7 +676,7 @@ class CallableCommandBase(CommandBase[ClientT, BuilderT], CallableCommandProto[C
 
     async def invoke(
         self, interaction: hikari.CommandInteraction, *args: t.Any, **kwargs: t.Any
-    ) -> None | asyncio.Future[ResponseBuilderT]:
+    ) -> asyncio.Future[ResponseBuilderT] | None:
         ctx = self._get_context(interaction, self)
         if self.autodefer.should_autodefer:
             ctx._start_autodefer(self.autodefer)
