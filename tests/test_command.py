@@ -135,6 +135,7 @@ def build_inter(
         resolved=resolved,
         type=hikari.InteractionType.APPLICATION_COMMAND,
         token="padoru padoru",
+        attachment_size_limit=8_000_000,
         version=1,
         channel=hikari.InteractionChannel(
             app=app,

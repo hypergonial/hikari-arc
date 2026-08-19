@@ -9,6 +9,10 @@ hide:
 
 Here you can find all the changelogs for `hikari-arc`.
 
+## 2.3.2
+
+- Bump `hikari` to `v2.6+`.
+
 ## 2.3.1
 
 - Add support for using Python 3.12+ `type` aliases as option types.
